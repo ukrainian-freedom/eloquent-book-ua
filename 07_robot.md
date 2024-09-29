@@ -1,48 +1,48 @@
-{{meta {load_files: ["code/chapter/07_robot.js", "code/animatevillage.js"], zip: html}}}
+{{meta {load_files: [«code/chapter/07_robot.js», «code/animatevillage.js»], zip: html}}}}
 
-# Project: A Robot
+# Проект: Робот
 
-{{quote {author: "Edsger Dijkstra", title: "The Threats to Computing Science", chapter: true}
+{{quote {author: «Edsger Dijkstra», title: 
 
-The question of whether Machines Can Think [...] is about as relevant as the question of whether Submarines Can Swim.
+Питання про те, чи можуть машини мислити [...] є настільки ж актуальним, як і питання про те, чи можуть підводні човни плавати.
 
 quote}}
 
-{{index "artificial intelligence", "Dijkstra, Edsger"}}
+{{index «artificial intelligence», «Dijkstra, Edsger»}}
 
-{{figure {url: "img/chapter_picture_7.jpg", alt: "Illustration of a robot holding a stack of packages", chapter: framed}}}
+{{figure {url: «img/chapter_picture_7.jpg», alt: «Ілюстрація робота, що тримає стос пакунків», “chapter”: “framed” }}}
 
-{{index "project chapter", "reading code", "writing code"}}
+{{index «глава проекту», «читання коду», «запис коду»}}
 
-In "project" chapters, I'll stop pummeling you with new theory for a brief moment, and instead we'll work through a program together. Theory is necessary to learn to program, but reading and understanding actual programs is just as important.
+У «проектних» розділах я ненадовго припиню засипати вас новою теорією, і натомість ми разом працюватимемо над програмою. Теорія необхідна для того, щоб навчитися програмувати, але читати і розуміти реальні програми не менш важливо.
 
-Our project in this chapter is to build an ((automaton)), a little program that performs a task in a ((virtual world)). Our automaton will be a mail-delivery ((robot)) picking up and dropping off parcels.
+Нашим завданням у цій главі є створення ((автомата)), маленької програми, яка виконує завдання у ((віртуальному світі)). Наш автомат буде поштовим ((роботом)), який забиратиме та розноситиме посилки.
 
-## Meadowfield
+## Медоуфілд
 
-{{index "roads array"}}
+{{index «roads array»}}
 
-The village of ((Meadowfield)) isn't very big. It consists of 11 places with 14 roads between them. It can be described with this array of roads:
+Село ((Meadowfield)) не дуже велике. Воно складається з 11 населених пунктів, між якими прокладено 14 доріг. Його можна описати за допомогою цього масиву доріг:
 
 ```{includeCode: true}
 const roads = [
-  "Alice's House-Bob's House",   "Alice's House-Cabin",
-  "Alice's House-Post Office",   "Bob's House-Town Hall",
-  "Daria's House-Ernie's House", "Daria's House-Town Hall",
-  "Ernie's House-Grete's House", "Grete's House-Farm",
-  "Grete's House-Shop",          "Marketplace-Farm",
-  "Marketplace-Post Office",     "Marketplace-Shop",
-  "Marketplace-Town Hall",       "Shop-Town Hall"
+  «Будинок Аліси - Будинок Боба», “Будинок Аліси - Хатина”,
+  «Будинок Аліси-Пошта», “Будинок Боба-Ратуша”,
+  «Будинок Дарини - будинок Ерні», “Будинок Дарини - ратуша”,
+  «Будинок Ерні - будинок Грети», “Будинок Грети - ферма”,
+  «Будинок Грети - магазин», “Ринок - ферма”,
+  «Ринок-пошта», “Ринок-магазин”,
+  «Ринок-ратуша», »Магазин-ратуша»
 ];
 ```
 
-{{figure {url: "img/village2x.png", alt: "Pixel art illustration of a small village with 11 locations, labeled with letters, and roads going being them"}}}
+{{figure {url: «img/village2x.png», alt: «Піксельна ілюстрація невеликого села з 11 локаціями, позначеними літерами, та дорогами, що ведуть до них"}}}.
 
-The network of roads in the village forms a _((graph))_. A graph is a collection of points (places in the village) with lines between them (roads). This graph will be the world that our robot moves through.
+Мережа доріг у селі утворює _((граф))_. Граф - це сукупність точок (місць у селі) з лініями між ними (дорогами). Цей граф і буде світом, яким рухається наш робот.
 
-{{index "roadGraph object"}}
+{{index «roadGraph object»}}
 
-The array of strings isn't very easy to work with. What we're interested in is the destinations that we can reach from a given place. Let's convert the list of roads to a data structure that, for each place, tells us what can be reached from there.
+З масивом рядків не дуже зручно працювати. Нас цікавлять пункти призначення, до яких ми можемо дістатися з даного місця. Давайте перетворимо список доріг у структуру даних, яка для кожного місця покаже, куди можна дістатися з нього.
 
 ```{includeCode: true}
 function buildGraph(edges) {
@@ -54,43 +54,43 @@ function buildGraph(edges) {
       graph[from] = [to];
     }
   }
-  for (let [from, to] of edges.map(r => r.split("-"))) {
+  for (let [from, to] of edges.map(r => r.split(«-»)) {
     addEdge(from, to);
     addEdge(to, from);
   }
-  return graph;
+  return граф;
 }
 
 const roadGraph = buildGraph(roads);
 ```
 
-{{index "split method"}}
+{{index «split method»}}
 
-Given an array of edges, `buildGraph` creates a map object that, for each node, stores an array of connected nodes. It uses the `split` method to go from the road strings—which have the form `"Start-End"`)—to two-element arrays containing the start and end as separate strings.
+Отримавши масив ребер, `buildGraph` створює об'єкт карти, який для кожної вершини зберігає масив з'єднаних вершин. Він використовує метод `split` для переходу від рядків доріг, які мають вигляд `«Початок-Кінець»`), до двоелементних масивів, що містять початок і кінець як окремі рядки.
 
-## The task
+## Задача
 
-Our ((robot)) will be moving around the village. There are parcels in various places, each addressed to some other place. The robot picks up parcels when it comes across them and delivers them when it arrives at their destinations.
+Наш ((робот)) буде пересуватись по селу. У різних місцях розкладено посилки, кожна з яких адресована у певне місце. Робот забирає посилки, коли натрапляє на них, і доставляє їх, коли прибуває до місця призначення.
 
-The automaton must decide, at each point, where to go next. It has finished its task when all parcels have been delivered.
+У кожній точці автомат повинен вирішити, куди їхати далі. Він завершить свою роботу, коли всі посилки будуть доставлені.
 
-{{index simulation, "virtual world"}}
+{{індекс симуляції, «віртуальний світ»}}
 
-To be able to simulate this process, we must define a virtual world that can describe it. This model tells us where the robot is and where the parcels are. When the robot has decided to move somewhere, we need to update the model to reflect the new situation.
+Щоб змоделювати цей процес, ми повинні визначити віртуальний світ, який може його описати. Ця модель показує нам, де знаходиться робот і де знаходяться посилки. Коли робот вирішив кудись переїхати, нам потрібно оновити модель, щоб відобразити нову ситуацію.
 
-{{index [state, in objects]}}
+{{індекс [стан, в об'єктах]}}
 
-If you're thinking in terms of ((object-oriented programming)), your first impulse might be to start defining objects for the various elements in the world: a ((class)) for the robot, one for a parcel, maybe one for places. These could then hold properties that describe their current ((state)), such as the pile of parcels at a location, which we could change when updating the world.
+Якщо ви мислите в термінах ((об'єктно-орієнтованого програмування)), вашим першим імпульсом може бути почати визначати об'єкти для різних елементів світу: один ((клас)) для робота, один для посилки, можливо, один для місця. Ці об'єкти можуть мати властивості, які описують їх поточний ((стан)), наприклад, купу посилок у певному місці, які ми можемо змінювати при оновленні світу.
 
-This is wrong. At least, it usually is. The fact that something sounds like an object does not automatically mean that it should be an object in your program. Reflexively writing classes for every concept in your application tends to leave you with a collection of interconnected objects that each have their own internal, changing state. Such programs are often hard to understand and thus easy to break.
+Це неправильно. Принаймні, зазвичай так і є. Той факт, що щось звучить як об'єкт, не означає автоматично, що це має бути об'єктом у вашій програмі. Рефлекторне написання класів для кожного поняття у вашій програмі, як правило, призводить до того, що ви отримуєте набір взаємопов'язаних об'єктів, кожен з яких має свій власний внутрішній стан, що змінюється. Такі програми часто важко зрозуміти, а отже, їх легко зламати.
 
-{{index [state, in objects]}}
+{{index [стан, в об'єктах]}}
 
-Instead, let's condense the village's state down to the minimal set of values that define it. There's the robot's current location and the collection of undelivered parcels, each of which has a current location and a destination address. That's it.
+Натомість давайте зведемо стан села до мінімального набору значень, які його визначають. Це поточне місцезнаходження робота та колекція недоставлених посилок, кожна з яких має поточне місцезнаходження та адресу призначення. Це все.
 
-{{index "VillageState class", "persistent data structure"}}
+{{index «VillageState class», «persistent data structure»}}
 
-While we're at it, let's make it so that we don't _change_ this state when the robot moves but rather compute a _new_ state for the situation after the move.
+Давайте зробимо так, щоб ми не _змінювали_ цей стан, коли робот рухається, а обчислювали _новий_ стан для ситуації після переміщення.
 
 ```{includeCode: true}
 class VillageState {
@@ -101,50 +101,50 @@ class VillageState {
 
   move(destination) {
     if (!roadGraph[this.place].includes(destination)) {
-      return this;
+      повернути this;
     } else {
       let parcels = this.parcels.map(p => {
         if (p.place != this.place) return p;
-        return {place: destination, address: p.address};
+        return { місце: пункт призначення, адреса: p.адреса};
       }).filter(p => p.place != p.address);
-      return new VillageState(destination, parcels);
+      return new VillageState(пункт призначення, посилки);
     }
   }
 }
 ```
 
-The `move` method is where the action happens. It first checks whether there is a road going from the current place to the destination, and if not, it returns the old state, since this is not a valid move.
+Метод `move` - це місце, де відбувається дія. Спочатку він перевіряє, чи існує дорога, яка веде з поточного місця до місця призначення, і якщо ні, то повертає старий стан, оскільки це не є дійсним переміщенням.
 
-{{index "map method", "filter method"}}
+{{index «map method», «filter method»}}
 
-Next, the method creates a new state with the destination as the robot's new place. It also needs to create a new set of parcels—parcels that the robot is carrying (that are at the robot's current place) need to be moved along to the new place. And parcels that are addressed to the new place need to be delivered—that is, they need to be removed from the set of undelivered parcels. The call to `map` takes care of the moving, and the call to `filter` does the delivering.
+Далі метод створює новий стан з пунктом призначення як новим місцем перебування робота. Він також повинен створити новий набір посилок - посилки, які робот перевозить (які знаходяться у поточному місці робота), повинні бути переміщені до нового місця. А посилки, адресовані на нове місце, потрібно доставити - тобто, видалити їх з набору недоставлених посилок. Виклик `map` відповідає за переміщення, а виклик `filter` - за доставку.
 
-Parcel objects aren't changed when they are moved but re-created. The `move` method gives us a new village state but leaves the old one entirely intact.
+При переміщенні об'єкти посилок не змінюються, а створюються заново. Метод `move` дає нам новий стан села, але залишає старий повністю недоторканим.
 
 ```
 let first = new VillageState(
-  "Post Office",
-  [{place: "Post Office", address: "Alice's House"}]
+  «Пошта»,
+  [{місце: «Поштове відділення», адреса: «Будинок Аліси»}]
 );
-let next = first.move("Alice's House");
+let next = first.move(«Alice's House»);
 
 console.log(next.place);
-// → Alice's House
+// → Будинок Аліси
 console.log(next.parcels);
 // → []
 console.log(first.place);
-// → Post Office
+// → Пошта
 ```
 
-The move causes the parcel to be delivered, which is reflected in the next state. But the initial state still describes the situation where the robot is at the post office and the parcel is undelivered.
+Переміщення призводить до доставки посилки, що відображається у наступному стані. Але початковий стан все ще описує ситуацію, коли робот знаходиться на пошті, а посилка не доставлена.
 
-## Persistent data
+## Постійні дані
 
-{{index "persistent data structure", mutability, ["data structure", immutable]}}
+{{index «persistent data structure», mutability, [«data structure», immutable]}}
 
-Data structures that don't change are called _((immutable))_ or _persistent_. They behave a lot like strings and numbers in that they are who they are and stay that way, rather than containing different things at different times.
+Структури даних, які не змінюються, називаються _((незмінними))_ або _постійними_. Вони поводяться подібно до рядків і чисел, оскільки вони є тим, чим вони є, і залишаються такими, а не містять різні речі в різний час.
 
-In JavaScript, just about everything _can_ be changed, so working with values that are supposed to be persistent requires some restraint. There is a function called `Object.freeze` that changes an object so that writing to its properties is ignored. You could use that to make sure your objects aren't changed, if you want to be careful. Freezing does require the computer to do some extra work, and having updates ignored is just about as likely to confuse someone as having them do the wrong thing. I usually prefer to just tell people that a given object shouldn't be messed with and hope they remember it.
+У JavaScript майже все  можна змінювати, тому робота зі значеннями, які мають бути постійними, вимагає певної стриманості. Існує функція `Object.freeze`, яка змінює об'єкт так, що запис до його властивостей ігнорується. Ви можете скористатися нею, щоб переконатися, що ваші об'єкти не буде змінено, якщо ви хочете бути обережними. Заморожування вимагає від комп'ютера додаткової роботи, а ігнорування оновлень може заплутати когось з такою ж ймовірністю, як і неправильні дії. Зазвичай я вважаю за краще просто сказати людям, що з певним об'єктом не варто жартувати, і сподіваюся, що вони це запам'ятають.
 
 ```
 let object = Object.freeze({value: 5});
@@ -153,44 +153,44 @@ console.log(object.value);
 // → 5
 ```
 
-Why am I going out of my way to not change objects when the language is obviously expecting me to? Because it helps me understand my programs. This is about complexity management again. When the objects in my system are fixed, stable things, I can consider operations on them in isolation—moving to Alice's house from a given start state always produces the same new state. When objects change over time, that adds a whole new dimension of complexity to this kind of reasoning.
+Чому я намагаюся не змінювати об'єкти, коли мова явно очікує, що я це зроблю? Тому що це допомагає мені розуміти мої програми. Це знову про управління складністю. Коли об'єкти в моїй системі є фіксованими, стабільними речами, я можу розглядати операції над ними ізольовано - переміщення до будинку Аліси з заданого початкового стану завжди призводить до того ж самого нового стану. Коли об'єкти змінюються з часом, це додає цілий новий вимір складності до такого роду міркувань.
 
-For a small system like the one we are building in this chapter, we could handle that bit of extra complexity. But the most important limit on what kind of systems we can build is how much we can understand. Anything that makes your code easier to understand makes it possible to build a more ambitious system.
+Для невеликої системи, подібної до тієї, яку ми будуємо у цій главі, ми можемо впоратися з цією додатковою складністю. Але найважливішим обмеженням на те, які системи ми можемо створювати, є те, наскільки багато ми можемо зрозуміти. Все, що робить ваш код простішим для розуміння, дає можливість побудувати більш амбітну систему.
 
-Unfortunately, although understanding a system built on persistent data structures is easier, _designing_ one, especially when your programming language isn't helping, can be a little harder. We'll look for opportunities to use persistent data structures in this book, but we'll also be using changeable ones.
+На жаль, хоча зрозуміти систему, побудовану на постійних структурах даних, простіше, «спроектувати» її, особливо коли ваша мова програмування не допомагає, може бути трохи складніше. У цій книзі ми будемо шукати можливості для використання постійних структур даних, але також будемо використовувати і змінні.
 
-## Simulation
+## Моделювання
 
-{{index simulation, "virtual world"}}
+{{index simulation, «virtual world»}}
 
-A delivery ((robot)) looks at the world and decides in which direction it wants to move. So we could say that a robot is a function that takes a `VillageState` object and returns the name of a nearby place.
+Кур'єр ((робот)) дивиться на світ і вирішує, у якому напрямку він хоче рухатися. Можна сказати, що робот - це функція, яка отримує об'єкт `VillageState` і повертає назву найближчого населеного пункту.
 
-{{index "runRobot function"}}
+{{index «runRobot function»}}
 
-Because we want robots to be able to remember things so they can make and execute plans, we also pass them their memory and allow them to return a new memory. Thus, the thing a robot returns is an object containing both the direction it wants to move in and a memory value that will be given back to it the next time it is called.
+Оскільки ми хочемо, щоб роботи могли запам'ятовувати речі, щоб вони могли складати і виконувати плани, ми також передаємо їм їхню пам'ять і дозволяємо їм повертати нову пам'ять. Таким чином, робот повертає об'єкт, який містить як напрямок, у якому він хоче рухатися, так і значення пам'яті, яке буде повернуто йому при наступному виклику.
 
 ```{includeCode: true}
 function runRobot(state, robot, memory) {
   for (let turn = 0;; turn++) {
     if (state.parcels.length == 0) {
-      console.log(`Done in ${turn} turns`);
+      console.log(`Зроблено за ${turn} ходів`);
       break;
     }
     let action = robot(state, memory);
     state = state.move(action.direction);
     memory = action.memory;
-    console.log(`Moved to ${action.direction}`);
+    console.log(`Переміщено у ${action.direction}`);
   }
 }
 ```
 
-Consider what a robot has to do to "solve" a given state. It must pick up all parcels by visiting every location that has a parcel and deliver them by visiting every location to which a parcel is addressed, but only after picking up the parcel.
+Розглянемо, що повинен зробити робот, щоб «вирішити» заданий стан. Він повинен забрати всі посилки, відвідавши кожне місце, де є посилка, і доставити їх, відвідавши кожне місце, куди адресовано посилку, але тільки після того, як забере посилку.
 
-What is the dumbest strategy that could possibly work? The robot could just walk in a random direction every turn. That means, with great likelihood, it will eventually run into all parcels and then also at some point reach the place where they should be delivered.
+Яка найбезглуздіша стратегія може спрацювати? Робот може просто йти у випадковому напрямку на кожному кроці. Це означає, що з великою ймовірністю він натрапить на всі посилки, а потім також в якийсь момент досягне місця, куди їх потрібно доставити.
 
-{{index "randomPick function", "randomRobot function"}}
+{{index «randomPick function», «randomRobot function»}}
 
-Here's what that could look like:
+Ось як це може виглядати:
 
 ```{includeCode: true}
 function randomPick(array) {
@@ -203,13 +203,13 @@ function randomRobot(state) {
 }
 ```
 
-{{index "Math.random function", "Math.floor function", [array, "random element"]}}
+{{index «Math.random function», «Math.floor function», [array, «random element»]}}
 
-Remember that `Math.random()` returns a number between 0 and 1—but always below 1. Multiplying such a number by the length of an array and then applying `Math.floor` to it gives us a random index for the array.
+Пам'ятайте, що `Math.random()` повертає число від 0 до 1 - але завжди менше 1. Помноживши це число на довжину масиву, а потім застосувавши до нього `Math.floor`, ми отримаємо випадковий індекс масиву.
 
-Since this robot does not need to remember anything, it ignores its second argument (remember that JavaScript functions can be called with extra arguments without ill effects) and omits the `memory` property in its returned object.
+Оскільки цьому роботу не потрібно нічого запам'ятовувати, він ігнорує свій другий аргумент (пам'ятайте, що функції JavaScript можна викликати з додатковими аргументами без будь-яких негативних наслідків) і опускає властивість `memory` в об'єкті, що повертається.
 
-To put this sophisticated robot to work, we'll first need a way to create a new state with some parcels. A static method (written here by directly adding a property to the constructor) is a good place to put that functionality.
+Щоб змусити цього складного робота працювати, нам спочатку потрібен спосіб створення нового стану з деякими посилками. Статичний метод (написаний тут шляхом безпосереднього додавання властивості до конструктора) є гарним місцем для розміщення цієї функціональності.
 
 ```{includeCode: true}
 VillageState.random = function(parcelCount = 5) {
@@ -222,56 +222,56 @@ VillageState.random = function(parcelCount = 5) {
     } while (place == address);
     parcels.push({place, address});
   }
-  return new VillageState("Post Office", parcels);
+  return new VillageState(«Пошта», parcels);
 };
 ```
 
-{{index "do loop"}}
+{{index «do loop»}}
 
-We don't want any parcels to be sent from the same place that they are addressed to. For this reason, the `do` loop keeps picking new places when it gets one that's equal to the address.
+Ми не хочемо, щоб посилки відправлялися з того ж місця, куди вони були адресовані. З цієї причини цикл `do` продовжує вибирати нові місця, коли він отримує місце, яке дорівнює адресі.
 
-Let's start up a virtual world.
+Запустимо віртуальний світ.
 
 ```{test: no}
 runRobot(VillageState.random(), randomRobot);
-// → Moved to Marketplace
-// → Moved to Town Hall
-// → …
-// → Done in 63 turns
+// → Перемістився на Ринок
+// → Переїхали до Ратуші
+// → ...
+// → Виконано за 63 ходи
 ```
 
-It takes the robot a lot of turns to deliver the parcels because it isn't planning ahead very well. We'll address that soon.
+Роботу потрібно багато ходів, щоб доставити посилки, тому що він не дуже добре планує наперед. Ми скоро це виправимо.
 
-{{if interactive
+{{якщо інтерактивно
 
-For a more pleasant perspective on the simulation, you can use the `runRobotAnimation` function that's available in [this chapter's programming environment](https://eloquentjavascript.net/code/#7). This runs the simulation, but instead of outputting text, it shows you the robot moving around the village map.
+Для більш приємного перегляду симуляції ви можете скористатися функцією `runRobotAnimation`, яка доступна у середовищі програмування [цієї глави](https://eloquentjavascript.net/code/#7). Вона запускає симуляцію, але замість виведення тексту показує вам робота, який рухається мапою села.
 
 ```{test: no}
 runRobotAnimation(VillageState.random(), randomRobot);
 ```
 
-The way `runRobotAnimation` is implemented will remain a mystery for now, but after you've read the [later chapters](dom) of this book, which discuss JavaScript integration in web browsers, you'll be able to guess how it works.
+Спосіб реалізації `runRobotAnimation` поки що залишиться загадкою, але після того, як ви прочитаєте [наступні розділи](dom) цієї книги, у яких обговорюється інтеграція JavaScript у веб-браузери, ви зможете здогадатися, як це працює.
 
 if}}
 
-## The mail truck's route
+## Маршрут поштової машини
 
-{{index "mailRoute array"}}
+{{index «mailRoute array»}}
 
-We should be able to do a lot better than the random ((robot)). An easy improvement would be to take a hint from the way real-world mail delivery works. If we find a route that passes all places in the village, the robot could run that route twice, at which point it is guaranteed to be done. Here is one such route (starting from the post office):
+Ми можемо зробити набагато краще, ніж випадковий ((робот)). Простим покращенням може бути використання підказки з того, як працює доставка пошти у реальному світі. Якщо ми знайдемо маршрут, який проходить через усі місця у селі, то робот може проїхати цим маршрутом двічі, і тоді він гарантовано буде доставлений. Ось один з таких маршрутів (починається від поштового відділення):
 
 ```{includeCode: true}
 const mailRoute = [
-  "Alice's House", "Cabin", "Alice's House", "Bob's House",
-  "Town Hall", "Daria's House", "Ernie's House",
-  "Grete's House", "Shop", "Grete's House", "Farm",
-  "Marketplace", "Post Office"
+  «Будинок Аліси», “Хатина”, “Будинок Аліси”, “Будинок Боба”,
+  «Ратуша», “Дім Дарини”, “Дім Ерні”,
+  «Будинок Грети», “Магазин”, “Будинок Грети”, “Ферма”,
+  «Ринок», »Пошта»
 ];
 ```
 
-{{index "routeRobot function"}}
+{{index «routeRobot function»}}
 
-To implement the route-following robot, we'll need to make use of robot memory. The robot keeps the rest of its route in its memory and drops the first element every turn.
+Для реалізації робота, що слідує за маршрутом, нам знадобиться пам'ять робота. Робот зберігає решту маршруту у своїй пам'яті і скидає перший елемент на кожному кроці.
 
 ```{includeCode: true}
 function routeRobot(state, memory) {
@@ -282,9 +282,9 @@ function routeRobot(state, memory) {
 }
 ```
 
-This robot is a lot faster already. It'll take a maximum of 26 turns (twice the 13-step route) but usually less.
+Цей робот вже набагато швидший. Він зробить максимум 26 поворотів (вдвічі більше, ніж 13-кроковий маршрут), але зазвичай менше.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
 runRobotAnimation(VillageState.random(), routeRobot, []);
@@ -292,25 +292,25 @@ runRobotAnimation(VillageState.random(), routeRobot, []);
 
 if}}
 
-## Pathfinding
+## Пошук шляху
 
-Still, I wouldn't really call blindly following a fixed route intelligent behavior. The ((robot)) could work more efficiently if it adjusted its behavior to the actual work that needs to be done.
+Все ж таки, я б не назвав сліпе слідування за фіксованим маршрутом розумною поведінкою. ((робот)) міг би працювати ефективніше, якби пристосовував свою поведінку до реальної роботи, яку потрібно виконати.
 
-{{index pathfinding}}
+{{індексний пошук шляху}}
 
-To do that, it has to be able to deliberately move toward a given parcel or toward the location where a parcel has to be delivered. Doing that, even when the goal is more than one move away, will require some kind of route-finding function.
+Для цього він повинен мати можливість цілеспрямовано рухатися до певної посилки або до місця, де її потрібно доставити. Для цього, навіть якщо мета знаходиться на відстані більше одного ходу, потрібна певна функція пошуку маршруту.
 
-The problem of finding a route through a ((graph)) is a typical _((search problem))_. We can tell whether a given solution (a route) is valid, but we can't directly compute the solution the way we could for 2 + 2. Instead, we have to keep creating potential solutions until we find one that works.
+Задача пошуку маршруту через ((граф)) є типовою _((задачею пошуку))_. Ми можемо сказати, чи є даний розв'язок (маршрут) допустимим, але ми не можемо безпосередньо обчислити розв'язок так, як ми могли б це зробити для 2 + 2. Замість цього ми повинні продовжувати створювати потенційні рішення, поки не знайдемо те, яке працює.
 
-The  number of possible routes through a graph is infinite. But when searching for a route from _A_ to _B_, we are interested only in the ones that start at _A_. We also don't care about routes that visit the same place twice—those are definitely not the most efficient route anywhere. So that cuts down on the number of routes that the route finder has to consider.
+Кількість можливих маршрутів через граф нескінченна. Але при пошуку маршруту з _A_ в _B_ нас цікавлять лише ті, що починаються в _A_. Нас також не цікавлять маршрути, які двічі проходять через одне й те саме місце - це точно не найефективніший маршрут. Таким чином, ми зменшуємо кількість маршрутів, які має розглянути пошуковик маршрутів.
 
-In fact, since we are mostly interested in the _shortest_ route, we want to make sure we look at short routes before we look at longer ones. A good approach would be to "grow" routes from the starting point, exploring every reachable place that hasn't been visited yet until a route reaches the goal. That way, we'll explore only routes that are potentially interesting, and we know that the first route we find is the shortest route (or one of the shortest routes, if there are more than one).
+Насправді, оскільки нас здебільшого цікавить _найкоротший_ маршрут, ми хочемо переконатися, що ми розглядаємо короткі маршрути перед тим, як шукати довші. Хорошим підходом було б «вирощувати» маршрути від початкової точки, досліджуючи кожне доступне місце, яке ще не було відвідано, доки маршрут не досягне мети. Таким чином, ми досліджуватимемо лише потенційно цікаві маршрути, і ми знаємо, що перший знайдений нами маршрут буде найкоротшим (або одним з найкоротших, якщо їх більше одного).
 
-{{index "findRoute function"}}
+{{index «findRoute function»}}
 
 {{id findRoute}}
 
-Here is a function that does this:
+Ось функція, яка робить це:
 
 ```{includeCode: true}
 function findRoute(graph, from, to) {
@@ -327,20 +327,20 @@ function findRoute(graph, from, to) {
 }
 ```
 
-The exploring has to be done in the right order—the places that were reached first have to be explored first. We can't immediately explore a place as soon as we reach it because that would mean places reached _from there_ would also be explored immediately, and so on, even though there may be other, shorter paths that haven't yet been explored.
+Дослідження має відбуватися у правильному порядку - місця, які були досягнуті першими, мають бути досліджені першими. Ми не можемо одразу досліджувати місце, як тільки його досягнемо, тому що це означатиме, що місця, досягнуті _звідти_, також будуть досліджені одразу, і так далі, хоча можуть існувати інші, коротші шляхи, які ще не були досліджені.
 
-Therefore, the function keeps a _((work list))_. This is an array of places that should be explored next, along with the route that got us there. It starts with just the start position and an empty route.
+Тому функція зберігає _((робочий список))_. Це масив місць, які слід дослідити наступними, разом з маршрутом, який привів нас туди. Пошук починається з початкової позиції і порожнього маршруту.
 
-The search then operates by taking the next item in the list and exploring that, which means it looks at all roads going from that place. If one of them is the goal, a finished route can be returned. Otherwise, if we haven't looked at this place before, a new item is added to the list. If we have looked at it before, since we are looking at short routes first, we've found either a longer route to that place or one precisely as long as the existing one, and we don't need to explore it.
+Потім пошук починається з наступного елемента у списку і досліджує його, тобто переглядає всі дороги, що ведуть з цього місця. Якщо одна з них є метою, можна повернути готовий маршрут. В іншому випадку, якщо ми не дивилися на це місце раніше, до списку додається новий пункт. Якщо ж ми вже переглядали це місце раніше, то, оскільки ми спочатку переглядаємо короткі маршрути, ми знайдемо або довший маршрут до цього місця, або такий самий довгий, як і існуючий, і нам не потрібно буде його досліджувати.
 
-You can visualize this as a web of known routes crawling out from the start location, growing evenly on all sides (but never tangling back into itself). As soon as the first thread reaches the goal location, that thread is traced back to the start, giving us our route.
+Ви можете уявити це як павутину відомих маршрутів, що виповзає з початкової точки, рівномірно розростаючись на всі боки (але ніколи не заплутуючись у собі). Як тільки перша нитка досягає місця призначення, вона повертається назад до старту, даючи нам наш маршрут.
 
-{{index "connected graph"}}
+{{index «connected graph»}}
 
-Our code doesn't handle the situation where there are no more work items on the work list because we know that our graph is _connected_, meaning that every location can be reached from all other locations. We'll always be able to find a route between two points, and the search can't fail.
+Наш код не обробляє ситуацію, коли у списку робіт не залишилося жодної роботи, тому що ми знаємо, що наш граф є _зв'язним_, тобто до кожної локації можна дістатися з усіх інших локацій. Ми завжди зможемо знайти маршрут між двома точками, і пошук не може бути невдалим.
 
 ```{includeCode: true}
-function goalOrientedRobot({place, parcels}, route) {
+function goalOrientedRobot({місце, посилки}, маршрут) {
   if (route.length == 0) {
     let parcel = parcels[0];
     if (parcel.place != place) {
@@ -349,17 +349,17 @@ function goalOrientedRobot({place, parcels}, route) {
       route = findRoute(roadGraph, place, parcel.address);
     }
   }
-  return {direction: route[0], memory: route.slice(1)};
+  return { напрямок: route[0], пам'ять: route.slice(1)};
 }
 ```
 
-{{index "goalOrientedRobot function"}}
+{{index «goalOrientedRobot function»}}
 
-This robot uses its memory value as a list of directions to move in, just like the route-following robot. Whenever that list is empty, it has to figure out what to do next. It takes the first undelivered parcel in the set and, if that parcel hasn't been picked up yet, plots a route toward it. If the parcel _has_ been picked up, it still needs to be delivered, so the robot creates a route toward the delivery address instead.
+Цей робот використовує значення своєї пам'яті як список напрямків для руху, так само як і робот, що слідує за маршрутом. Щоразу, коли цей список порожній, він повинен вирішити, що робити далі. Він бере першу недоставлену посилку в наборі і, якщо її ще не забрали, прокладає маршрут до неї. Якщо ж посилку _забрали_, її все одно потрібно доставити, тому робот прокладає маршрут до адреси доставки.
 
-{{if interactive
+{{якщо інтерактивний
 
-Let's see how it does.
+Давайте подивимося, як це працює.
 
 ```{test: no, startCode: true}
 runRobotAnimation(VillageState.random(),
@@ -368,25 +368,25 @@ runRobotAnimation(VillageState.random(),
 
 if}}
 
-This robot usually finishes the task of delivering 5 parcels in about 16 turns. That's slightly better than `routeRobot` but still definitely not optimal. We'll continue refining it in the exercises.
+Зазвичай цей робот виконує завдання з доставки 5 посилок приблизно за 16 ходів. Це трохи краще, ніж `routeRobot`, але все ще не оптимально. Ми продовжимо вдосконалювати його у вправах.
 
-## Exercises
+## Вправи
 
-### Measuring a robot
+### Вимірювання робота
 
-{{index "measuring a robot (exercise)", testing, automation, "compareRobots function"}}
+{{index «вимірювання робота (вправа)», тестування, автоматизація, «функція compareRobots»}}
 
-It's hard to objectively compare ((robot))s by just letting them solve a few scenarios. Maybe one robot just happened to get easier tasks or the kind of tasks that it is good at, whereas the other didn't.
+Важко об'єктивно порівняти роботів, просто давши їм розв'язати декілька сценаріїв. Можливо, одному з роботів просто пощастило отримати легші завдання або завдання, з якими він добре справляється, а іншому - ні.
 
-Write a function `compareRobots` that takes two robots (and their starting memory). It should generate 100 tasks and let both of the robots solve each of these tasks. When done, it should output the average number of steps each robot took per task.
+Напишіть функцію `compareRobots`, яка бере двох роботів (і їх початкову пам'ять). Вона повинна згенерувати 100 задач і дозволити обом роботам розв'язати кожну з них. Після завершення роботи вона повинна вивести середню кількість кроків, яку зробив кожен робот на кожну задачу.
 
-For the sake of fairness, make sure you give each task to both robots, rather than generating different tasks per robot.
+Заради справедливості, переконайтеся, що ви даєте кожну задачу обом роботам, а не генеруєте різні задачі для кожного робота.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
 function compareRobots(robot1, memory1, robot2, memory2) {
-  // Your code here
+  // Ваш код тут
 }
 
 compareRobots(routeRobot, [], goalOrientedRobot, []);
@@ -395,26 +395,26 @@ if}}
 
 {{hint
 
-{{index "measuring a robot (exercise)", "runRobot function"}}
+{{index «вимірювання робота (вправа)», «функція runRobot»}}
 
-You'll have to write a variant of the `runRobot` function that, instead of logging the events to the console, returns the number of steps the robot took to complete the task.
+Вам доведеться написати варіант функції `runRobot`, який замість того, щоб виводити події на консоль, повертає кількість кроків, зроблених роботом для виконання завдання.
 
-Your measurement function can then, in a loop, generate new states and count the steps each of the robots takes. When it has generated enough measurements, it can use `console.log` to output the average for each robot, which is the total number of steps taken divided by the number of measurements.
+Після цього ваша функція вимірювання може в циклі генерувати нові стани і підраховувати кроки, зроблені кожним з роботів. Коли вона згенерує достатню кількість вимірювань, вона може використовувати `console.log` для виведення середнього значення для кожного робота, яке дорівнює загальній кількості зроблених кроків, поділеній на кількість вимірювань.
 
-hint}}
+підказка}}
 
-### Robot efficiency
+### Ефективність робота
 
-{{index "robot efficiency (exercise)"}}
+{{index «robot efficiency (exercise)»}}
 
-Can you write a robot that finishes the delivery task faster than `goalOrientedRobot`? If you observe that robot's behavior, what obviously stupid things does it do? How could those be improved?
+Чи можете ви написати робота, який виконує завдання доставки швидше, ніж `goalOrientedRobot`? Якщо ви спостерігаєте за поведінкою цього робота, які очевидні дурниці він робить? Як їх можна покращити?
 
-If you solved the previous exercise, you might want to use your `compareRobots` function to verify whether you improved the robot.
+Якщо ви виконали попередню вправу, ви можете скористатися функцією `compareRobots`, щоб перевірити, чи покращили ви робота.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
-// Your code here
+// Ваш код тут
 
 runRobotAnimation(VillageState.random(), yourRobot, memory);
 ```
@@ -423,48 +423,48 @@ if}}
 
 {{hint
 
-{{index "robot efficiency (exercise)"}}
+{{index «ефективність робота (вправа)»}}
 
-The main limitation of `goalOrientedRobot` is that it considers only one parcel at a time. It will often walk back and forth across the village because the parcel it happens to be looking at happens to be at the other side of the map, even if there are others much closer.
+Основним обмеженням `goalOrientedRobot` є те, що він розглядає лише одну посилку за раз. Він часто ходитиме туди-сюди по селу, тому що ділянка, на яку він дивиться, знаходиться на іншому кінці мапи, навіть якщо інші знаходяться набагато ближче.
 
-One possible solution would be to compute routes for all packages and then take the shortest one. Even better results can be obtained, if there are multiple shortest routes, by preferring the ones that go to pick up a package instead of delivering a package.
+Одним з можливих рішень може бути розрахунок маршрутів для всіх посилок, а потім вибір найкоротшого з них. Ще кращі результати можна отримати, якщо є кілька найкоротших маршрутів, віддавши перевагу тим, які йдуть забрати пакунок, а не доставити пакунок.
 
-hint}}
+підказка}}
 
-### Persistent group
+### Постійна група
 
-{{index "persistent group (exercise)", "persistent data structure", "Set class", "set (data structure)", "Group class", "PGroup class"}}
+{{index «persistent group (exercise)», «persistent data structure», «Set class», «set (data structure)», «Group class», «PGroup class»}}
 
-Most data structures provided in a standard JavaScript environment aren't very well suited for persistent use. Arrays have `slice` and `concat` methods, which allow us to easily create new arrays without damaging the old one. But `Set`, for example, has no methods for creating a new set with an item added or removed.
+Більшість структур даних, що надаються у стандартному середовищі JavaScript, не дуже добре підходять для постійного використання. Масиви мають методи `slice` та `concat`, які дозволяють легко створювати нові масиви, не пошкоджуючи старі. А от клас `Set`, наприклад, не має методів для створення нової множини з додаванням або вилученням елемента.
 
-Write a new class `PGroup`, similar to the `Group` class from [Chapter ?](object#groups), which stores a set of values. Like `Group`, it has `add`, `delete`, and `has` methods. Its `add` method, however, should return a _new_ `PGroup` instance with the given member added and leave the old one unchanged. Similarly, `delete` should create a new instance without a given member.
+Напишіть новий клас `PGroup`, схожий на клас `Group` з [Глава ?](об'єкт#групи), який зберігає набір значень. Як і `Group`, він має методи `add`, `delete` і `has`. Однак метод `add` має повертати _новий_ екземпляр `PGroup` з доданим членом і залишати старий екземпляр без змін. Аналогічно, метод `delete` повинен створювати новий екземпляр без заданого члена.
 
-The class should work for values of any type, not just strings. It does _not_ have to be efficient when used with large numbers of values.
+Клас повинен працювати зі значеннями будь-якого типу, а не тільки з рядками. Він _не_ повинен бути ефективним при використанні з великою кількістю значень.
 
-{{index [interface, object]}}
+{{index [інтерфейс, об'єкт]}}
 
-The ((constructor)) shouldn't be part of the class's interface (though you'll definitely want to use it internally). Instead, there is an empty instance, `PGroup.empty`, that can be used as a starting value.
+((конструктор)) не повинен бути частиною інтерфейсу класу (хоча ви, безумовно, захочете використовувати його всередині). Натомість існує порожній екземпляр `PGroup.empty`, який можна використовувати як початкове значення.
 
 {{index singleton}}
 
-Why do you need only one `PGroup.empty` value rather than having a function that creates a new, empty map every time?
+Навіщо вам потрібне лише одне значення `PGroup.empty` замість того, щоб мати функцію, яка щоразу створює нову, порожню мапу?
 
-{{if interactive
+{{if інтерактивний
 
-```{test: no}
+```{test: no}}
 class PGroup {
-  // Your code here
+  // Ваш код тут
 }
 
-let a = PGroup.empty.add("a");
-let ab = a.add("b");
-let b = ab.delete("a");
+let a = PGroup.empty.add(«a»);
+let ab = a.add(«b»);
+let b = ab.delete(«a»);
 
-console.log(b.has("b"));
+console.log(b.has(«b»));
 // → true
-console.log(a.has("b"));
+console.log(a.has(«b»));
 // → false
-console.log(b.has("a"));
+console.log(b.has(«a»));
 // → false
 ```
 
@@ -472,20 +472,20 @@ if}}
 
 {{hint
 
-{{index "persistent map (exercise)", "Set class", [array, creation], "PGroup class"}}
+{{index «persistent map (exercise)», «Set class», [array, creation], «PGroup class»}}
 
-The most convenient way to represent the set of member values is still as an array, since arrays are easy to copy.
+Найзручнішим способом представлення множини значень членів все ж таки є масив, оскільки масиви легко копіювати.
 
-{{index "concat method", "filter method"}}
+{{index «метод конкатенації», «метод фільтрації»}}
 
-When a value is added to the group, you can create a new group with a copy of the original array that has the value added (for example, using `concat`). When a value is deleted, you filter it from the array.
+Коли значення додається до групи, ви можете створити нову групу з копією оригінального масиву, до якого додається значення (наприклад, за допомогою `concat`). Коли значення видаляється, ви фільтруєте його з масиву.
 
-The class's ((constructor)) can take such an array as its argument and store it as the instance's (only) property. This array is never updated.
+Конструктор класу може приймати такий масив як аргумент і зберігати його як (єдину) властивість екземпляра. Цей масив ніколи не оновлюється.
 
-{{index "static property"}}
+{{index «static property»}}
 
-To add the `empty` property to the constructor, you can declare it as a static property.
+Щоб додати властивість `empty` до конструктора, ви можете оголосити її як статичну властивість.
 
-You need only one `empty` instance because all empty groups are the same and instances of the class don't change. You can create many different groups from that single empty group without affecting it.
+Вам потрібен лише один екземпляр `empty`, оскільки всі порожні групи однакові і екземпляри класу не змінюються. Ви можете створити багато різних груп з однієї порожньої групи, не впливаючи на неї.
 
-hint}}
+підказка}}

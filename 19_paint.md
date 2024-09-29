@@ -1,86 +1,88 @@
-{{meta {load_files: ["code/chapter/19_paint.js"], zip: "html include=[\"css/paint.css\"]"}}}
+{{meta {load_files: [«code/chapter/19_paint.js»], zip: «html include=[\«css/paint.css\»]"}}}
 
-# Project: A Pixel Art Editor
+# Проект: Піксельний художній редактор
 
-{{quote {author: "Joan Miró", chapter: true}
+{{quote {автор: 
 
-I look at the many colors before me. I look at my blank canvas. Then, I try to apply colors like words that shape poems, like notes that shape music.
+«Joan Miró», chapter: true}} {{quote {author: “Joan Miró”, chapter: true}}
+
+Я дивлюся на безліч кольорів переді мною. Я дивлюся на своє чисте полотно. Потім я намагаюся застосувати кольори, як слова, що формують вірші, як ноти, що формують музику.
 
 quote}}
 
-{{index "Miró, Joan", "drawing program example", "project chapter"}}
+{{index «Miró, Joan», «example of drawing program», «project chapter»}}
 
-{{figure {url: "img/chapter_picture_19.jpg", alt: "Illustration showing a mosaic of black tiles, with jars of other tiles next to it", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_19.jpg», alt: «Ілюстрація із зображенням мозаїки з чорних плиток, з банками інших плиток поруч», »chapter: «Обрамлення"}}}.
 
-The material from the previous chapters gives you all the elements you need to build a basic ((web application)). In this chapter, we will do just that.
+Матеріал попередніх розділів дає вам всі елементи, необхідні для створення базового ((веб-додатку)). У цій главі ми зробимо саме це.
 
-{{index [file, image]}}
+{{index [файл, зображення]}}
 
-Our ((application)) will be a ((pixel))-((drawing)) program that allows you to modify a picture pixel by pixel by manipulating a zoomed-in view of it, shown as a grid of colored squares. You can use the program to open image files, scribble on them with your mouse or other pointer device, and save them. This is what it will look like:
+Наш ((додаток)) буде ((піксель))-((малюнок)) програмою, яка дозволяє змінювати зображення піксель за пікселем, маніпулюючи його збільшеним зображенням, показаним у вигляді сітки з кольорових квадратів. За допомогою програми можна відкривати файли зображень, малювати на них мишею або іншим вказівним пристроєм і зберігати їх. Ось як це буде виглядати:
 
-{{figure {url: "img/pixel_editor.png", alt: "Screenshot of the pixel editor interface, with a grid of colored pixels at the top and a number of controls, in the form of HTML fields and buttons, below that", width: "8cm"}}}
+{{figure {url: «img/pixel_editor.png», alt: «Скріншот інтерфейсу піксельного редактора, з сіткою кольорових пікселів вгорі і рядом елементів керування у вигляді HTML полів і кнопок внизу», width: “8cm”}}}}
 
-Painting on a computer is great. You don't need to worry about materials, ((skill)), or talent. You just start smearing and see where you end up.
+Малювати на комп'ютері - це чудово. Вам не потрібно турбуватися про матеріали, ((навички)) або талант. Ви просто починаєте мазати і бачите, що вийшло.
 
-## Components
+## Компоненти
 
-{{index drawing, "select (HTML tag)", "canvas (HTML tag)", component}}
+{{index drawing, «select (HTML-тег)», «canvas (HTML-тег)», component}}
 
-The interface for the application shows a big `<canvas>` element on top, with a number of form ((field))s below it. The user draws on the ((picture)) by selecting a tool from a `<select>` field and then clicking, ((touch))ing, or ((dragging)) across the canvas. There are ((tool))s for drawing single pixels or rectangles, for filling an area, and for picking a ((color)) from the picture.
+Інтерфейс програми показує великий елемент `<canvas>` зверху, з кількома формами ((поле)) під ним. Користувач малює на ((малюнок)), обираючи інструмент у полі `<select>`, а потім клацає, ((торкається)) або ((перетягує)) по полотну. Існують інструменти для малювання окремих пікселів або прямокутників, заповнення області та вибору кольору на зображенні.
 
-{{index [DOM, components]}}
+{{index [DOM, компоненти]}}
 
-We will structure the editor interface as a number of _((component))s_, objects that are responsible for a piece of the DOM and that may contain other components inside them.
+Ми структуруємо інтерфейс редактора як низку об'єктів _((component))s_, які відповідають за частину DOM і можуть містити всередині себе інші компоненти.
 
-{{index [state, "of application"]}}
+{{index [state, «of application»]}}
 
-The state of the application consists of the current picture, the selected tool, and the selected color. We'll set things up so that the state lives in a single value and the interface components always base the way they look on the current state.
+Стан програми складається з поточного зображення, вибраного інструменту та вибраного кольору. Ми налаштуємо так, щоб стан зберігався у єдиному значенні, а компоненти інтерфейсу завжди базували свій вигляд на поточному стані.
 
-To see why this is important, let's consider the alternative—distributing pieces of state throughout the interface. Up to a certain point, this is easier to program. We can just put in a ((color field)) and read its value when we need to know the current color.
+Щоб зрозуміти, чому це важливо, давайте розглянемо альтернативний розподіл фрагментів стану по всьому інтерфейсу. До певного моменту це легше програмувати. Ми можемо просто додати ((поле кольору)) і прочитати його значення, коли нам потрібно дізнатися поточний колір.
 
-But then we add the ((color picker))—a tool that lets you click the picture to select the color of a given pixel. To keep the color field showing the correct color, that tool would have to know that the color field exists and update it whenever it picks a new color. If you ever add another place that makes the color visible (maybe the mouse cursor could show it), you have to update your color-changing code to keep that synchronized as well.
+Але потім ми додаємо ((піпетку кольору)) - інструмент, який дозволяє клацнути по зображенню, щоб вибрати колір певного пікселя. Щоб колірне поле показувало правильний колір, цей інструмент повинен знати, що колірне поле існує, і оновлювати його щоразу, коли він вибирає новий колір. Якщо ви коли-небудь додасте інше місце, яке робить колір видимим (можливо, курсор миші може показувати його), вам доведеться оновити код зміни кольору, щоб він також був синхронізований.
 
-{{index modularity}}
+{Модульність індексів
 
-In effect, this creates a problem where each part of the interface needs to know about all other parts, which is not very modular. For small applications like the one in this chapter, that may not be a problem. For bigger projects, it can turn into a real nightmare.
+По суті, це створює проблему, коли кожна частина інтерфейсу повинна знати про всі інші частини, що не є дуже модульним. Для невеликих програм, подібних до тієї, що описано у цій главі, це може не бути проблемою. Для великих проектів це може перетворитися на справжній кошмар.
 
-To avoid this nightmare on principle, we're going to be strict about _((data flow))_. There is a state, and the interface is drawn based on that state. An interface component may respond to user actions by updating the state, at which point the components get a chance to synchronize themselves with this new state.
+Щоб уникнути цього кошмару в принципі, ми будемо суворо дотримуватися _((потоку даних))_. Є стан, і інтерфейс малюється на основі цього стану. Компонент інтерфейсу може реагувати на дії користувача, оновлюючи стан, і тоді компоненти отримують можливість синхронізувати себе з цим новим станом.
 
-{{index library, framework}}
+{{індексна бібліотека, фреймворк}}
 
-In practice, each ((component)) is set up so that when it is given a new state, it also notifies its child components, insofar as those need to be updated. Setting this up is a bit of a hassle. Making this more convenient is the main selling point of many browser programming libraries. But for a small application like this, we can do it without such infrastructure.
+На практиці, кожен ((компонент)) налаштовується так, що коли йому надається новий стан, він також повідомляє про це свої дочірні компоненти, якщо ті потребують оновлення. Налаштування цього є дещо клопіткою справою. Зробити це зручнішим - основна перевага багатьох бібліотек програмування для браузерів. Але для такого невеликого додатку, як цей, ми можемо обійтися без такої інфраструктури.
 
 {{index [state, transitions]}}
 
-Updates to the state are represented as objects, which we'll call _((action))s_. Components may create such actions and _((dispatch))_ them—give them to a central state management function. That function computes the next state, after which the interface components update themselves to this new state.
+Оновлення стану представляються у вигляді об'єктів, які ми будемо називати _((action))s_. Компоненти можуть створювати такі дії і _((відправляти))_ їх - передавати центральній функції управління станом. Ця функція обчислює наступний стан, після чого інтерфейсні компоненти оновлюються до цього нового стану.
 
 {{index [DOM, components]}}
 
-We're taking the messy task of running a ((user interface)) and applying ((structure)) to it. Though the DOM-related pieces are still full of ((side effect))s, they are held up by a conceptually simple backbone: the state update cycle. The state determines what the DOM looks like, and the only way DOM events can change the state is by dispatching actions to the state.
+Ми беремо на себе брудну задачу запуску ((користувацького інтерфейсу)) і застосування до нього ((структури)). Хоча частини, пов'язані з DOM, все ще повні ((побічних ефектів)), вони тримаються на концептуально простому кістяку: циклі оновлення стану. Стан визначає, як виглядає DOM, і єдиний спосіб, у який події DOM можуть змінити стан, - це надсилати дії до стану.
 
-{{index "data flow"}}
+{{index «data flow»}}
 
-There are _many_ variants of this approach, each with its own benefits and problems, but their central idea is the same: state changes should go through a single well-defined channel, not happen all over the place.
+Існує _багато_ варіантів цього підходу, кожен з яких має свої переваги та проблеми, але їх центральна ідея однакова: зміни стану повинні проходити через один чітко визначений канал, а не відбуватися повсюдно.
 
-{{index "dom property", [interface, object]}}
+{{index «dom property», [interface, object]}}
 
-Our ((component))s will be ((class))es conforming to an interface. Their constructor is given a state—which may be the whole application state or some smaller value if it doesn't need access to everything—and uses that to build up a `dom` property. This is the DOM element that represents the component. Most constructors will also take some other values that won't change over time, such as the function they can use to ((dispatch)) an action.
+Наші ((компонент))и будуть ((клас))ами, що відповідають інтерфейсу. Їхньому конструктору надається стан - який може бути повним станом програми або меншим значенням, якщо йому не потрібен доступ до всього - і він використовує його для створення властивості `dom`. Це елемент DOM, який представляє компонент. Більшість конструкторів також приймають деякі інші значення, які не змінюються з часом, наприклад, функцію, яку вони можуть використовувати для ((відправлення)) дії.
 
-{{index "syncState method"}}
+{{index «syncState method»}}
 
-Each component has a `syncState` method that is used to synchronize it to a new state value. The method takes one argument, the state, which is of the same type as the first argument to its constructor.
+Кожен компонент має метод syncState, який використовується для синхронізації його з новим значенням стану. Метод отримує один аргумент, стан, який має той самий тип, що і перший аргумент його конструктора.
 
-## The state
+## Стан
 
-{{index "Picture class", "picture property", "tool property", "color property"}}
+{{індекс «клас зображення», «властивість зображення», «властивість інструмента», «властивість кольору»}}
 
-The application state will be an object with `picture`, `tool`, and `color` properties. The picture is itself an object that stores the width, height, and pixel content of the picture. The ((pixel))s are stored in a single array, row by row, from top to bottom.
+Стан програми буде об'єктом з властивостями `picture`, `tool` та `color`. Зображення саме по собі є об'єктом, який зберігає ширину, висоту та піксельний вміст зображення. Пікселі ((pixel)) зберігаються у єдиному масиві, рядок за рядком, зверху вниз.
 
 ```{includeCode: true}
 class Picture {
   constructor(width, height, pixels) {
-    this.width = width;
-    this.height = height;
+    this.width = width
+    this.height = height
     this.pixels = pixels;
   }
   static empty(width, height, color) {
@@ -100,27 +102,27 @@ class Picture {
 }
 ```
 
-{{index "side effect", "persistent data structure"}}
+{{index «side effect», «persistent data structure»}}
 
-We want to be able to treat a picture as an ((immutable)) value, for reasons we'll get back to later in the chapter. But we also sometimes need to update a whole bunch of pixels at a time. To be able to do that, the class has a `draw` method that expects an array of updated pixels—objects with `x`, `y`, and `color` properties—and creates a new picture with those pixels overwritten. This method uses `slice` without arguments to copy the entire pixel array—the start of the slice defaults to 0, and the end defaults to the array's length.
+Ми хочемо мати можливість обробляти зображення як ((незмінне)) значення, з причин, до яких ми повернемося пізніше у цій главі. Але іноді нам також потрібно оновити цілу групу пікселів за один раз. Для цього у класі передбачено метод `draw`, який очікує масив оновлених пікселів - об'єктів з властивостями `x`, `y` та `color` - і створює нове зображення з перезаписаними пікселями. Цей метод використовує `slice` без аргументів для копіювання всього масиву пікселів - початок зрізу за замовчуванням дорівнює 0, а кінець - довжині масиву.
 
-{{index "Array constructor", "fill method", ["length property", "for array"], [array, creation]}}
+{{індекс «Конструктор масиву», «метод заповнення», [«властивість довжини», «для масиву»], [масив, створення]}}
 
-The `empty` method uses two pieces of array functionality that we haven't seen before. The `Array` constructor can be called with a number to create an empty array of the given length. The `fill` method can then be used to fill this array with a given value. These are used to create an array in which all pixels have the same color.
+Метод `empty` використовує дві частини функціональності масиву, які ми не бачили раніше. Конструктор `Array` можна викликати з числом для створення порожнього масиву заданої довжини. Метод `fill` можна використовувати для заповнення цього масиву заданим значенням. Ці методи використовуються для створення масиву, у якому всі пікселі мають однаковий колір.
 
-{{index "hexadecimal number", "color component", "color field", "fillStyle property"}}
+{{індекс «шістнадцяткове число», «компонент кольору», «поле кольору», «властивість fillStyle»}}
 
-Colors are stored as strings containing traditional ((CSS)) ((color code))s made up of a ((hash sign)) (`#`) followed by six hexadecimal (base-16) digits—two for the ((red)) component, two for the ((green)) component, and two for the ((blue)) component. This is a somewhat cryptic and inconvenient way to write colors, but it is the format the HTML color input field uses, and it can be used in the `fillStyle` property of a canvas drawing context, so for the ways we'll use colors in this program, it is practical enough.
+Кольори зберігаються у вигляді рядків, що містять традиційні ((CSS)) ((код кольору)), які складаються з ((хеш-знак)) (`#`) та шести шістнадцяткових (основа 16) цифр - дві для ((червоного)) компонента, дві для ((зеленого)) компонента та дві для ((синього)) компонента. Це дещо загадковий і незручний спосіб запису кольорів, але саме такий формат використовується у полі введення кольорів HTML, і його можна використовувати у властивості `fillStyle` контексту малювання полотна, тому для способів використання кольорів у цій програмі він є достатньо практичним.
 
 {{index black}}
 
-Black, where all components are zero, is written `"#000000"`, and bright ((pink)) looks like `"#ff00ff"`, where the red and blue components have the maximum value of 255, written `ff` in hexadecimal ((digit))s (which use _a_ to _f_ to represent digits 10 to 15).
+Чорний, де всі компоненти дорівнюють нулю, записується `«#000000»`, а яскравий ((рожевий)) виглядає як `«#ff00ff»`, де червона і синя компоненти мають максимальне значення 255, записується `ff` у шістнадцятковій системі числення ((цифра)) (яка використовує _a_ до _f_ для представлення цифр від 10 до 15).
 
-{{index [state, transitions]}}
+{{index [стан, переходи]}}
 
-We'll allow the interface to ((dispatch)) ((action))s as objects whose properties overwrite the properties of the previous state. The color field, when the user changes it, could dispatch an object like `{color: field.value}`, from which this update function can compute a new state.
+Ми дозволимо інтерфейсу ((dispatch)) ((action))s як об'єкти, властивості яких перезаписують властивості попереднього стану. Поле кольору, коли користувач змінює його, може відправити об'єкт на кшталт `{color: field.value}`, з якого ця функція оновлення може обчислити новий стан.
 
-{{index "updateState function"}}
+{{index «updateState function»}}
 
 ```{includeCode: true}
 function updateState(state, action) {
@@ -128,60 +130,60 @@ function updateState(state, action) {
 }
 ```
 
-{{index "period character"}}
+{{index «символ крапки»}}
 
-This pattern, in which object ((spread)) is used to first add the properties an existing object and then override some of those, is common in JavaScript code that uses ((immutable)) objects.
+Цей патерн, в якому об'єкт ((spread)) використовується для того, щоб спочатку додати властивості до існуючого об'єкту, а потім перевизначити деякі з них, є поширеним в JavaScript коді, який використовує об'єкти ((immutable)).
 
-## DOM building
+## Створення DOM
 
-{{index "createElement method", "elt function", [DOM, construction]}}
+{{index «createElement method», «elt function», [DOM, construction]}}
 
-One of the main things that interface components do is create DOM structure. We again don't want to directly use the verbose DOM methods for that, so here's a slightly expanded version of the `elt` function:
+Однією з основних речей, які роблять інтерфейсні компоненти, є створення структури DOM. Ми знову ж таки не хочемо безпосередньо використовувати для цього багатослівні методи DOM, тому пропонуємо дещо розширену версію функції `elt`:
 
 ```{includeCode: true}
 function elt(type, props, ...children) {
   let dom = document.createElement(type);
   if (props) Object.assign(dom, props);
   for (let child of children) {
-    if (typeof child != "string") dom.appendChild(child);
+    if (typeof child != «string») dom.appendChild(child);
     else dom.appendChild(document.createTextNode(child));
   }
   return dom;
 }
 ```
 
-{{index "setAttribute method", "attribute", "onclick property", "click event", "event handling"}}
+{{index «метод setAttribute», «атрибут», «властивість onclick», «подія кліку», «обробка події»}}
 
-The main difference between this version and the one we used in [Chapter ?](game#domdisplay) is that it assigns _properties_ to DOM nodes, not _attributes_. This means we can't use it to set arbitrary attributes, but we _can_ use it to set properties whose value isn't a string, such as `onclick`, which can be set to a function to register a click event handler.
+Основна відмінність цієї версії від тієї, яку ми використовували у [Глава ?](game#domdisplay) полягає у тому, що вона призначає _властивості_ вузлам DOM, а не _атрибути_. Це означає, що ми не можемо використовувати його для встановлення довільних атрибутів, але ми _можемо_ використовувати його для встановлення властивостей, значення яких не є рядком, наприклад, `onclick`, який можна встановити у функції для реєстрації обробника події кліку.
 
-{{index "button (HTML tag)"}}
+{{index «button (HTML-тег)»}}
 
-This allows this convenient style for registering event handlers:
+Це дозволяє використовувати цей зручний стиль для реєстрації обробників подій:
 
 ```{lang: html}
-<body>
+<body
   <script>
-    document.body.appendChild(elt("button", {
-      onclick: () => console.log("click")
-    }, "The button"));
-  </script>
-</body>
+    document.body.appendChild(elt(«button», {
+      onclick: () => console.log(«click»)
+    }, «Кнопка»));
+  </script> </span> </span> </span> </span> </span
+</body> </body
 ```
 
-## The canvas
+## Полотно
 
-The first component we'll define is the part of the interface that displays the picture as a grid of colored boxes. This component is responsible for two things: showing a picture and communicating ((pointer event))s on that picture to the rest of the application.
+Перший компонент, який ми визначимо, - це частина інтерфейсу, яка відображає зображення у вигляді сітки кольорових клітинок. Цей компонент відповідає за дві речі: показує картинку та передає ((подію вказівника)) на цю картинку решті програми.
 
-{{index "PictureCanvas class", "callback function", "scale constant", "canvas (HTML tag)", "mousedown event", "touchstart event", [state, "of application"]}}
+{{index «PictureCanvas class», «callback function», «scale constant», «canvas (HTML tag)», «mousedown event», «touchstart event», [state, «of application»]}}
 
-Therefore, we can define it as a component that only knows about the current picture, not the whole application state. Because it doesn't know how the application as a whole works, it cannot directly dispatch ((action))s. Rather, when responding to pointer events, it calls a callback function provided by the code that created it, which will handle the application-specific parts.
+Отже, ми можемо визначити його як компонент, який знає лише про поточну картинку, а не про весь стан програми. Оскільки він не знає, як працює програма в цілому, він не може безпосередньо відправляти ((дію))и. Натомість, реагуючи на події вказівника, він викликає функцію зворотного виклику, надану кодом, який його створив, яка обробляє специфічні для програми частини.
 
 ```{includeCode: true}
 const scale = 10;
 
 class PictureCanvas {
   constructor(picture, pointerDown) {
-    this.dom = elt("canvas", {
+    this.dom = elt(«canvas», {
       onmousedown: event => this.mouse(event, pointerDown),
       ontouchstart: event => this.touch(event, pointerDown)
     });
@@ -195,19 +197,19 @@ class PictureCanvas {
 }
 ```
 
-{{index "syncState method", efficiency}}
+{{index «syncState method», efficiency}}
 
-We draw each pixel as a 10-by-10 square, as determined by the `scale` constant. To avoid unnecessary work, the component keeps track of its current picture and does a redraw only when `syncState` is given a new picture.
+Ми малюємо кожен піксель у вигляді квадрату 10 на 10, що визначається константою `scale`. Щоб уникнути зайвої роботи, компонент відстежує поточну картинку і перемальовує її лише тоді, коли `синхронізація` отримує нове зображення.
 
-{{index "drawPicture function"}}
+{{index «drawPicture function»}}
 
-The actual drawing function sets the size of the canvas based on the scale and picture size and fills it with a series of squares, one for each pixel.
+Власне функція малювання встановлює розмір полотна на основі масштабу та розміру зображення і заповнює його серією квадратів, по одному на кожен піксель.
 
 ```{includeCode: true}
-function drawPicture(picture, canvas, scale) {
+функція drawPicture(picture, canvas, scale) {
   canvas.width = picture.width * scale;
   canvas.height = picture.height * scale;
-  let cx = canvas.getContext("2d");
+  let cx = canvas.getContext(«2d»);
 
   for (let y = 0; y < picture.height; y++) {
     for (let x = 0; x < picture.width; x++) {
@@ -218,9 +220,9 @@ function drawPicture(picture, canvas, scale) {
 }
 ```
 
-{{index "mousedown event", "mousemove event", "button property", "buttons property", "pointerPosition function"}}
+{{index «mousedown event», «mousemove event», «button property», «buttons property», «pointerPosition function»}}
 
-When the left mouse button is pressed while the mouse is over the picture canvas, the component calls the `pointerDown` callback, giving it the position of the pixel that was clicked—in picture coordinates. This will be used to implement mouse interaction with the picture. The callback may return another callback function to be notified when the pointer is moved to a different pixel while the button is held down.
+При натисканні лівої кнопки миші, коли курсор миші знаходиться над полотном зображення, компонент викликає функцію зворотного виклику `pointerDown`, передаючи їй позицію пікселя, на який було натиснуто, у координатах зображення. Це буде використано для реалізації взаємодії миші з зображенням. Функція зворотного виклику може повертати іншу функцію зворотного виклику, яка буде сповіщати про переміщення вказівника на інший піксель при натиснутій кнопці.
 
 ```{includeCode: true}
 PictureCanvas.prototype.mouse = function(downEvent, onDown) {
@@ -230,15 +232,15 @@ PictureCanvas.prototype.mouse = function(downEvent, onDown) {
   if (!onMove) return;
   let move = moveEvent => {
     if (moveEvent.buttons == 0) {
-      this.dom.removeEventListener("mousemove", move);
+      this.dom.removeEventListener(«mousemove», move);
     } else {
-      let newPos = pointerPosition(moveEvent, this.dom);
+      нехай newPos = pointerPosition(moveEvent, this.dom);
       if (newPos.x == pos.x && newPos.y == pos.y) return;
       pos = newPos;
       onMove(newPos);
     }
   };
-  this.dom.addEventListener("mousemove", move);
+  this.dom.addEventListener(«mousemove», move);
 };
 
 function pointerPosition(pos, domNode) {
@@ -248,17 +250,17 @@ function pointerPosition(pos, domNode) {
 }
 ```
 
-{{index "getBoundingClientRect method", "clientX property", "clientY property"}}
+{{index «метод getBoundingClientRect», «властивість clientX», «властивість clientY»}}
 
-Since we know the size of the ((pixel))s and we can use `getBoundingClientRect` to find the position of the canvas on the screen, it is possible to go from mouse event coordinates (`clientX` and `clientY`) to picture coordinates. These are always rounded down so that they refer to a specific pixel.
+Оскільки ми знаємо розмір ((pixel))s і можемо використовувати `getBoundingClientRect` для знаходження положення полотна на екрані, можна перейти від координат подій миші (`clientX` і `clientY`) до координат зображення. Вони завжди округлюються вниз, щоб посилатися на конкретний піксель.
 
-{{index "touchstart event", "touchmove event", "preventDefault method"}}
+{{index «touchstart event», «touchmove event», «preventDefault method»}}
 
-With touch events, we have to do something similar, but using different events and making sure we call `preventDefault` on the `"touchstart"` event to prevent ((panning)).
+З подіями дотику ми маємо зробити щось подібне, але з використанням інших подій і обов'язковим викликом `preventDefault` на події `«touchstart»` для запобігання ((панорамування)).
 
 ```{includeCode: true}
 PictureCanvas.prototype.touch = function(startEvent,
-                                         onDown) {
+                                         onDown) {}}
   let pos = pointerPosition(startEvent.touches[0], this.dom);
   let onMove = onDown(pos);
   startEvent.preventDefault();
@@ -271,27 +273,27 @@ PictureCanvas.prototype.touch = function(startEvent,
     onMove(newPos);
   };
   let end = () => {
-    this.dom.removeEventListener("touchmove", move);
-    this.dom.removeEventListener("touchend", end);
+    this.dom.removeEventListener(«touchmove», move);
+    this.dom.removeEventListener(«touch», end);
   };
-  this.dom.addEventListener("touchmove", move);
-  this.dom.addEventListener("touchend", end);
+  this.dom.addEventListener(«touchmove», move);
+  this.dom.addEventListener(«touchend», end);
 };
 ```
 
-{{index "touches property", "clientX property", "clientY property"}}
+{{index «touches property», «clientX property», «clientY property»}}
 
-For touch events, `clientX` and `clientY` aren't available directly on the event object, but we can use the coordinates of the first touch object in the `touches` property.
+Для подій дотику, `clientX` та `clientY` не доступні безпосередньо на об'єкті події, але ми можемо використовувати координати першого об'єкту дотику у властивості `touches`.
 
-## The application
+## Додаток
 
-To make it possible to build the application piece by piece, we'll implement the main component as a shell around a picture canvas and a dynamic set of ((tool))s and ((control))s that we pass to its constructor.
+Для того, щоб можна було збирати додаток по частинах, ми реалізуємо головний компонент як оболонку навколо полотна зображення і динамічного набору ((tool))s та ((control))s, які ми передаємо його конструктору.
 
-The _controls_ are the interface elements that appear below the picture. They'll be provided as an array of ((component)) constructors.
+Елементи  управління - це елементи інтерфейсу, які з'являються під зображенням. Вони будуть надані у вигляді масиву конструкторів ((компонент)).
 
-{{index "br (HTML tag)", "flood fill", "select (HTML tag)", "PixelEditor class", dispatch}}
+{{index «br (HTML-тег)», «flood fill», «select (HTML-тег)», «PixelEditor class», dispatch}}
 
-The _tools_ do things like drawing pixels or filling in an area. The application shows the set of available tools as a `<select>` field. The currently selected tool determines what happens when the user interacts with the picture with a pointer device. The set of available tools is provided as an object that maps the names that appear in the drop-down field to functions that implement the tools. Such functions get a picture position, a current application state, and a `dispatch` function as arguments. They may return a move handler function that gets called with a new position and a current state when the pointer moves to a different pixel.
+Інструменти виконують такі дії, як малювання пікселів або заливка області. Програма показує набір доступних інструментів у вигляді поля `<select>`. Поточно вибраний інструмент визначає, що відбувається, коли користувач взаємодіє з зображенням за допомогою вказівного пристрою. Набір доступних інструментів надається у вигляді об'єкта, який відображає назви, що з'являються у випадаючому полі, на функції, які реалізують ці інструменти. Такі функції отримують позицію зображення, поточний стан програми та функцію `dispatch` як аргументи. Вони можуть повертати функцію-обробник переміщення, яка викликається з новою позицією і поточним станом, коли вказівник переміщується на інший піксель.
 
 ```{includeCode: true}
 class PixelEditor {
@@ -306,9 +308,9 @@ class PixelEditor {
     });
     this.controls = controls.map(
       Control => new Control(state, config));
-    this.dom = elt("div", {}, this.canvas.dom, elt("br"),
+    this.dom = elt(«div», {}, this.canvas.dom, elt(«br»),
                    ...this.controls.reduce(
-                     (a, c) => a.concat(" ", c.dom), []));
+                     (a, c) => a.concat(» », c.dom), []));
   }
   syncState(state) {
     this.state = state;
@@ -318,71 +320,71 @@ class PixelEditor {
 }
 ```
 
-The pointer handler given to `PictureCanvas` calls the currently selected tool with the appropriate arguments and, if that returns a move handler, adapts it to also receive the state.
+Обробник вказівника, переданий `PictureCanvas`, викликає поточний вибраний інструмент з відповідними аргументами і, якщо той повертає обробник переміщення, адаптує його, щоб також отримувати стан.
 
-{{index "reduce method", "map method", [whitespace, "in HTML"], "syncState method"}}
+{{index «reduce method», «map method», [пробіли, «in HTML»], «syncState method»}}
 
-All controls are constructed and stored in `this.controls` so that they can be updated when the application state changes. The call to `reduce` introduces spaces between the controls' DOM elements. That way, they don't look so pressed together.
+Всі елементи управління створюються та зберігаються у `this.controls`, щоб їх можна було оновити при зміні стану програми. Виклик `reduce` вводить пробіли між DOM-елементами елементів управління. Таким чином, вони не виглядають притиснутими один до одного.
 
-{{index "select (HTML tag)", "change event", "ToolSelect class", "syncState method"}}
+{{index «select (HTML-тег)», «change event», «ToolSelect class», «syncState method»}}
 
-The first control is the ((tool)) selection menu. It creates a `<select>` element with an option for each tool and sets up a `"change"` event handler that updates the application state when the user selects a different tool.
+Перший елемент управління - це меню вибору ((tool)). Він створює елемент `<select>` з опцією для кожного інструмента і налаштовує обробник події `«change»`, який оновлює стан програми, коли користувач вибирає інший інструмент.
 
 ```{includeCode: true}
 class ToolSelect {
   constructor(state, {tools, dispatch}) {
-    this.select = elt("select", {
+    this.select = elt(«select», {
       onchange: () => dispatch({tool: this.select.value})
-    }, ...Object.keys(tools).map(name => elt("option", {
+    }, ...Object.keys(tools).map(name => elt(«option», {
       selected: name == state.tool
     }, name)));
-    this.dom = elt("label", null, "🖌 Tool: ", this.select);
+    this.dom = elt(«label», null, «🖌 Tool: », this.select);
   }
   syncState(state) { this.select.value = state.tool; }
 }
 ```
 
-{{index "label (HTML tag)"}}
+{{index «label (HTML-тег)»}}
 
-By wrapping the label text and the field in a `<label>` element, we tell the browser that the label belongs to that field so that you can, for example, click the label to focus the field.
+Обертаючи текст мітки і поле в елемент `<label>`, ми повідомляємо браузеру, що мітка належить до цього поля, так що ви можете, наприклад, клацнути на мітці, щоб сфокусувати поле.
 
-{{index "color field", "input (HTML tag)"}}
+{{index «color field», «input (HTML tag)»}}
 
-We also need to be able to change the color, so let's add a control for that. An HTML `<input>` element with a `type` attribute of `color` gives us a form field that is specialized for selecting colors. Such a field's value is always a CSS color code in `"#RRGGBB"` format (red, green, and blue components, two digits per color). The browser will show a ((color picker)) interface when the user interacts with it.
+Нам також потрібно мати можливість змінювати колір, тому додамо елемент керування для цього. HTML-елемент `<input>` з атрибутом `type`, що має значення `color`, надає нам поле форми, яке спеціалізовано для вибору кольору. Значенням такого поля завжди є код кольору CSS у форматі `«#RRGGBB»` (червоний, зелений і синій компоненти, по дві цифри на колір). Браузер покаже інтерфейс ((піпетка кольорів)), коли користувач буде взаємодіяти з ним.
 
 {{if book
 
-Depending on the browser, the color picker might look like this:
+Залежно від браузера, піпетка кольорів може мати такий вигляд:
 
-{{figure {url: "img/color-field.png", alt: "Screenshot of color field", width: "6cm"}}}
+{{figure {url: «img/color-field.png», alt: «Знімок поля кольору», width: “6cm”}}}}
 
 if}}
 
-{{index "ColorSelect class", "syncState method"}}
+{{index «ColorSelect class», «syncState method»}}
 
-This ((control)) creates such a field and wires it up to stay synchronized with the application state's `color` property.
+Цей ((елемент управління)) створює таке поле і підключає його до синхронізації з властивістю `color` стану програми.
 
 ```{includeCode: true}
 class ColorSelect {
   constructor(state, {dispatch}) {
-    this.input = elt("input", {
-      type: "color",
+    this.input = elt(«input», {
+      тип: «color»,
       value: state.color,
       onchange: () => dispatch({color: this.input.value})
     });
-    this.dom = elt("label", null, "🎨 Color: ", this.input);
+    this.dom = elt(«label», null, «🎨 Колір: », this.input);
   }
   syncState(state) { this.input.value = state.color; }
 }
 ```
 
-## Drawing tools
+## Інструменти малювання
 
-Before we can draw anything, we need to implement the ((tool))s that will control the functionality of mouse or touch events on the canvas.
+Перш ніж ми зможемо щось намалювати, нам потрібно реалізувати ((інструмент))и, які будуть керувати функціональністю подій миші або дотику на полотні.
 
-{{index "draw function"}}
+{{index «draw function»}}
 
-The most basic tool is the draw tool, which changes any ((pixel)) you click or tap to the currently selected color. It dispatches an action that updates the picture to a version in which the pointed-at pixel is given the currently selected color.
+Найпростішим інструментом є інструмент малювання, який змінює будь-який ((піксель)), на який ви натискаєте або торкаєтесь, на поточний вибраний колір. Він виконує дію, яка оновлює зображення до версії, у якій піксель, на який вказано, набуває поточного вибраного кольору.
 
 ```{includeCode: true}
 function draw(pos, state, dispatch) {
@@ -395,18 +397,18 @@ function draw(pos, state, dispatch) {
 }
 ```
 
-The function immediately calls the `drawPixel` function but then also returns it so that it's called again for newly touched pixels when the user drags or ((swipe))s over the picture.
+Функція негайно викликає функцію `drawPixel`, але потім також повертає її, щоб викликати її знову для нових пікселів, коли користувач перетягує або проводить ((свайпом)) по зображенню.
 
-{{index "rectangle function"}}
+{{index «rectangle function»}}
 
-To draw larger shapes, it can be useful to quickly create ((rectangle))s. The `rectangle` ((tool)) draws a rectangle between the point where you start ((dragging)) and the point that you drag to.
+Для малювання більших фігур може бути корисним швидке створення ((прямокутника))s. Інструмент `прямокутник` ((інструмент)) малює прямокутник між точкою, з якої ви починаєте ((перетягування)), і точкою, до якої ви перетягуєте.
 
 ```{includeCode: true}
 function rectangle(start, state, dispatch) {
   function drawRectangle(pos) {
-    let xStart = Math.min(start.x, pos.x);
-    let yStart = Math.min(start.y, pos.y);
-    let xEnd = Math.max(start.x, pos.x);
+    let xStart = Math.min(start.x, pos.x)
+    let yStart = Math.min(start.y, pos.y)
+    let xEnd = Math.max(start.x, pos.x)
     let yEnd = Math.max(start.y, pos.y);
     let drawn = [];
     for (let y = yStart; y <= yEnd; y++) {
@@ -421,17 +423,17 @@ function rectangle(start, state, dispatch) {
 }
 ```
 
-{{index "persistent data structure", [state, persistence]}}
+{{index «persistent data structure», [state, persistence]}}
 
-An important detail in this implementation is that when dragging, the rectangle is redrawn on the picture from the _original_ state. That way, you can make the rectangle larger and smaller again while creating it, without the intermediate rectangles sticking around in the final picture. This is one of the reasons why ((immutable)) picture objects are useful—we'll see another reason later.
+Важливою деталлю у цій реалізації є те, що при перетягуванні прямокутник перемальовується на зображенні з _початкового_ стану. Таким чином, ви можете робити прямокутник більшим і меншим знову під час його створення, без проміжних прямокутників, що залишаються на кінцевому зображенні. Це одна з причин, чому ((незмінні)) об'єкти зображень є корисними - ми побачимо іншу причину пізніше.
 
-Implementing ((flood fill)) is somewhat more involved. This is a ((tool)) that fills the pixel under the pointer and all adjacent pixels that have the same color. "Adjacent" means directly horizontally or vertically adjacent, not diagonally. This picture illustrates the set of ((pixel))s colored when the flood fill tool is used at the marked pixel:
+Реалізація ((заливка)) дещо складніша. Це ((інструмент)), який заливає піксель під вказівником і всі сусідні пікселі, які мають такий самий колір. «Суміжні» означає безпосередньо сусідні по горизонталі або вертикалі, а не по діагоналі. Цей малюнок ілюструє набір ((пікселів)), які зафарбовуються при застосуванні інструмента заливки до позначеного пікселя:
 
-{{figure {url: "img/flood-grid.svg", alt: "Diagram of a pixel grid showing the area filled by a flood fill operation", width: "6cm"}}}
+{{figure {url: «img/flood-grid.svg», alt: «Діаграма піксельної сітки, що показує область, заповнену операцією заливки», width: “6cm”}}}}
 
-{{index "fill function"}}
+{{index «fill function»}}
 
-Interestingly, the way we'll do this looks a bit like the ((pathfinding)) code from [Chapter ?](robot). Whereas that code searched through a graph to find a route, this code searches through a grid to find all "connected" pixels. The problem of keeping track of a branching set of possible routes is similar.
+Цікаво, що спосіб, у який ми це зробимо, трохи схожий на код ((пошук шляху)) з [Розділ ?](робот). У той час як той код шукав маршрут на графі, цей код шукає по сітці, щоб знайти всі «з'єднані» пікселі. Проблема відстеження розгалуженої множини можливих маршрутів схожа.
 
 ```{includeCode: true}
 const around = [{dx: -1, dy: 0}, {dx: 1, dy: 0},
@@ -445,11 +447,11 @@ function fill({x, y}, state, dispatch) {
     for (let {dx, dy} of around) {
       let x = drawn[done].x + dx, y = drawn[done].y + dy;
       if (x >= 0 && x < state.picture.width &&
-          y >= 0 && y < state.picture.height &&
-          !visited.has(x + "," + y) &&
-          state.picture.pixel(x, y) == targetColor) {
+          y >= 0 && y < state.picture.height &&)
+          !visited.has(x + «,» + y) && !visited.has(x + «,» + y) &&
+          state.picture.pixel(x, y) == targetColor) { })
         drawn.push({x, y, color: state.color});
-        visited.add(x + "," + y);
+        visited.add(x + «,» + y);
       }
     }
   }
@@ -457,11 +459,11 @@ function fill({x, y}, state, dispatch) {
 }
 ```
 
-The array of drawn pixels doubles as the function's ((work list)). For each pixel reached, we have to see whether any adjacent pixels have the same color and haven't already been painted over. The loop counter lags behind the length of the `drawn` array as new pixels are added. Any pixels ahead of it still need to be explored. When it catches up with the length, no unexplored pixels remain, and the function is done.
+Масив намальованих пікселів подвоюється у функції ((робочий список)). Для кожного досягнутого пікселя ми повинні перевірити, чи сусідні пікселі мають такий самий колір і не були зафарбовані. Лічильник циклу відстає від довжини масиву «намальованих» пікселів, коли додаються нові пікселі. Будь-які пікселі перед ним ще потрібно дослідити. Коли він наздоганяє довжину масиву, не залишиться жодного недослідженого пікселя, і функція завершується.
 
-{{index "pick function"}}
+{{index «pick function»}}
 
-The final ((tool)) is a ((color picker)), which allows you to point at a color in the picture to use it as the current drawing color.
+Останнім ((інструментом)) є ((піпетка)), яка дозволяє вказати на колір на зображенні, щоб використати його як поточний колір малювання.
 
 ```{includeCode: true}
 function pick(pos, state, dispatch) {
@@ -469,17 +471,17 @@ function pick(pos, state, dispatch) {
 }
 ```
 
-{{if interactive
+{{if інтерактивний
 
-We can now test our application!
+Тепер ми можемо протестувати наш додаток!
 
 ```{lang: html}
 <div></div>
 <script>
   let state = {
-    tool: "draw",
-    color: "#000000",
-    picture: Picture.empty(60, 30, "#f0f0f0")
+    інструмент: «draw»,
+    color: «#000000»,
+    малюнок: Picture.empty(60, 30, «#f0f0f0»)
   };
   let app = new PixelEditor(state, {
     tools: {draw, fill, rectangle, pick},
@@ -489,32 +491,32 @@ We can now test our application!
       app.syncState(state);
     }
   });
-  document.querySelector("div").appendChild(app.dom);
+  document.querySelector(«div»).appendChild(app.dom);
 </script>
 ```
 
 if}}
 
-## Saving and loading
+## Збереження та завантаження
 
-{{index "SaveButton class", "drawPicture function", [file, image]}}
+{{index «SaveButton class», «drawPicture function», [file, image]}}
 
-When we've drawn our masterpiece, we'll want to save it for later. We should add a button for ((download))ing the current picture as an image file. This ((control)) provides that button:
+Коли ми намалюємо наш шедевр, ми захочемо зберегти його на потім. Нам слід додати кнопку для ((завантаження)) завантаження поточного малюнка у вигляді графічного файлу. Цей ((елемент управління)) надає таку кнопку:
 
 ```{includeCode: true}
 class SaveButton {
   constructor(state) {
     this.picture = state.picture;
-    this.dom = elt("button", {
+    this.dom = elt(«button», {
       onclick: () => this.save()
-    }, "💾 Save");
+    }, «💾 Зберегти»);
   }
   save() {
-    let canvas = elt("canvas");
+    let canvas = elt(«canvas»);
     drawPicture(this.picture, canvas, 1);
-    let link = elt("a", {
+    let link = elt(«a», {
       href: canvas.toDataURL(),
-      download: "pixelart.png"
+      download: «pixelart.png»
     });
     document.body.appendChild(link);
     link.click();
@@ -524,35 +526,35 @@ class SaveButton {
 }
 ```
 
-{{index "canvas (HTML tag)"}}
+{{index «canvas (HTML-тег)»}}
 
-The component keeps track of the current picture so that it can access it when saving. To create the image file, it uses a `<canvas>` element on which it draws the picture (at a scale of one pixel per pixel).
+Компонент відстежує поточну картинку, щоб мати доступ до неї при збереженні. Для створення файлу зображення він використовує елемент `<canvas>`, на якому малює картинку (у масштабі один піксель на піксель).
 
-{{index "toDataURL method", "data URL"}}
+{{index «toDataURL метод», «URL даних»}}
 
-The `toDataURL` method on a canvas element creates a URL that uses the `data:` scheme. Unlike `http:` and `https:` URLs, data URLs contain the whole resource in the URL. They are usually very long, but they allow us to create working links to arbitrary pictures, right here in the browser.
+Метод `toDataURL` на елементі полотна створює URL-адресу, яка використовує схему `data:`. На відміну від URL-адрес `http:` і `https:`, URL-адреси даних містять весь ресурс в URL-адресі. Зазвичай вони дуже довгі, але дозволяють створювати робочі посилання на довільні зображення прямо тут, у браузері.
 
-{{index "a (HTML tag)", "download attribute"}}
+{{index «a (HTML-тег)», «download attribute»}}
 
-To actually get the browser to download the picture, we then create a ((link)) element that points at this URL and has a `download` attribute. Such links, when clicked, make the browser show a file save dialog. We add that link to the document, simulate a click on it, and remove it again. You can do a lot with ((browser)) technology, but sometimes the way to do it is rather odd.
+Щоб змусити браузер завантажити зображення, ми створюємо елемент ((посилання)), який вказує на цю URL-адресу і має атрибут `download`. Такі посилання, при натисканні на них, змушують браузер показати діалогове вікно збереження файлу. Ми додаємо це посилання в документ, імітуємо натискання на нього і знову видаляємо його. За допомогою технології ((браузер)) можна зробити багато чого, але іноді це робиться досить дивним чином.
 
-{{index "LoadButton class", control, [file, image]}}
+{{index «LoadButton class», control, [file, image]}}
 
-And it gets worse. We'll also want to be able to load existing image files into our application. To do that, we again define a button component.
+І це ще не все. Ми також хочемо мати можливість завантажувати існуючі файли зображень у наш додаток. Для цього ми знову визначимо компонент кнопки.
 
 ```{includeCode: true}
 class LoadButton {
   constructor(_, {dispatch}) {
-    this.dom = elt("button", {
+    this.dom = elt(«button», {
       onclick: () => startLoad(dispatch)
-    }, "📁 Load");
+    }, «📁 Load»);
   }
   syncState() {}
 }
 
 function startLoad(dispatch) {
-  let input = elt("input", {
-    type: "file",
+  let input = elt(«input», {
+    тип: «file»,
     onchange: () => finishLoad(input.files[0], dispatch)
   });
   document.body.appendChild(input);
@@ -561,20 +563,20 @@ function startLoad(dispatch) {
 }
 ```
 
-{{index [file, access], "input (HTML tag)"}}
+{{index [файл, доступ], «input (HTML-тег)»}}
 
-To get access to a file on the user's computer, we need the user to select the file through a file input field. But we don't want the load button to look like a file input field, so we create the file input when the button is clicked and then pretend that this file input itself was clicked.
+Щоб отримати доступ до файлу на комп'ютері користувача, нам потрібно, щоб користувач вибрав файл через поле введення файлу. Але ми не хочемо, щоб кнопка завантаження виглядала як поле введення файлу, тому ми створюємо введення файлу при натисканні кнопки, а потім вдаємо, що це саме введення файлу було натиснуто.
 
-{{index "FileReader class", "img (HTML tag)", "readAsDataURL method", "Picture class"}}
+{{index «FileReader class», «img (HTML-тег)», «readAsDataURL method», «Picture class»}}
 
-When the user has selected a file, we can use `FileReader` to get access to its contents, again as a ((data URL)). That URL can be used to create an `<img>` element, but because we can't get direct access to the pixels in such an image, we can't create a `Picture` object from that.
+Коли користувач вибрав файл, ми можемо використовувати `FileReader`, щоб отримати доступ до його вмісту, знову ж таки як ((URL-адресу даних)). Ця URL-адреса може бути використана для створення елемента `<img>`, але оскільки ми не можемо отримати прямий доступ до пікселів такого зображення, ми не можемо створити з нього об'єкт `Picture`.
 
 ```{includeCode: true}
 function finishLoad(file, dispatch) {
   if (file == null) return;
   let reader = new FileReader();
-  reader.addEventListener("load", () => {
-    let image = elt("img", {
+  reader.addEventListener(«load», () => {
+    let image = elt(«img», {
       onload: () => dispatch({
         picture: pictureFromImage(image)
       }),
@@ -585,58 +587,58 @@ function finishLoad(file, dispatch) {
 }
 ```
 
-{{index "canvas (HTML tag)", "getImageData method", "pictureFromImage function"}}
+{{index «canvas (HTML-тег)», «getImageData метод», «pictureFromImage функція»}}
 
-To get access to the pixels, we must first draw the picture to a `<canvas>` element. The canvas context has a `getImageData` method that allows a script to read its ((pixel))s. So once the picture is on the canvas, we can access it and construct a `Picture` object.
+Щоб отримати доступ до пікселів, ми повинні спочатку намалювати зображення до елемента `<canvas>`. Контекст полотна має метод `getImageData`, який дозволяє скрипту прочитати його ((pixel))s. Отже, коли зображення буде на полотні, ми зможемо отримати до нього доступ і створити об'єкт `Picture`.
 
 ```{includeCode: true}
 function pictureFromImage(image) {
-  let width = Math.min(100, image.width);
+  let width = Math.min(100, image.width)
   let height = Math.min(100, image.height);
-  let canvas = elt("canvas", {width, height});
-  let cx = canvas.getContext("2d");
+  let canvas = elt(«canvas», {width, height});
+  let cx = canvas.getContext(«2d»);
   cx.drawImage(image, 0, 0);
   let pixels = [];
   let {data} = cx.getImageData(0, 0, width, height);
 
   function hex(n) {
-    return n.toString(16).padStart(2, "0");
+    return n.toString(16).padStart(2, «0»);
   }
   for (let i = 0; i < data.length; i += 4) {
     let [r, g, b] = data.slice(i, i + 3);
-    pixels.push("#" + hex(r) + hex(g) + hex(b));
+    pixels.push(«#» + hex(r) + hex(g) + hex(b));
   }
   return new Picture(width, height, pixels);
 }
 ```
 
-We'll limit the size of images to 100 by 100 pixels, since anything bigger will look _huge_ on our display and might slow down the interface.
+Ми обмежимо розмір зображень до 100 на 100 пікселів, оскільки більші будуть виглядати _величезними_ на нашому дисплеї і можуть сповільнити роботу інтерфейсу.
 
-{{index "getImageData method", color, transparency}}
+{{index «метод getImageData», color, transparency}}
 
-The `data` property of the object returned by `getImageData` is an array of color components. For each pixel in the rectangle specified by the arguments, it contains four values that represent the red, green, blue, and _((alpha))_ components of the pixel's color, as numbers between 0 and 255. The alpha part represents opacity—when it is 0, the pixel is fully transparent, and when it is 255, it is fully opaque. For our purpose, we can ignore it.
+Властивість `data` об'єкта, що повертається методом `getImageData`, є масивом компонентів кольору. Для кожного пікселя у прямокутнику, заданому аргументами, він містить чотири значення, які представляють червону, зелену, синю та _((альфа))_ складові кольору пікселя у вигляді чисел від 0 до 255. Альфа-частина представляє непрозорість - коли вона дорівнює 0, піксель є повністю прозорим, а коли 255, він є повністю непрозорим. Для нашої мети ми можемо ігнорувати її.
 
-{{index "hexadecimal number", "toString method"}}
+{{index «шістнадцяткове число», «метод toString»}}
 
-The two hexadecimal digits per component, as used in our color notation, correspond precisely to the 0 to 255 range—two base-16 digits can express 16^2^ = 256 different numbers. The `toString` method of numbers can be given a base as an argument, so `n.toString(16)` will produce a string representation in base 16. We have to make sure that each number takes up two digits, so the `hex` helper function calls `padStart` to add a leading 0 when necessary.
+Дві шістнадцяткові цифри на компонент, що використовуються у наших позначеннях кольорів, точно відповідають діапазону від 0 до 255 - дві цифри з основою 16 можуть виражати 16^2^ = 256 різних чисел. Метод `toString` для чисел може передавати основу як аргумент, тому `n.toString(16)` створить рядкове представлення у системі числення з основою 16. Ми повинні переконатися, що кожне число займає дві цифри, тому допоміжна функція `hex` викликає `padStart` для додавання початкового 0, коли це необхідно.
 
-We can load and save now! That leaves just one more feature before we're done.
+Тепер ми можемо завантажувати і зберігати! Залишилася лише одна функція, і ми закінчимо.
 
-## Undo history
+## Відміна історії
 
-Because half the process of editing is making little mistakes and correcting them, an important feature in a drawing program is an ((undo history)).
+Оскільки половина процесу редагування полягає у тому, щоб робити маленькі помилки і виправляти їх, важливою функцією у програмі для малювання є ((відміна історії)).
 
-{{index "persistent data structure", [state, "of application"]}}
+{{index «persistent data structure», [state, «of application»]}}
 
-To be able to undo changes, we need to store previous versions of the picture. Since pictures are ((immutable)) values, that's easy. But it does require an additional field in the application state.
+Для того, щоб мати змогу скасувати зміни, нам потрібно зберігати попередні версії малюнка. Оскільки зображення є ((незмінними)) значеннями, це легко. Але це потребує додаткового поля у стані додатку.
 
-{{index "done property"}}
+{{index «done property»}}
 
-We'll add a `done` array to keep previous versions of the ((picture)). Maintaining this property requires a more complicated state update function that adds pictures to the array.
+Ми додамо масив `done` для зберігання попередніх версій ((picture)). Підтримка цієї властивості вимагає більш складної функції оновлення стану, яка додає зображення до масиву.
 
-{{index "doneAt property", "historyUpdateState function", "Date.now function"}}
+{{index «doneAt property», «historyUpdateState function», «Date.now function»}}
 
-We don't want to store _every_ change, though—just changes that are a certain amount of ((time)) apart. To be able to do that, we'll need a second property, `doneAt`, to track the time at which we last stored a picture in the history.
+Ми не хочемо зберігати _кожну_ зміну - лише зміни, які відбуваються через певний проміжок часу. Для цього нам знадобиться друга властивість, `doneAt`, щоб відстежувати час, коли ми востаннє зберігали зображення в історії.
 
 ```{includeCode: true}
 function historyUpdateState(state, action) {
@@ -649,7 +651,7 @@ function historyUpdateState(state, action) {
       doneAt: 0
     };
   } else if (action.picture &&
-             state.doneAt < Date.now() - 1000) {
+             state.doneAt < Date.now() - 1000) { } if (state.doneAt < Date.now() - 1000) {
     return {
       ...state,
       ...action,
@@ -662,23 +664,23 @@ function historyUpdateState(state, action) {
 }
 ```
 
-{{index "undo history"}}
+{{index «undo history»}}
 
-When the action is an undo action, the function takes the most recent picture from the history and makes that the current picture. It sets `doneAt` to zero so that the next change is guaranteed to store the picture back in the history, allowing you to revert to it another time if you want.
+Коли дія є дією скасування, функція бере останнє зображення з історії і робить його поточним зображенням. Вона встановлює `doneAt` в нуль, так що наступна зміна гарантовано збереже зображення назад в історію, що дозволить вам повернутися до нього іншим разом, якщо ви захочете.
 
-Otherwise, if the action contains a new picture and the last time we stored something is more than a second (1000 milliseconds) ago, the `done` and `doneAt` properties are updated to store the previous picture.
+В іншому випадку, якщо дія містить нове зображення, а востаннє ми зберігали щось більше секунди (1000 мілісекунд) тому, властивості `done` і `doneAt` буде оновлено, щоб зберегти попереднє зображення.
 
-{{index "UndoButton class", control}}
+{{index «UndoButton class», control}}
 
-The undo button ((component)) doesn't do much. It dispatches undo actions when clicked and disables itself when there is nothing to undo.
+Кнопка скасування ((компонент)) не робить багато чого. Вона виконує дії скасування при натисканні і вимикається, коли немає чого скасовувати.
 
 ```{includeCode: true}
 class UndoButton {
   constructor(state, {dispatch}) {
-    this.dom = elt("button", {
+    this.dom = elt(«button», {
       onclick: () => dispatch({undo: true}),
       disabled: state.done.length == 0
-    }, "⮪ Undo");
+    }, «⮪ Скасувати»);
   }
   syncState(state) {
     this.dom.disabled = state.done.length == 0;
@@ -686,17 +688,17 @@ class UndoButton {
 }
 ```
 
-## Let's draw
+## Малюємо
 
-{{index "PixelEditor class", "startState constant", "baseTools constant", "baseControls constant", "startPixelEditor function"}}
+{{index «клас PixelEditor», «константа startState», «константа baseTools», «константа baseControls», «функція startPixelEditor»}}
 
-To set up the application, we need to create a state, a set of ((tool))s, a set of ((control))s, and a ((dispatch)) function. We can pass them to the `PixelEditor` constructor to create the main component. Since we'll need to create several editors in the exercises, we first define some bindings.
+Щоб налаштувати програму, нам потрібно створити стан, набір ((інструментів)), набір ((елементів керування)) та функцію ((відправлення)). Ми можемо передати їх конструктору `PixelEditor` для створення головного компонента. Оскільки у вправах нам потрібно буде створити декілька редакторів, спочатку визначимо деякі прив'язки.
 
 ```{includeCode: true}
 const startState = {
-  tool: "draw",
-  color: "#000000",
-  picture: Picture.empty(60, 30, "#f0f0f0"),
+  tool: «draw»,
+  color: «#000000»,
+  picture: Picture.empty(60, 30, «#f0f0f0»),
   done: [],
   doneAt: 0
 };
@@ -722,66 +724,66 @@ function startPixelEditor({state = startState,
 }
 ```
 
-{{index "destructuring binding", "= operator", [property, access]}}
+{{index «destructuring binding», «= operator», [property, access]}}
 
-When destructuring an object or array, you can use `=` after a binding name to give the binding a ((default value)), which is used when the property is missing or holds `undefined`. The `startPixelEditor` function makes use of this to accept an object with a number of optional properties as an argument. If you don't provide a `tools` property, for example, `tools` will be bound to `baseTools`.
+При деструкції об'єкта або масиву ви можете використовувати `=` після імені прив'язки, щоб надати прив'язці значення a ((значення за замовчуванням)), яке використовується, коли властивість відсутня або має значення `undefined`. Функція `startPixelEditor` використовує це, щоб прийняти об'єкт з низкою необов'язкових властивостей як аргумент. Наприклад, якщо ви не вкажете властивість `tools`, то `tools` буде прив'язано до `baseTools`.
 
-This is how we get an actual editor on the screen:
+Таким чином ми отримаємо на екрані справжній редактор:
 
 ```{lang: html, startCode: true}
 <div></div>
 <script>
-  document.querySelector("div")
+  document.querySelector(«div»)
     .appendChild(startPixelEditor({}));
 </script>
 ```
 
-{{if interactive
+{{якщо інтерактивний
 
-Go ahead and draw something.
+Продовжуйте малювати.
 
 if}}
 
-## Why is this so hard?
+## Чому це так складно?
 
-Browser technology is amazing. It provides a powerful set of interface building blocks, ways to style and manipulate them, and tools to inspect and debug your applications. The software you write for the ((browser)) can be run on almost every computer and phone on the planet.
+Технологія браузерів дивовижна. Вона надає потужний набір будівельних блоків інтерфейсу, способів стилізації та маніпулювання ними, а також інструменти для перевірки та налагодження ваших програм. Програмне забезпечення, яке ви пишете для ((браузера)), можна запустити майже на кожному комп'ютері та телефоні на планеті.
 
-At the same time, browser technology is ridiculous. You have to learn a large number of silly tricks and obscure facts to master it, and the default programming model it provides is so problematic that most programmers prefer to cover it in several layers of ((abstraction)) rather than deal with it directly.
+У той же час, технологія браузерів просто смішна. Щоб опанувати її, потрібно вивчити велику кількість дурних трюків і незрозумілих фактів, а стандартна модель програмування, яку вона надає, настільки проблематична, що більшість програмістів вважають за краще покрити її кількома шарами ((абстракції)), ніж мати справу з нею безпосередньо.
 
-{{index standard, evolution}}
+{{індексний стандарт, еволюція}}
 
-While the situation is definitely improving, it mostly does so in the form of more elements being added to address shortcomings—creating even more ((complexity)). A feature used by a million websites can't really be replaced. Even if it could, it would be hard to decide what it should be replaced with.
+Хоча ситуація, безумовно, покращується, здебільшого це відбувається у формі додавання нових елементів для усунення недоліків, що створює ще більшу ((складність)). Функцію, яку використовують мільйони веб-сайтів, насправді не можна замінити. Навіть якби це було можливо, було б важко вирішити, чим її замінити.
 
-{{index "social factors", "economic factors", history}}
+{{індекс «соціальні фактори», «економічні фактори», історія}}
 
-Technology never exists in a vacuum—we're constrained by our tools and the social, economic, and historical factors that produced them. This can be annoying, but it is generally more productive to try to build a good understanding of how the _existing_ technical reality works—and why it is the way it is—than to rage against it or hold out for another reality.
+Технології ніколи не існують у вакуумі - ми обмежені нашими інструментами та соціальними, економічними й історичними факторами, які їх створили. Це може дратувати, але загалом продуктивніше намагатися зрозуміти, як працює _існуюча_ технічна реальність - і чому вона є саме такою, - ніж лютувати проти неї або шукати іншу реальність.
 
-New ((abstraction))s _can_ be helpful. The component model and ((data flow)) convention I used in this chapter is a crude form of that. As mentioned, there are libraries that try to make user interface programming more pleasant. At the time of writing, [React](https://reactjs.org/) and [Svelte](https://svelte.dev/) are popular choices, but there's a whole cottage industry of such frameworks. If you're interested in programming web applications, I recommend investigating a few of them to understand how they work and what benefits they provide.
+Нові ((абстракції))  можуть бути корисними. Компонентна модель і угода ((потік даних)), яку я використовував у цій главі, є грубою формою цього. Як вже згадувалося, існують бібліотеки, які намагаються зробити програмування інтерфейсу користувача більш приємним. На момент написання цієї статті [React] (https://reactjs.org/) та [Svelte] (https://svelte.dev/) були популярними, але існує ціла кустарна індустрія таких фреймворків. Якщо ви зацікавлені в програмуванні веб-додатків, я рекомендую ознайомитися з деякими з них, щоб зрозуміти, як вони працюють і які переваги надають.
 
-## Exercises
+## Вправи
 
-There is still room for improvement in our program. Let's add a few more features as exercises.
+У нашій програмі все ще є місце для вдосконалення. Давайте додамо ще кілька функцій у вигляді вправ.
 
-### Keyboard bindings
+### Прив'язка клавіатури
 
-{{index "keyboard bindings (exercise)"}}
+{{index «прив'язки клавіатури (вправа)»}}
 
-Add ((keyboard)) shortcuts to the application. The first letter of a tool's name selects the tool, and [ctrl]{keyname}-Z or [command]{keyname}-Z activates undo.
+Додайте ((клавіатура)) комбінації клавіш до програми. Перша літера назви інструмента вибирає інструмент, а [ctrl]{назва клавіші}-Z або [command]{назва клавіші}-Z активує скасування.
 
-{{index "PixelEditor class", "tabindex attribute", "elt function", "keydown event"}}
+{{index «клас PixelEditor», «атрибут tabindex», «функція elt», «подія натискання клавіші»}}
 
-Do this by modifying the `PixelEditor` component. Add a `tabIndex` property of 0 to the wrapping `<div>` element so that it can receive keyboard ((focus)). Note that the _property_ corresponding to the `tabindex` _attribute_ is called `tabIndex`, with a capital I, and our `elt` function expects property names. Register the key event handlers directly on that element. This means you have to click, touch, or tab to the application before you can interact with it with the keyboard.
+Зробіть це, модифікувавши компонент `PixelEditor`. Додайте властивість `tabIndex`, рівну 0, до обгорткового елемента `<div>`, щоб він міг отримувати клавіатуру ((focus)). Зверніть увагу, що _властивість_, яка відповідає _атрибуту_ `tabindex`, називається `tabIndex` з великої літери, а наша функція `elt` очікує імена властивостей. Зареєструйте обробники ключових подій безпосередньо на цьому елементі. Це означає, що вам доведеться клацнути, торкнутися або перейти на вкладку програми, перш ніж ви зможете взаємодіяти з нею за допомогою клавіатури.
 
-{{index "ctrlKey property", "metaKey property", "control key", "command key"}}
+{{index «ctrlKey property», «metaKey property», «control key», «command key»}}
 
-Remember that keyboard events have `ctrlKey` and `metaKey` (for [command]{keyname} on Mac) properties that you can use to see whether those keys are held down.
+Пам'ятайте, що клавіатурні події мають властивості `ctrlKey` та `metaKey` (для [command]{keyname} на Mac), за допомогою яких можна дізнатися, чи утримуються ці клавіші натиснутими.
 
-{{if interactive
+{{якщо інтерактивна
 
 ```{test: no, lang: html}
 <div></div>
 <script>
-  // The original PixelEditor class. Extend the constructor.
+  // Оригінальний клас PixelEditor. Розширити конструктор.
   class PixelEditor {
     constructor(state, config) {
       let {tools, controls, dispatch} = config;
@@ -796,9 +798,9 @@ Remember that keyboard events have `ctrlKey` and `metaKey` (for [command]{keynam
       });
       this.controls = controls.map(
         Control => new Control(state, config));
-      this.dom = elt("div", {}, this.canvas.dom, elt("br"),
+      this.dom = elt(«div», {}, this.canvas.dom, elt(«br»),
                      ...this.controls.reduce(
-                       (a, c) => a.concat(" ", c.dom), []));
+                       (a, c) => a.concat(» », c.dom), []));
     }
     syncState(state) {
       this.state = state;
@@ -807,7 +809,7 @@ Remember that keyboard events have `ctrlKey` and `metaKey` (for [command]{keynam
     }
   }
 
-  document.querySelector("div")
+  document.querySelector(«div»)
     .appendChild(startPixelEditor({}));
 </script>
 ```
@@ -816,55 +818,55 @@ if}}
 
 {{hint
 
-{{index "keyboard bindings (exercise)", "key property", "shift key"}}
+{{index «прив'язка клавіатури (вправа)», «властивість клавіші», «клавіша shift»}}
 
-The `key` property of events for letter keys will be the lowercase letter itself, if [shift]{keyname} isn't being held. We're not interested in key events with [shift]{keyname} here.
+Властивістю `key` подій для літерних клавіш буде сама мала літера, якщо [shift]{назва клавіші} не утримується. Нас тут не цікавлять події клавіш з [shift]{ім'я_клавіші}.
 
-{{index "keydown event"}}
+{{index «keydown event»}}
 
-A `"keydown"` handler can inspect its event object to see whether it matches any of the shortcuts. You can automatically get the list of first letters from the `tools` object so that you don't have to write them out.
+Обробник `«keydown»` може перевірити об'єкт події, щоб побачити, чи відповідає він жодному зі сполучень клавіш. Ви можете автоматично отримати список перших літер з об'єкта `tools`, щоб вам не довелося їх виписувати.
 
-{{index "preventDefault method"}}
+{{index «preventDefault method»}}
 
-When the key event matches a shortcut, call `preventDefault` on it and ((dispatch)) the appropriate action.
+Коли ключова подія збігається з ярликом, викличте для нього метод `preventDefault` і ((відправте)) відповідну дію.
 
-hint}}
+підказка}}
 
-### Efficient drawing
+### Ефективне малювання
 
-{{index "efficient drawing (exercise)", "canvas (HTML tag)", efficiency}}
+{{index «ефективне малювання (вправа)», «полотно (тег HTML)», efficiency}}
 
-During drawing, the majority of work that our application does happens in `drawPicture`. Creating a new state and updating the rest of the DOM isn't very expensive, but repainting all the pixels on the canvas is quite a bit of work.
+Під час малювання більшість роботи, яку виконує наш додаток, відбувається у `drawPicture`. Створення нового стану та оновлення решти DOM не є дуже дорогим, але перемальовування всіх пікселів на полотні є досить складним завданням.
 
-{{index "syncState method", "PictureCanvas class"}}
+{{index «syncState method», «PictureCanvas class»}}
 
-Find a way to make the `syncState` method of `PictureCanvas` faster by redrawing only the pixels that actually changed.
+Знайдіть спосіб зробити метод `синхронізації` класу `PictureCanvas` швидшим, перемальовуючи лише ті пікселі, які дійсно змінилися.
 
-{{index "drawPicture function", compatibility}}
+{{index «drawPicture function», compatibility}}
 
-Remember that `drawPicture` is also used by the save button, so if you change it, either make sure the changes don't break the old use or create a new version with a different name.
+Пам'ятайте, що `drawPicture` також використовується кнопкою збереження, тому якщо ви змінюєте її, переконайтеся, що зміни не порушують старе використання, або створіть нову версію з іншою назвою.
 
-{{index "width property", "height property"}}
+{{index «width property», «height property»}}
 
-Also note that changing the size of a `<canvas>` element, by setting its `width` or `height` properties, clears it, making it entirely transparent again.
+Також зауважте, що зміна розміру елемента `<canvas>` шляхом встановлення його властивостей `width` або `height` очищає його, роблячи його знову повністю прозорим.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no, lang: html}
 <div></div>
 <script>
-  // Change this method
+  // Змініть цей метод
   PictureCanvas.prototype.syncState = function(picture) {
     if (this.picture == picture) return;
     this.picture = picture;
     drawPicture(this.picture, this.dom, scale);
   };
 
-  // You may want to use or change this as well
-  function drawPicture(picture, canvas, scale) {
+  // Можливо, ви також захочете використати або змінити це
+  функція drawPicture(picture, canvas, scale) {
     canvas.width = picture.width * scale;
     canvas.height = picture.height * scale;
-    let cx = canvas.getContext("2d");
+    let cx = canvas.getContext(«2d»);
 
     for (let y = 0; y < picture.height; y++) {
       for (let x = 0; x < picture.width; x++) {
@@ -874,7 +876,7 @@ Also note that changing the size of a `<canvas>` element, by setting its `width`
     }
   }
 
-  document.querySelector("div")
+  document.querySelector(«div»)
     .appendChild(startPixelEditor({}));
 </script>
 ```
@@ -883,39 +885,39 @@ if}}
 
 {{hint
 
-{{index "efficient drawing (exercise)"}}
+{{index «ефективне малювання (вправа)»}}
 
-This exercise is a good example of how ((immutable)) data structures can make code _faster_. Because we have both the old and the new picture, we can compare them and redraw only the pixels that changed color, saving more than 99 percent of the drawing work in most cases.
+Ця вправа є гарним прикладом того, як ((незмінні)) структури даних можуть зробити код _швидшим_. Оскільки у нас є старе і нове зображення, ми можемо порівняти їх і перемалювати лише ті пікселі, що змінили колір, заощадивши у більшості випадків понад 99 відсотків роботи з малювання.
 
-{{index "drawPicture function"}}
+{{index «drawPicture function»}}
 
-You can either write a new function `updatePicture` or have `drawPicture` take an extra argument, which may be undefined or the previous picture. For each ((pixel)), the function checks whether a previous picture was passed with the same color at this position and skips the pixel when that is the case.
+Ви можете або написати нову функцію `updatePicture`, або використовувати функцію `drawPicture` з додатковим аргументом, який може бути невизначеним або попереднім зображенням. Для кожного ((пікселя)) функція перевіряє, чи було передано попереднє зображення з таким самим кольором у цій позиції, і пропускає піксель, якщо це так.
 
-{{index "width property", "height property", "canvas (HTML tag)"}}
+{{index «width property», «height property», «canvas (HTML tag)»}}
 
-Because the canvas gets cleared when we change its size, you should also avoid touching its `width` and `height` properties when the old picture and the new picture have the same size. If they are different, which will happen when a new picture has been loaded, you can set the binding holding the old picture to `null` after changing the canvas size because you shouldn't skip any pixels after you've changed the canvas size.
+Оскільки полотно очищується, коли ми змінюємо його розмір, вам також слід уникати зміни його властивостей `width` і `height`, коли старе і нове зображення мають однаковий розмір. Якщо вони відрізняються, що станеться після завантаження нового зображення, ви можете встановити прив'язку, яка утримує старе зображення, на `null` після зміни розміру полотна, оскільки ви не повинні пропустити жодного пікселя після зміни розміру полотна.
 
-hint}}
+підказка}}
 
-### Circles
+### Кола
 
-{{index "circles (exercise)", dragging}}
+{{індекс «кола (вправа)», перетягування}}
 
-Define a ((tool)) called `circle` that draws a filled circle when you drag. The center of the circle lies at the point where the drag or touch gesture starts, and its ((radius)) is determined by the distance dragged.
+Визначте ((інструмент)) з назвою `circle`, який малює зафарбоване коло під час перетягування. Центр кола лежить у точці, де починається перетягування, а його ((радіус)) визначається відстанню, на яку перетягується.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no, lang: html}
 <div></div>
 <script>
   function circle(pos, state, dispatch) {
-    // Your code here
+    // Ваш код тут
   }
 
   let dom = startPixelEditor({
     tools: {...baseTools, circle}
   });
-  document.querySelector("div").appendChild(dom);
+  document.querySelector(«div»).appendChild(dom);
 </script>
 ```
 
@@ -923,42 +925,42 @@ if}}
 
 {{hint
 
-{{index "circles (exercise)", "rectangle function"}}
+{{index «кола (вправа)», «функція прямокутника»}}
 
-You can take some inspiration from the `rectangle` tool. As with that tool, you'll want to keep drawing on the _starting_ picture, rather than the current picture, when the pointer moves.
+Ви можете надихнутися інструментом ``прямокутник``. Як і у випадку з цим інструментом, під час переміщення вказівника вам слід продовжувати малювати на _початковому_ зображенні, а не на поточному.
 
-To figure out which pixels to color, you can use the ((Pythagorean theorem)). First figure out the distance between the current pointer position and the start position by taking the square root (`Math.sqrt`) of the sum of the square (`x ** 2`) of the difference in x-coordinates and the square of the difference in y-coordinates. Then loop over a square of pixels around the start position, whose sides are at least twice the ((radius)), and color those that are within the circle's radius, again using the Pythagorean formula to figure out their ((distance)) from the center.
+Щоб визначити, які пікселі зафарбовувати, можна скористатися теоремою Піфагора. Спочатку обчисліть відстань між поточним положенням вказівника і початковим положенням, взявши квадратний корінь (`Math.sqrt`) з суми квадрата (`x ** 2`) різниці в координатах x і квадрата різниці в координатах y. Потім обведіть квадрат пікселів навколо початкової позиції, сторони якого принаймні вдвічі перевищують ((радіус)), і зафарбуйте ті, що знаходяться в межах радіуса кола, знову ж таки використовуючи формулу Піфагора, щоб визначити їхню ((відстань)) від центру.
 
-Make sure you don't try to color pixels that are outside of the picture's boundaries.
+Переконайтеся, що ви не намагаєтеся зафарбувати пікселі, які знаходяться за межами зображення.
 
-hint}}
+підказка}}
 
-### Proper lines
+### Власні лінії
 
-{{index "proper lines (exercise)", "line drawing"}}
+{{index «правильні лінії (вправа)», «малювання ліній»}}
 
-This is a more advanced exercise than the preceding three, and it will require you to design a solution to a nontrivial problem. Make sure you have plenty of time and ((patience)) before starting to work on this exercise, and don't get discouraged by initial failures.
+Ця вправа є більш складною, ніж попередні три, і вимагатиме від вас розв'язання нетривіальної задачі. Переконайтеся, що у вас достатньо часу і терпіння перед початком роботи над цією вправою, і не падайте духом через перші невдачі.
 
-{{index "draw function", "mousemove event", "touchmove event"}}
+{{index «draw function», «mousemove event», «touchmove event»}}
 
-On most browsers, when you select the `draw` ((tool)) and quickly drag across the picture, you don't get a closed line. Rather, you get dots with gaps between them because the `"mousemove"` or `"touchmove"` events did not fire quickly enough to hit every ((pixel)).
+У більшості браузерів, коли ви вибираєте `draw` (інструмент малювання) і швидко перетягуєте зображення, ви не отримуєте замкнену лінію. Скоріше, ви отримаєте крапки з проміжками між ними, оскільки події `mousemove` або `touchmove` не спрацювали достатньо швидко, щоб потрапити до кожного пікселя ((пікселя)).
 
-Improve the `draw` tool to make it draw a full line. This means you have to make the motion handler function remember the previous position and connect that to the current one.
+Вдосконалити інструмент `draw`, щоб він малював повну лінію. Це означає, що вам потрібно змусити функцію обробника руху запам'ятовувати попередню позицію і пов'язувати її з поточною.
 
-To do this, since the pixels can be an arbitrary distance apart, you'll have to write a general line drawing function.
+Для цього, оскільки пікселі можуть знаходитися на довільній відстані один від одного, вам доведеться написати загальну функцію малювання лінії.
 
-A line between two pixels is a connected chain of pixels, as straight as possible, going from the start to the end. Diagonally adjacent pixels count as connected. A slanted line should look like the picture on the left, not the picture on the right.
+Лінія між двома пікселями - це з'єднаний ланцюжок пікселів, максимально прямий, що йде від початку до кінця. Сусідні по діагоналі пікселі вважаються з'єднаними. Нахилена лінія має виглядати як на малюнку ліворуч, а не як на малюнку праворуч.
 
-{{figure {url: "img/line-grid.svg", alt: "Diagram of two pixelated lines, one light, skipping across pixels diagonally, and one heavy, with all pixels connected horizontally or vertically", width: "6cm"}}}
+{{figure {url: «img/line-grid.svg», alt: «Діаграма з двох піксельних ліній, однієї легкої, що пропускає пікселі по діагоналі, і однієї важкої, з усіма пікселями, з'єднаними по горизонталі або вертикалі», width: “6cm”}}}.
 
-Finally, if we have code that draws a line between two arbitrary points, we might as well use it to also define a `line` tool, which draws a straight line between the start and end of a drag.
+Нарешті, якщо у нас є код, який малює лінію між двома довільними точками, ми можемо також використати його для визначення інструмента `line`, який малює пряму лінію між початком і кінцем перетягування.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no, lang: html}
 <div></div>
 <script>
-  // The old draw tool. Rewrite this.
+  // Старий інструмент малювання. Перепишіть це.
   function draw(pos, state, dispatch) {
     function drawPixel({x, y}, state) {
       let drawn = {x, y, color: state.color};
@@ -969,13 +971,13 @@ Finally, if we have code that draws a line between two arbitrary points, we migh
   }
 
   function line(pos, state, dispatch) {
-    // Your code here
+    // Ваш код тут
   }
 
   let dom = startPixelEditor({
     tools: {draw, line, fill, rectangle, pick}
   });
-  document.querySelector("div").appendChild(dom);
+  document.querySelector(«div»).appendChild(dom);
 </script>
 ```
 
@@ -983,30 +985,30 @@ if}}
 
 {{hint
 
-{{index "proper lines (exercise)", "line drawing"}}
+{{index «правильні лінії (вправа)», «малювання ліній»}}
 
-The thing about the problem of drawing a pixelated line is that it is really four similar but slightly different problems. Drawing a horizontal line from the left to the right is easy—you loop over the x-coordinates and color a pixel at every step. If the line has a slight slope (less than 45 degrees or ¼π radians), you can interpolate the y-coordinate along the slope. You still need one pixel per _x_ position, with the _y_ position of those pixels determined by the slope.
+Справа у тому, що проблема малювання піксельної лінії полягає у тому, що насправді це чотири схожі, але дещо відмінні проблеми. Намалювати горизонтальну лінію зліва направо дуже просто - ви обходите координати x і зафарбовуєте піксель на кожному кроці. Якщо лінія має невеликий нахил (менше 45 градусів або ¼π радіана), ви можете інтерполювати координату y вздовж нахилу. Вам все одно знадобиться один піксель на позицію _x_, а позиція _y_ цих пікселів визначатиметься нахилом.
 
-But as soon as your slope goes across 45 degrees, you need to switch the way you treat the coordinates. You now need one pixel per _y_ position, since the line goes up more than it goes left. And then, when you cross 135 degrees, you have to go back to looping over the x-coordinates, but from right to left.
+Але як тільки нахил переходить через 45 градусів, вам потрібно змінити спосіб обробки координат. Тепер вам потрібен один піксель на позицію _y_, оскільки лінія йде вгору більше, ніж вліво. А потім, коли ви перетинаєте 135 градусів, вам потрібно повернутися до циклу над координатами x, але справа наліво.
 
-You don't actually have to write four loops. Since drawing a line from _A_ to _B_ is the same as drawing a line from _B_ to _A_, you can swap the start and end positions for lines going from right to left and treat them as going left to right.
+Насправді вам не потрібно писати чотири цикли. Оскільки намалювати лінію від _A_ до _B_ - це те саме, що намалювати лінію від _B_ до _A_, ви можете поміняти місцями початкову і кінцеву позиції для ліній, що йдуть справа наліво, і розглядати їх як такі, що йдуть зліва направо.
 
-So you need two different loops. The first thing your line drawing function should do is check whether the difference between the x-coordinates is larger than the difference between the y-coordinates. If it is, this is a horizontalish line, and if not, a verticalish one.
+Отже, вам потрібні два різних цикли. Перше, що має зробити ваша функція малювання ліній, це перевірити, чи різниця між x-координатами більша за різницю між y-координатами. Якщо так, то це буде горизонтальна лінія, а якщо ні, то вертикальна.
 
-{{index "Math.abs function", "absolute value"}}
+{{index «Math.abs function», «абсолютне значення»}}
 
-Make sure you compare the _absolute_ values of the _x_ and _y_ difference, which you can get with `Math.abs`.
+Обов'язково порівнюйте _абсолютні_ значення різниці _x_ та _y_, які ви можете отримати за допомогою `Math.abs`.
 
-{{index "swapping bindings"}}
+{{index «swapping bindings»}}
 
-Once you know along which ((axis)) you will be looping, you can check whether the start point has a higher coordinate along that axis than the endpoint and swap them if necessary. A succinct way to swap the values of two bindings in JavaScript uses ((destructuring assignment)) like this:
+Коли ви знаєте, вздовж якої ((осі)) ви будете виконувати цикл, ви можете перевірити, чи початкова точка має вищу координату вздовж цієї осі, ніж кінцева, і поміняти їх місцями, якщо це необхідно. Лаконічний спосіб поміняти місцями значення двох прив'язок у JavaScript використовує ((деструктурування присвоєння)) таким чином:
 
 ```{test: no}
 [start, end] = [end, start];
 ```
 
-{{index rounding}}
+{{округлення індексу}}
 
-Then you can compute the ((slope)) of the line, which determines the amount the coordinate on the other axis changes for each step you take along your main axis. With that, you can run a loop along the main axis while also tracking the corresponding position on the other axis, and you can draw pixels on every iteration. Make sure you round the nonmain axis coordinates, since they are likely to be fractional and the `draw` method doesn't respond well to fractional coordinates.
+Після цього ви можете обчислити ((нахил)) лінії, який визначає, наскільки змінюється координата на іншій осі для кожного кроку, який ви робите вздовж головної осі. Таким чином, ви можете виконати цикл вздовж головної осі, одночасно відстежуючи відповідну позицію на іншій осі, і ви можете малювати пікселі на кожній ітерації. Переконайтеся, що ви округлюєте координати неосновної осі, оскільки вони можуть бути дробовими, а метод `draw` погано реагує на дробові координати.
 
-hint}}
+підказка}}

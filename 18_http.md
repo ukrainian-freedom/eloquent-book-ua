@@ -1,149 +1,151 @@
 {{meta {}}}
 
-# HTTP and Forms
+# HTTP та форми
 
-{{quote {author: "Tim Berners-Lee", chapter: true}
+{{quote {author: «Tim Berners-Lee», chapter: true}}
 
-What was often difficult for people to understand about the design was that there was nothing else beyond URLs, HTTP and HTML. There was no central computer 'controlling' the web, no single network on which these protocols worked, not even an organisation anywhere that 'ran' the Web. The Web was not a physical 'thing' that existed in a certain 'place'. It was a 'space' in which information could exist.
+Людям часто було важко зрозуміти, що крім URL-адрес, HTTP і HTML не було нічого іншого. Не було центрального комп'ютера, який би «керував» Інтернетом, не було єдиної мережі, в якій би працювали ці протоколи, не було навіть організації, яка б «керувала» Інтернетом. 
 
+Інтернет не був фізичною «річчю», яка існувала в певному «місці». Це був «простір», в якому могла існувати інформація.
 quote}}
 
-{{index "Fielding, Roy"}}
+{{index «Філдінг, Рой»}}
 
-{{figure {url: "img/chapter_picture_18.jpg", alt: "Illustration showing a web sign-up form on a parchment scroll", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_18.jpg», alt: «Ілюстрація, що показує веб-форму реєстрації на сувої пергаменту», »chapter: «Обрамлення"}}}
 
-{{index [browser, environment]}}
+{{індекс [браузера, середовища]}}
 
-The Hypertext Transfer Protocol, introduced in [Chapter ?](browser#web), is the mechanism through which data is requested and provided on the ((World Wide Web)). This chapter describes the ((protocol)) in more detail and explains the way browser JavaScript has access to it.
+Протокол передачі гіпертексту, представлений у [главі ?](браузер#веб), є механізмом, за допомогою якого запитуються та надаються дані у ((всесвітній павутині)). У цій главі більш детально описується ((протокол)) і пояснюється, яким чином JavaScript браузера має доступ до нього.
 
-## The protocol
+## Протокол
 
-{{index "IP address"}}
+{{index «IP-адреса»}}
 
-If you type _eloquentjavascript.net/18_http.html_ in your browser's ((address bar)), the ((browser)) first looks up the ((address)) of the server associated with _eloquentjavascript.net_ and tries to open a ((TCP)) ((connection)) to it on ((port)) 80, the default port for ((HTTP)) traffic. If the ((server)) exists and accepts the connection, the browser might send something like this:
+Якщо ви наберете _eloquentjavascript.net/18_http.html_ в ((адресному рядку)) вашого браузера, ((браузер)) спочатку знайде ((адресу)) сервера, пов'язаного з _eloquentjavascript.net_, і спробує відкрити ((TCP)) ((з'єднання)) з ним через ((порт)) 80, порт за замовчуванням для ((HTTP)) трафіку. Якщо ((сервер)) існує і приймає з'єднання, браузер може надіслати щось на зразок цього:
 
 ```{lang: http}
 GET /18_http.html HTTP/1.1
 Host: eloquentjavascript.net
-User-Agent: Your browser's name
+User-Agent: Назва вашого браузера
 ```
 
-Then the server responds, through that same connection.
+Потім сервер відповідає через те саме з'єднання.
 
 ```{lang: http}
 HTTP/1.1 200 OK
 Content-Length: 87320
 Content-Type: text/html
-Last-Modified: Fri, 13 Oct 2023 10:05:41 GMT
+Востаннє змінено: Fri, 13 Oct 2023 10:05:41 GMT
 
 <!doctype html>
-... the rest of the document
+... решта документа
 ```
 
-The browser takes the part of the ((response)) after the blank line, its _body_ (not to be confused with the HTML `<body>` tag), and displays it as an ((HTML)) document.
+Браузер бере частину ((відповідь)) після порожнього рядка, його _тіло_ (не плутати з тегом HTML `<body>`), і відображає його як ((HTML)) документ.
 
-{{index HTTP}}
+{{індекс HTTP}}
 
-The information sent by the client is called the _((request))_. It starts with this line:
+Інформація, яку надсилає клієнт, називається _((запит))_. Вона починається з цього рядка:
 
 ```{lang: http}
 GET /18_http.html HTTP/1.1
+        
 ```
 
-{{index "DELETE method", "PUT method", "GET method", [method, HTTP]}}
+{{індекс «метод DELETE», «метод PUT», «метод GET», [метод, HTTP]}}
 
-The first word is the _method_ of the ((request)). `GET` means that we want to _get_ the specified resource. Other common methods are `DELETE` to delete a resource, `PUT` to create or replace it, and `POST` to send information to it. Note that the ((server)) is not obliged to carry out every request it gets. If you walk up to a random website and tell it to `DELETE` its main page, it'll probably refuse.
+Перше слово - це _метод_ ((запиту)). `GET` означає, що ми хочемо _отримати_ вказаний ресурс. Інші поширені методи: `DELETE` для видалення ресурсу, `PUT` для створення або заміни ресурсу і `POST` для надсилання інформації до нього. Зауважте, що ((сервер)) не зобов'язаний виконувати кожен запит, який він отримує. Якщо ви підійдете до випадкового сайту і скажете йому `DELETE` його головну сторінку, він, ймовірно, відмовиться.
 
-{{index [path, URL], GitHub, [file, resource]}}
+{{index [шлях, URL], GitHub, [файл, ресурс]}}
 
-The part after the method name is the path of the _((resource))_ the request applies to. In the simplest case, a resource is simply a file on the ((server)), but the protocol doesn't require it to be. A resource may be anything that can be transferred _as if_ it is a file. Many servers generate the responses they produce on the fly. For example, if you open [_https://github.com/marijnh_](https://github.com/marijnh), the server looks in its database for a user named "marijnh", and if it finds one, it will generate a profile page for that user.
+Частина після імені методу - це шлях до _((ресурсу))_, до якого застосовується запит. У найпростішому випадку ресурс - це просто файл на ((сервері)), але протокол не вимагає, щоб він був саме таким. Ресурсом може бути будь-що, що може бути передане так,  ніби це файл. Багато серверів генерують відповіді «на льоту». Наприклад, якщо ви відкриваєте [_https://github.com/marijnh_](https://github.com/marijnh), сервер шукає у своїй базі даних користувача на ім'я «marijnh», і якщо знаходить його, то генерує сторінку профілю для цього користувача.
 
-After the resource path, the first line of the request mentions `HTTP/1.1` to indicate the ((version)) of the ((HTTP)) ((protocol)) it is using.
+Після шляху до ресурсу в першому рядку запиту згадується `HTTP/1.1` для позначення ((версії)) ((протоколу)) ((HTTP)), який він використовує.
 
-In practice, many sites use HTTP version 2, which supports the same concepts as version 1.1 but is a lot more complicated so that it can be faster. Browsers will automatically switch to the appropriate protocol version when talking to a given server, and the outcome of a request is the same regardless of which version is used. Because version 1.1 is more straightforward and easier to play around with, we'll use that to illustrate the protocol.
+На практиці багато сайтів використовують HTTP версії 2, яка підтримує ті ж концепції, що і версія 1.1, але набагато складніша, тому може бути швидшою. Браузери автоматично перемикаються на відповідну версію протоколу при спілкуванні з певним сервером, і результат запиту буде однаковим незалежно від того, яка версія використовується. Оскільки версія 1.1 є більш простою і з нею легше гратися, ми будемо використовувати її для ілюстрації протоколу.
 
-{{index "status code"}}
+{{index «status code»}}
 
-The server's ((response)) will start with a version as well, followed by the status of the response, first as a three-digit status code and then as a human-readable string.
+Відповідь сервера ((response)) також починатиметься з версії, за якою слідуватиме статус відповіді, спочатку у вигляді тризначного коду статусу, а потім у вигляді рядка, що читається людиною.
 
 ```{lang: http}
 HTTP/1.1 200 OK
 ```
 
-{{index "200 (HTTP status code)", "error response", "404 (HTTP status code)"}}
+{{index «200 (код статусу HTTP)», «відповідь про помилку», «404 (код статусу HTTP)»}}
 
-Status codes starting with a 2 indicate that the request succeeded. Codes starting with 4 mean there was something wrong with the ((request)). The most famous HTTP status code is probably 404, which means that the resource could not be found. Codes that start with 5 mean an error happened on the ((server)) and the request is not to blame.
+Коди статусу, що починаються з 2, означають, що запит виконано успішно. Коди, що починаються з 4, означають, що з ((запитом)) було щось не так. Найвідомішим кодом статусу HTTP, мабуть, є 404, який означає, що ресурс не вдалося знайти. Коди, що починаються з 5, означають, що сталася помилка на ((сервері)) і запит не винен.
 
 {{index HTTP}}
 
 {{id headers}}
 
-The first line of a request or response may be followed by any number of _((header))s_. These are lines in the form `name: value` that specify extra information about the request or response. These headers were part of the example ((response)):
+За першим рядком запиту або відповіді може слідувати будь-яка кількість _((заголовків))s_. Це рядки у вигляді `name: value`, які вказують додаткову інформацію про запит або відповідь. Ці заголовки були частиною прикладу ((response)):
 
 ```{lang: null}
 Content-Length: 87320
 Content-Type: text/html
-Last-Modified: Fri, 13 Oct 2023 10:05:41 GMT
+Востаннє змінено: Fri, 13 Oct 2023 10:05:41 GMT
 ```
 
-{{index "Content-Length header", "Content-Type header", "Last-Modified header"}}
+{{index «Content-Length header», «Content-Type header», «Last-Modified header»}}
 
-This tells us the size and type of the response document. In this case, it is an HTML document of 87,320 bytes. It also tells us when that document was last modified.
+Це показує нам розмір і тип документа-відповіді. У цьому випадку це HTML-документ розміром 87 320 байт. Він також повідомляє нам, коли цей документ було востаннє змінено.
 
-The client and server are free to decide what ((header))s to include in their ((request))s or ((response))s. But some of them are necessary for things to work. For example, without a `Content-Type` header in the response, the browser won't know how to display the document.
+Клієнт і сервер вільні вирішувати, які ((заголовки)) включати в свої ((запити)) або ((відповіді)). Але деякі з них необхідні для роботи. Наприклад, без заголовка `Content-Type` у відповіді браузер не знатиме, як відобразити документ.
 
-{{index "GET method", "DELETE method", "PUT method", "POST method", "body (HTTP)"}}
+{{index «метод GET», «метод DELETE», «метод PUT», «метод POST», «тіло (HTTP)»}}
 
-After the headers, both requests and responses may include a blank line followed by a body, which contains the actual document being sent. `GET` and `DELETE` requests don't send along any data, but `PUT` and `POST` requests do. Some response types, such as error responses, also don't require a body.
+Після заголовків як запити, так і відповіді можуть містити порожній рядок, за яким слідує тіло, що містить власне документ, який надсилається. Запити `GET` і `DELETE` не надсилають жодних даних, а запити `PUT` і `POST` надсилають. Деякі типи відповідей, такі як відповіді на помилки, також не потребують тіла.
 
-## Browsers and HTTP
+## Браузери та HTTP
 
-{{index HTTP, [file, resource]}}
+{{index HTTP, [файл, ресурс]}}
 
-As we saw, a ((browser)) will make a request when we enter a ((URL)) in its ((address bar)). When the resulting HTML page references other files, such as ((image))s and JavaScript files, it will retrieve those as well.
+Як ми бачили, ((браузер)) зробить запит, коли ми введемо ((URL)) в його ((адресний рядок)). Коли результуюча HTML-сторінка посилається на інші файли, такі як ((зображення)) та файли JavaScript, вона також отримає їх.
 
-{{index parallelism, "GET method"}}
+{{індексний паралелізм, «метод GET»}}
 
-A moderately complicated ((website)) can easily include anywhere from 10 to 200 ((resource))s. To be able to fetch those quickly, browsers will make several `GET` requests simultaneously, rather than waiting for the responses one at a time.
+Помірно складний ((веб-сайт)) може легко включати від 10 до 200 ((ресурсів)). Щоб мати змогу швидко отримати їх, браузери роблять декілька `GET`-запитів одночасно, замість того, щоб чекати на відповіді по черзі.
 
-HTML pages may include _((form))s_, which allow the user to fill out information and send it to the server. This is an example of a form:
+HTML-сторінки можуть містити _((форми))_, які дозволяють користувачеві заповнювати інформацію та надсилати її на сервер. Ось приклад такої форми:
 
 ```{lang: html}
-<form method="GET" action="example/message.html">
-  <p>Name: <input type="text" name="name"></p>
-  <p>Message:<br><textarea name="message"></textarea></p>
-  <p><button type="submit">Send</button></p>
-</form>
+<form method=«GET» action=«example/message.html»>
+  <p>Назва: <input type=«text» name=«name»></p></p> <input type=«text» name=«name»></p> </p> </p> </p> <input type="text
+  <p>Повідомлення:<br><textarea name=«message»></textarea></p></p>
+  <p><button type=«submit»>Надіслати</button></p></p> <p><button type=«submit»>Надіслати</button></p>
+</form> </form
 ```
 
-{{index form, "method attribute", "GET method"}}
+{{index form, «method attribute», «GET method»}}
 
-This code describes a form with two ((field))s: a small one asking for a name and a larger one to write a message in. When you click the Send ((button)), the form is _submitted_, meaning that the content of its field is packed into an HTTP request and the browser navigates to the result of that request.
+Цей код описує форму з двома полями: маленьким, де запитується ім'я, і великим, де можна написати повідомлення. Коли ви натискаєте кнопку «Надіслати», форма _відправляється_, тобто вміст її полів упаковується в HTTP-запит, і браузер переходить до результату цього запиту.
 
-When the `<form>` element's `method` attribute is `GET` (or is omitted), the information in the form is added to the end of the `action` URL as a _((query string))_. The browser might make a request to this URL:
+Коли атрибут `method` елемента `<form>` має значення `GET` (або відсутній), інформація з форми додається в кінець URL-адреси `action` як _((рядок запиту))_. Браузер може зробити запит до цієї URL-адреси:
 
 ```{lang: null}
 GET /example/message.html?name=Jean&message=Yes%3F HTTP/1.1
 ```
 
-{{index "ampersand character"}}
+{{index «символ амперсанду»}}
 
-The ((question mark)) indicates the end of the path part of the URL and the start of the query. It is followed by pairs of names and values, corresponding to the `name` attribute on the form field elements and the content of those elements, respectively. An ampersand character (`&`) is used to separate the pairs.
+Символ ((знак питання)) вказує на кінець частини шляху до URL-адреси і початок запиту. За ним слідують пари імен і значень, що відповідають атрибуту `name` в елементах полів форми і вмісту цих елементів відповідно. Для розділення пар використовується символ амперсанд (`&`).
 
-{{index [escaping, "in URLs"], "hexadecimal number", "encodeURIComponent function", "decodeURIComponent function"}}
+{{index [escape, «в URLs»], «шістнадцяткове число», «функція кодуванняURIComponent», «функція декодуванняURIComponent»}}
 
-The actual message encoded in the URL is "Yes?" but the question mark is replaced by a strange code. Some characters in query strings must be escaped. The question mark, represented as `%3F`, is one of those. There seems to be an unwritten rule that every format needs its own way of escaping characters. This one, called _((URL encoding))_, uses a ((percent sign)) followed by two hexadecimal (base 16) digits that encode the character code. In this case, 3F, which is 63 in decimal notation, is the code of a question mark character. JavaScript provides the `encodeURIComponent` and `decodeURIComponent` functions to encode and decode this format.
+Фактичне повідомлення, закодоване в URL, - це «Yes?», але знак питання замінено дивним кодом. Деякі символи в рядках запиту повинні бути екрановані. Знак питання, представлений як `%3F`, є одним з них. Здається, існує неписане правило, що для кожного формату потрібен свій власний спосіб екранування символів. Цей спосіб, який називається _((URL-кодування))_, використовує знак ((знак відсотка)), за яким слідують дві шістнадцяткові (основа 16) цифри, що кодують код символу. У цьому випадку 3F, що в десятковій системі числення дорівнює 63, є кодом символу знаку питання. JavaScript надає функції `encodeURIComponent` та `decodeURIComponent` для кодування та декодування цього формату.
 
 ```
-console.log(encodeURIComponent("Yes?"));
-// → Yes%3F
-console.log(decodeURIComponent("Yes%3F"));
-// → Yes?
+console.log(encodeURIComponent(«Yes?»));
+// → Так%3F
+console.log(decodeURIComponent(«Yes%3F»));
+// → Так?
 ```
 
-{{index "body (HTTP)", "POST method"}}
+{{index «body (HTTP)», «POST method»}}
 
-If we change the `method` attribute of the HTML form in the example we saw earlier to `POST`, the ((HTTP)) request made to submit the ((form)) will use the `POST` method and put the ((query string)) in the body of the request rather than adding it to the URL.
+Якщо ми змінимо атрибут `method` HTML-форми у прикладі, який ми бачили раніше, на `POST`, то запит ((HTTP)) на відправку ((форми)) буде використовувати метод `POST` і помістить ((рядок запиту)) в тіло запиту замість того, щоб додавати його до URL-адреси.
 
 ```{lang: http}
 POST /example/message.html HTTP/1.1
@@ -153,488 +155,488 @@ Content-type: application/x-www-form-urlencoded
 name=Jean&message=Yes%3F
 ```
 
-`GET` requests should be used for requests that do not have ((side effect))s but simply ask for information. Requests that change something on the server, for example creating a new account or posting a message, should be expressed with other methods, such as `POST`. Client-side software such as a browser knows that it shouldn't blindly make `POST` requests but will often implicitly make `GET` requests—to prefetch a resource it believes the user will soon need, for example.
+Запити `GET` слід використовувати для запитів, які не мають ((побічних ефектів)), а просто запитують інформацію. Запити, які змінюють щось на сервері, наприклад, створення нового облікового запису або відправлення повідомлення, слід виражати іншими методами, такими як `POST`. Клієнтське програмне забезпечення, таке як браузер, знає, що не слід сліпо робити запити `POST`, але часто неявно робить запити `GET` - наприклад, для попередньої вибірки ресурсу, який, на його думку, незабаром знадобиться користувачеві.
 
-We'll come back to forms and how to interact with them from JavaScript [later in the chapter](http#forms).
+Ми повернемося до форм і того, як взаємодіяти з ними за допомогою JavaScript [пізніше в цьому розділі] (http#forms).
 
 {{id fetch}}
 
 ## Fetch
 
-{{index "fetch function", "Promise class", [interface, module]}}
+{{index «fetch function», «Promise class», [інтерфейс, модуль]}}
 
-The interface through which browser JavaScript can make HTTP requests is called `fetch`.
+Інтерфейс, через який JavaScript браузера може робити HTTP-запити, називається `fetch`.
 
 ```{test: no}
-fetch("example/data.txt").then(response => {
+fetch(«example/data.txt»).then(response => {
   console.log(response.status);
   // → 200
-  console.log(response.headers.get("Content-Type"));
+  console.log(response.headers.get(«Content-Type»));
   // → text/plain
 });
 ```
 
-{{index "Response class", "status property", "headers property"}}
+{{індекс «Клас відповіді», «властивість стану», «властивість заголовків»}}
 
-Calling `fetch` returns a promise that resolves to a `Response` object holding information about the server's response, such as its status code and its headers. The headers are wrapped in a `Map`-like object that treats its keys (the header names) as case insensitive because header names are not supposed to be case sensitive. This means  `headers.get("Content-Type")` and `headers.get("content-TYPE")` will return the same value.
+Виклик `fetch` повертає обіцянку, яка перетворюється на об'єкт `Response`, що містить інформацію про відповідь сервера, таку як код статусу та заголовки. Заголовки обгорнуто в об'єкт типу `Map`, який розглядає свої ключі (назви заголовків) як нечутливі до регістру, оскільки назви заголовків не повинні бути чутливими до регістру. Це означає, що `headers.get(«Content-Type»)` і `headers.get(«content-TYPE»)` повернуть те саме значення.
 
-Note that the promise returned by `fetch` resolves successfully even if the server responded with an error code. It can also be rejected if there is a network error or if the ((server)) to which that the request is addressed can't be found.
+Зауважте, що обіцянка, яку повертає `fetch`, успішно виконується, навіть якщо сервер відповів кодом помилки. Вона також може бути відхилена, якщо виникла мережева помилка або якщо ((сервер)), до якого адресовано запит, не може бути знайдено.
 
-{{index [path, URL], "relative URL"}}
+{{index [шлях, URL], «відносний URL»}}
 
-The first argument to `fetch` is the URL that should be requested. When that ((URL)) doesn't start with a protocol name (such as _http:_), it is treated as _relative_, which means it is interpreted relative to the current document. When it starts with a slash (/), it replaces the current path, which is the part after the server name. When it does not, the part of the current path up to and including its last ((slash character)) is put in front of the relative URL.
+Перший аргумент `fetch` - це URL-адреса, яку слід запросити. Якщо ця адреса ((URL)) не починається з назви протоколу (наприклад, _http:_), вона розглядається як _відносна_, що означає, що вона інтерпретується відносно поточного документа. Якщо він починається з косої риски (/), він замінює поточний шлях, тобто частину після імені сервера. Якщо ні, то перед відносною URL-адресою ставиться частина поточного шляху до останнього символу ((коса риска) включно.
 
-{{index "text method", "body (HTTP)", "Promise class"}}
+{{index «text method», «body (HTTP)», «Promise class»}}
 
-To get at the actual content of a response, you can use its `text` method. Because the initial promise is resolved as soon as the response's headers have been received and because reading the response body might take a while longer, this again returns a promise.
+Щоб отримати фактичний вміст відповіді, ви можете використати її метод `text`. Оскільки початкова обіцянка виконується одразу після отримання заголовків відповіді, а читання тіла відповіді може зайняти деякий час, цей метод знову повертає обіцянку.
 
 ```{test: no}
-fetch("example/data.txt")
+fetch(«example/data.txt»)
   .then(resp => resp.text())
   .then(text => console.log(text));
-// → This is the content of data.txt
+// → Це вміст файлу data.txt
 ```
 
-{{index "json method"}}
+{{index «метод json»}}
 
-A similar method, called `json`, returns a promise that resolves to the value you get when parsing the body as ((JSON)) or rejects if it's not valid JSON.
+Аналогічний метод, який називається `json`, повертає обіцянку, яка перетворюється на значення, отримане при розборі тіла як ((JSON)) або відхиляється, якщо це не валідний JSON.
 
-{{index "GET method", "body (HTTP)", "DELETE method", "method property"}}
+{{індекс «метод GET», «тіло (HTTP)», «метод DELETE», «властивість методу»}}
 
-By default, `fetch` uses the `GET` method to make its request and does not include a request body. You can configure it differently by passing an object with extra options as a second argument. For example, this request tries to delete `example/data.txt`:
+За замовчуванням `fetch` використовує для запиту метод `GET` і не включає тіло запиту. Ви можете налаштувати його по-іншому, передавши об'єкт з додатковими параметрами як другий аргумент. Наприклад, цей запит намагається видалити `example/data.txt`:
 
 ```{test: no}
-fetch("example/data.txt", {method: "DELETE"}).then(resp => {
+fetch(«example/data.txt», {метод: «DELETE»}).then(resp => {
   console.log(resp.status);
   // → 405
 });
 ```
 
-{{index "405 (HTTP status code)"}}
+{{index «405 (код статусу HTTP)»}}
 
-The 405 status code means "method not allowed", an HTTP server's way of saying "I'm afraid I can't do that".
+Код статусу 405 означає «метод не дозволено», це спосіб сказати HTTP-серверу: «Боюся, я не можу цього зробити».
 
-{{index "Range header", "body property", "headers property"}}
+{{index «Range header», «body property», «headers property»}}
 
-To add a request body for a `PUT` or `POST` request, you can include a `body` option. To set headers, there's the `headers` option. For example, this request includes a `Range` header, which instructs the server to return only part of a document.
+Щоб додати тіло запиту для `PUT` або `POST` запитів, ви можете включити опцію `body`. Щоб задати заголовки, використовується параметр `headers`. Наприклад, цей запит містить заголовок `Range`, який вказує серверу повернути лише частину документа.
 
 ```{test: no}
-fetch("example/data.txt", {headers: {Range: "bytes=8-19"}})
+fetch(«example/data.txt», {headers: {Range: «bytes=8-19»}})
   .then(resp => resp.text())
   .then(console.log);
-// → the content
+// → вміст
 ```
 
-The browser will automatically add some request ((header))s, such as "Host" and those needed for the server to figure out the size of the body. But adding your own headers is often useful to include things such as authentication information or to tell the server which file format you'd like to receive.
+Браузер автоматично додасть деякі запити ((заголовки)), такі як «Host» і ті, що необхідні серверу для визначення розміру тіла. Але додавання власних заголовків часто буває корисним, щоб включити такі речі, як інформація для автентифікації або вказати серверу, який формат файлу ви бажаєте отримати.
 
 {{id http_sandbox}}
 
-## HTTP sandboxing
+## Пісочниця HTTP
 
-{{index sandbox, [browser, security]}}
+{{index sandbox, [браузер, безпека]}}
 
-Making ((HTTP)) requests in web page scripts once again raises concerns about ((security)). The person who controls the script might not have the same interests as the person on whose computer it is running. More specifically, if I visit _themafia.org_, I do not want its scripts to be able to make a request to _mybank.com_, using identifying information from my browser, with instructions to transfer away all my money.
+Виконання ((HTTP)) запитів у скриптах веб-сторінок знову викликає занепокоєння щодо ((безпеки)). Особа, яка контролює скрипт, може не мати тих самих інтересів, що й особа, на чиєму комп'ютері він виконується. Зокрема, якщо я відвідую _themafia.org_, я не хочу, щоб його скрипти могли зробити запит до _mybank.com_, використовуючи ідентифікаційну інформацію з мого браузера, з інструкціями перевести всі мої гроші.
 
-For this reason, browsers protect us by disallowing scripts to make HTTP requests to other ((domain))s (names such as _themafia.org_ and _mybank.com_).
+З цієї причини браузери захищають нас, забороняючи скриптам робити HTTP-запити до інших ((доменів)) (таких як _themafia.org_ і _mybank.com_).
 
-{{index "Access-Control-Allow-Origin header", "cross-domain request"}}
+{{index «Access-Control-Allow-Origin header», «cross-domain request»}}
 
-This can be an annoying problem when building systems that want to access several domains for legitimate reasons. Fortunately, ((server))s can include a ((header)) like this in their ((response)) to explicitly indicate to the browser that it is okay for the request to come from another domain:
+Це може бути прикрою проблемою при створенні систем, які хочуть отримати доступ до декількох доменів з легітимних причин. На щастя, ((сервер))и можуть включати такий ((заголовок)) у свої ((відповідь)), щоб явно вказати браузеру, що запит може надходити з іншого домену:
 
 ```{lang: null}
 Access-Control-Allow-Origin: *
 ```
 
-## Appreciating HTTP
+## Оцінка HTTP
 
 {{index client, HTTP, [interface, HTTP]}}
 
-When building a system that requires ((communication)) between a JavaScript program running in the ((browser)) (client-side) and a program on a ((server)) (server-side), there are several different ways to model this communication.
+При побудові системи, яка вимагає ((зв'язку)) між програмою на JavaScript, запущеною у ((браузері)) (на стороні клієнта) та програмою на ((сервері)) (на стороні сервера), існує декілька різних способів моделювання цього зв'язку.
 
-{{index [network, abstraction], abstraction}}
+{{індекс [мережа, абстракція], абстракція}}
 
-A commonly used model is that of _((remote procedure call))s_. In this model, communication follows the patterns of normal function calls, except that the function is actually running on another machine. Calling it involves making a request to the server that includes the function's name and arguments. The response to that request contains the returned value.
+Найчастіше використовується модель _((віддалений виклик процедури))s_. У цій моделі взаємодія відбувається за зразком звичайного виклику функції, за винятком того, що функція насправді виконується на іншій машині. Її виклик включає в себе запит до сервера, який містить ім'я функції та аргументи. Відповідь на цей запит містить значення, що повертається.
 
-When thinking in terms of remote procedure calls, HTTP is just a vehicle for communication, and you will most likely write an abstraction layer that hides it entirely.
+Якщо мислити в термінах віддаленого виклику процедур, то HTTP є лише засобом зв'язку, і ви, швидше за все, напишете рівень абстракції, який повністю його приховує.
 
-{{index "media type", "document format", [method, HTTP]}}
+{{index «media type», «document format», [method, HTTP]}}
 
-Another approach is to build your communication around the concept of ((resource))s and ((HTTP)) methods. Instead of a remote procedure called `addUser`, you use a `PUT` request to `/users/larry`. Instead of encoding that user's properties in function arguments, you define a JSON document format (or use an existing format) that represents a user. The body of the `PUT` request to create a new resource is then such a document. A resource is fetched by making a `GET` request to the resource's URL (for example, `/users/larry`), which again returns the document representing the resource.
+Інший підхід полягає в тому, щоб побудувати вашу комунікацію навколо концепції ((ресурсу)) і ((HTTP)) методів. Замість віддаленої процедури з назвою `addUser` ви використовуєте запит `PUT` до `/users/larry`. Замість того, щоб кодувати властивості користувача в аргументах функції, ви визначаєте формат документа JSON (або використовуєте існуючий формат), який представляє користувача. Тіло запиту `PUT` для створення нового ресурсу є таким документом. Ресурс отримується за допомогою запиту `GET` до URL-адреси ресурсу (наприклад, `/users/larry`), який знову повертає документ, що представляє ресурс.
 
-This second approach makes it easier to use some of the features that HTTP provides, such as support for caching resources (keeping a copy of a resource on the client for fast access). The concepts used in HTTP, which are well designed, can provide a helpful set of principles to design your server interface around.
+Цей другий підхід полегшує використання деяких можливостей HTTP, таких як підтримка кешування ресурсів (зберігання копії ресурсу на клієнті для швидкого доступу). Концепції, що використовуються в HTTP, які добре розроблені, можуть стати корисним набором принципів для проектування інтерфейсу вашого сервера.
 
-## Security and HTTPS
+## Безпека і HTTPS
 
-{{index "man-in-the-middle", security, HTTPS, [network, security]}}
+{{index «man-in-the-middle», security, HTTPS, [мережа, безпека]}}
 
-Data traveling over the internet tends to follow a long, dangerous road. To get to its destination, it must hop through anything from coffee shop Wi-Fi hotspots to networks controlled by various companies and states. At any point along its route, it may be inspected or even modified.
+Дані, що подорожують інтернетом, зазвичай проходять довгий і небезпечний шлях. Щоб дістатися до місця призначення, їм доводиться перестрибувати через що завгодно - від точок доступу Wi-Fi у кав'ярнях до мереж, контрольованих різними компаніями та державами. У будь-якій точці маршруту його можуть перевірити або навіть змінити.
 
-{{index tampering}}
+{{підробка індексу}}
 
-If it is important that something remain secret, such as the ((password)) to your ((email)) account, or that it arrive at its destination unmodified, such as the account number you transfer money to via your bank's website, plain HTTP is not good enough.
+Якщо важливо, щоб щось залишалося в таємниці, наприклад, ((пароль)) до вашого ((електронна адреса)) облікового запису, або щоб воно надійшло до місця призначення без змін, наприклад, номер рахунку, на який ви переказуєте гроші через веб-сайт вашого банку, простого HTTP недостатньо.
 
 {{index cryptography, encryption}}
 
-{{indexsee "Secure HTTP", HTTPS, [browser, security]}}
+{{покажчик «Безпечний HTTP», HTTPS, [браузер, безпека]}}
 
-The secure ((HTTP)) protocol, used for ((URL))s starting with _https://_, wraps HTTP traffic in a way that makes it harder to read and tamper with. Before exchanging data, the client verifies that the server is who it claims to be by asking it to prove that it has a cryptographic ((certificate)) issued by a certificate authority that the browser recognizes. Next, all data going over the ((connection)) is encrypted in a way that should prevent eavesdropping and tampering.
+Безпечний ((HTTP)) протокол, що використовується для ((URL)), починаючи з _https://_, обгортає HTTP-трафік таким чином, щоб його було важче прочитати і підробити. Перед обміном даними клієнт перевіряє, чи є сервер тим, за кого себе видає, запитуючи у нього криптографічний ((сертифікат)), виданий центром сертифікації, який розпізнається браузером. Далі всі дані, що проходять через ((з'єднання)), шифруються таким чином, щоб запобігти підслуховуванню і підробці.
 
-Thus, when it works right, ((HTTPS)) prevents other people from impersonating the website you are trying to talk to _and_ from snooping on your communication. It's not perfect, and there have been various incidents where HTTPS failed because of forged or stolen certificates and broken software, but it is a _lot_ safer than plain HTTP.
+Таким чином, коли він працює правильно, ((HTTPS)) не дозволяє іншим людям видавати себе за веб-сайт, з яким ви намагаєтеся поговорити,  і не дозволяє підглядати за вашим спілкуванням. Він не ідеальний, і були різні інциденти, коли HTTPS не працював через підроблені або викрадені сертифікати і зламане програмне забезпечення, але він  набагато безпечніший, ніж звичайний HTTP.
 
 {{id forms}}
 
-## Form fields
+## Поля форм
 
-Forms were originally designed for the pre-JavaScript web to allow websites to send user-submitted information in an HTTP request. This design assumes that interaction with the server always happens by navigating to a new page.
+Форми спочатку були розроблені для веб-сторінок, що не підтримували JavaScript, щоб дозволити веб-сайтам надсилати інформацію, надану користувачем, у HTTP-запиті. Такий дизайн передбачає, що взаємодія з сервером завжди відбувається шляхом переходу на нову сторінку.
 
 {{index [DOM, fields]}}
 
-However, the form elements are part of the DOM, like the rest of the page, and the DOM elements that represent form ((field))s support a number of properties and events that are not present on other elements. These make it possible to inspect and control such input fields with JavaScript programs and do things such as adding new functionality to a form or using forms and fields as building blocks in a JavaScript application.
+Однак елементи форми є частиною DOM, як і решта сторінки, а елементи DOM, що представляють форму ((поле)), підтримують ряд властивостей і подій, яких немає в інших елементах. Це дає змогу перевіряти і контролювати такі поля введення за допомогою програм на JavaScript і робити такі речі, як додавання нової функціональності до форми або використання форм і полів як будівельних блоків у додатку на JavaScript.
 
-{{index "form (HTML tag)"}}
+{{index «форма (HTML-тег)»}}
 
-A web form consists of any number of input ((field))s grouped in a `<form>` tag. HTML allows several different styles of fields, ranging from simple on/off checkboxes to drop-down menus and fields for text input. This book won't try to comprehensively discuss all field types, but we'll start with a rough overview.
+Веб-форма складається з довільної кількості полів вводу, згрупованих у тезі `<form>`. HTML допускає кілька різних стилів полів, починаючи від простих прапорців увімкнути/вимкнути і закінчуючи випадаючими меню та полями для введення тексту. У цій книзі ми не намагатимемося всебічно обговорити всі типи полів, але почнемо з приблизного огляду.
 
-{{index "input (HTML tag)", "type attribute"}}
+{{index «input (HTML-тег)», «type attribute»}}
 
-A lot of field types use the `<input>` tag. This tag's `type` attribute is used to select the field's style. These are some commonly used `<input>` types:
+Багато типів полів використовують тег `<input>`. Атрибут `type` цього тегу використовується для вибору стилю поля. Нижче наведено деякі з найпоширеніших типів `<input>`:
 
-{{index "password field", checkbox, "radio button", "file field"}}
+{{index «поле пароля», «прапорець», «перемикач», «поле файлу»}}
 
 {{table {cols: [1,5]}}}
 
-| `text`     | A single-line ((text field))
-| `password` | Same as `text` but hides the text that is typed
-| `checkbox` | An on/off switch
-| `color`    | A color
-| `date`     | A calendar date
-| `radio`    | (Part of) a ((multiple-choice)) field
-| `file`     | Allows the user to choose a file from their computer
+| `text` | Один рядок ((текстове поле))
+| `password` | Те саме, що й `text`, але приховує текст, що вводиться
+| `checkbox` | Перемикач увімкнення/вимкнення
+| `color` | Колір
+| `date` | Календарна дата
+| `radio` | (Частина) поля ((множинний вибір))
+| `file` | Дозволяє користувачеві вибрати файл зі свого комп'ютера
 
-{{index "value attribute", "checked attribute", "form (HTML tag)"}}
+{{index «атрибут значення», «перевірений атрибут», «форма (HTML-тег)»}}
 
-Form fields do not necessarily have to appear in a `<form>` tag. You can put them anywhere in a page. Such form-less fields cannot be ((submit))ted (only a form as a whole can), but when responding to input with JavaScript, we often don't want to submit our fields normally anyway.
+Поля форми не обов'язково повинні відображатися у тезі `<form>`. Ви можете розмістити їх будь-де на сторінці. Такі безформні поля не можна ((відправити)) відправити (відправити можна лише форму в цілому), але, відповідаючи на введення за допомогою JavaScript, ми часто не хочемо відправляти наші поля у звичайному вигляді.
 
 ```{lang: html}
-<p><input type="text" value="abc"> (text)</p>
-<p><input type="password" value="abc"> (password)</p>
-<p><input type="checkbox" checked> (checkbox)</p>
-<p><input type="color" value="orange"> (color)</p>
-<p><input type="date" value="2023-10-13"> (date)</p>
-<p><input type="radio" value="A" name="choice">
-   <input type="radio" value="B" name="choice" checked>
-   <input type="radio" value="C" name="choice"> (radio)</p>
-<p><input type="file"> (file)</p>
+<p><input type=«text» value=«abc»> (текст)</p>
+<p><input type=«password» value=«abc»> (пароль)</p>
+<p><input type=«checkbox» checked> (прапорець)</p>
+<p><input type=«color» value=«orange»> (колір)</p>
+<p><input type=«date» value=«2023-10-13»> (дата)</p></p> <p><input type=«date» value=«2023-10-13»> (дата)</p>
+<p><input type=«radio» value=«A» name=«choice»>
+   <input type=«radio» value=«B» name=«choice» checked>>.
+   <input type=«radio» value=«C» name=«choice»> (радіо)</p> (радіо)</p> <p style=«text» type=«text» value=«C» name=«choice»> (радіо)</p>
+<p><input type=«file»> (файл)</p>
 ```
 
 {{if book
 
-The fields created with this HTML code look like this:
+Поля, створені за допомогою цього HTML-коду, виглядають наступним чином:
 
-{{figure {url: "img/form_fields.png", alt: "Screenshot showing various types of input tags", width: "4cm"}}}
+{{figure {url: «img/form_fields.png», alt: «Знімок екрана з різними типами тегів введення», width: “4cm”}}}}
 
 if}}
 
-The JavaScript interface for such elements differs with the type of the element.
+Інтерфейс JavaScript для таких елементів відрізняється залежно від типу елемента.
 
-{{index "textarea (HTML tag)", "text field"}}
+{{index «textarea (HTML-тег)», «текстове поле»}}
 
-Multiline text fields have their own tag, `<textarea>`, mostly because using an attribute to specify a multiline starting value would be awkward. The `<textarea>` tag requires a matching `</textarea>` closing tag and uses the text between those two, instead of the `value` attribute, as starting text.
+Багаторядкові текстові поля мають власний тег `<textarea>`, головним чином тому, що використання атрибута для визначення багаторядкового початкового значення було б незручним. Тег `<textarea>` вимагає відповідного закриваючого тегу `</textarea>` і використовує текст між ними, а не атрибут `value`, як початковий текст.
 
 ```{lang: html}
 <textarea>
-one
-two
-three
-</textarea>
+один
+два
+три
+<textarea>
 ```
 
-{{index "select (HTML tag)", "option (HTML tag)", "multiple choice", "drop-down menu"}}
+{{index «select (HTML-тег)», «опція (HTML-тег)», «множинний вибір», «випадаюче меню»}}
 
-Finally, the `<select>` tag is used to create a field that allows the user to select from a number of predefined options.
+Нарешті, тег `<select>` використовується для створення поля, яке дозволяє користувачеві вибирати з декількох попередньо визначених варіантів.
 
 ```{lang: html}
 <select>
-  <option>Pancakes</option>
-  <option>Pudding</option>
-  <option>Ice cream</option>
+  <option>Млинці</option>
+  <option>Пудинг</option>
+  <option>Морозиво</option>
 </select>
 ```
 
 {{if book
 
-Such a field looks like this:
+Таке поле виглядає так:
 
-{{figure {url: "img/form_select.png", alt: "Screenshot showing a select field", width: "4cm"}}}
+{{figure {url: «img/form_select.png», alt: «Знімок екрана з полем вибору», width: “4cm”}}}}
 
 if}}
 
-{{index "change event"}}
+{{index «change event»}}
 
-Whenever the value of a form field changes, it will fire a `"change"` event.
+Щоразу, коли значення поля форми змінюється, буде згенеровано подію `«change»`.
 
-## Focus
+## Фокус
 
 {{index keyboard, focus}}
 
-{{indexsee "keyboard focus", focus}}
+{{indexsee «keyboard focus», focus}}
 
-Unlike most elements in HTML documents, form fields can get _keyboard ((focus))_. When clicked, moved to with [tab]{keyname}, or activated in some other way, they become the currently active element and the recipient of keyboard ((input)).
+На відміну від більшості елементів у HTML-документах, поля форми можуть отримати _клавіатуру ((фокус))_. При натисканні, переході на них за допомогою [вкладки]{ім'я_клавіші} або активації в інший спосіб вони стають поточним активним елементом і отримувачем клавіатури ((введення)).
 
-{{index "option (HTML tag)", "select (HTML tag)"}}
+{{index «option (HTML-тег)», «select (HTML-тег)»}}
 
-Thus, you can type into a ((text field)) only when it is focused. Other fields respond differently to keyboard events. For example, a `<select>` menu tries to move to the option that contains the text the user typed and responds to the arrow keys by moving its selection up and down.
+Таким чином, ви можете вводити текст у ((текстове поле)) лише тоді, коли воно сфокусоване. Інші поля реагують на події клавіатури інакше. Наприклад, меню `<select>` намагається перейти до пункту, який містить введений користувачем текст, і реагує на натискання клавіш зі стрілками переміщенням свого виділення вгору і вниз.
 
-{{index "focus method", "blur method", "activeElement property"}}
+{{index «метод фокусування», «метод розмиття», «властивість activeElement»}}
 
-We can control ((focus)) from JavaScript with the `focus` and `blur` methods. The first moves focus to the DOM element it is called on, and the second removes focus. The value in `document.activeElement` corresponds to the currently focused element.
+Ми можемо керувати ((focus)) з JavaScript за допомогою методів `focus` та `blur`. Перший переміщує фокус на DOM-елемент, на якому він викликається, а другий знімає фокус. Значення в `document.activeElement` відповідає поточному фокусу елемента.
 
 ```{lang: html}
-<input type="text">
+<input type=«text»>
 <script>
-  document.querySelector("input").focus();
+  document.querySelector(«input»).focus();
   console.log(document.activeElement.tagName);
   // → INPUT
-  document.querySelector("input").blur();
+  document.querySelector(«input»).blur();
   console.log(document.activeElement.tagName);
   // → BODY
-</script>
+</script> </span> </span> </span> </span> </p
 ```
 
-{{index "autofocus attribute"}}
+{{index «autofocus attribute»}}
 
-For some pages, the user is expected to want to interact with a form field immediately. JavaScript can be used to ((focus)) this field when the document is loaded, but HTML also provides the `autofocus` attribute, which produces the same effect while letting the browser know what we are trying to achieve. This gives the browser the option to disable the behavior when it is not appropriate, such as when the user has put the focus on something else.
+На деяких сторінках очікується, що користувач захоче негайно взаємодіяти з полем форми. JavaScript можна використовувати для ((фокусування)) цього поля під час завантаження документа, але HTML також надає атрибут `autofocus`, який дає той самий ефект, повідомляючи браузеру про те, чого ми намагаємося досягти. Це дає браузеру можливість вимкнути таку поведінку, коли вона є недоречною, наприклад, коли користувач переключив фокус на щось інше.
 
-{{index "tab key", keyboard, "tabindex attribute", "a (HTML tag)"}}
+{{index «клавіша табуляції», keyboard, «атрибут tabindex», «a (HTML-тег)»}}
 
-Browsers allow the user to move the focus through the document by pressing [tab]{keyname} to move to the next focusable element, and [shift-tab]{keyname} to move back to the previous element. By default, elements are visited in the order in which they appear in the document. It is possible to use the `tabindex` attribute to change this order. The following example document will let the focus jump from the text input to the OK button, rather than going through the help link first:
+Браузери дозволяють користувачеві переміщати фокус по документу, натискаючи [tab]{клавіша} для переходу до наступного елемента, на якому встановлено фокус, і [shift-tab]{клавіша} для повернення до попереднього елемента. За замовчуванням елементи переглядаються у тому порядку, у якому вони з'являються у документі. Цей порядок можна змінити за допомогою атрибута `tabindex`. У наступному прикладі документу фокус буде переходити від введення тексту до кнопки OK, а не від посилання на довідку:
 
 ```{lang: html, focus: true}
-<input type="text" tabindex=1> <a href=".">(help)</a>
-<button onclick="console.log('ok')" tabindex=2>OK</button>
+<input type=«text» tabindex=1> <a href=«.»>(help)</a>
+<button onclick=«console.log(“ok”)» tabindex=2>OK</button>
 ```
 
-{{index "tabindex attribute"}}
+{{index «атрибут tabindex»}}
 
-By default, most types of HTML elements cannot be focused. You can add a `tabindex` attribute to any element to make it focusable. A `tabindex` of 0 makes an element focusable without affecting the focus order.
+За замовчуванням більшість типів HTML-елементів не можуть бути сфокусовані. Ви можете додати атрибут `tabindex` до будь-якого елемента, щоб зробити його фокусованим. Значення `tabindex`, рівне 0, робить елемент фокусованим без зміни порядку фокусування.
 
-## Disabled fields
+## Відключені поля
 
-{{index "disabled attribute"}}
+{{index «відключений атрибут»}}
 
-All ((form)) ((field))s can be _disabled_ through their `disabled` attribute. It is an ((attribute)) that can be specified without value—the fact that it is present at all disables the element.
+Усі ((форма)) ((поле)) можуть бути _відключені_ через їхній атрибут `disabled`. Це атрибут, який може бути вказано без значення - сам факт його присутності вимикає елемент.
 
 ```{lang: html}
-<button>I'm all right</button>
-<button disabled>I'm out</button>
+<button>З мною все гаразд</button>
+<button disabled>Я вийшов</button>
 ```
 
-Disabled fields cannot be ((focus))ed or changed, and browsers make them look gray and faded.
+Вимкнені поля не можна ((фокусувати)) редагувати або змінювати, а браузери роблять їх сірими і бляклими.
 
 {{if book
 
-{{figure {url: "img/button_disabled.png", alt: "Screenshot of a disabled button", width: "3cm"}}}
+{{figure {url: «img/button_disabled.png», alt: «Знімок вимкненої кнопки», width: “3cm”}}}}
 
 if}}
 
-{{index "user experience"}}
+{{index «user experience»}}
 
-When a program is in the process of handling an action caused by some ((button)) or other control that might require communication with the server and thus take a while, it can be a good idea to disable the control until the action finishes. That way, when the user gets impatient and clicks it again, they don't accidentally repeat their action.
+Коли програма перебуває у процесі обробки дії, спричиненої деяким ((кнопкою)) або іншим елементом керування, що може вимагати зв'язку з сервером і, таким чином, зайняти деякий час, може бути гарною ідеєю відключити цей елемент керування до завершення дії. Таким чином, коли користувач втратить терпіння і натисне на нього знову, він випадково не повторить свою дію.
 
-## The form as a whole
+## Форма в цілому
 
-{{index "array-like object", "form (HTML tag)", "form property", "elements property"}}
+{{index «масивний об'єкт», «форма (HTML-тег)», «властивість форми», «властивість елементів»}}
 
-When a ((field)) is contained in a `<form>` element, its DOM element will have a `form` property linking back to the form's DOM element. The `<form>` element, in turn, has a property called `elements` that contains an array-like collection of the fields inside it.
+Коли ((поле)) міститься в елементі `<form>`, його DOM-елемент матиме властивість `form`, що посилається на DOM-елемент форми. Елемент `<form>`, у свою чергу, має властивість `elements`, яка містить масивну колекцію полів всередині нього.
 
-{{index "elements property", "name attribute"}}
+{{index «властивість елементів», «атрибут name»}}
 
-The `name` attribute of a form field determines the way its value will be identified when the form is ((submit))ted. It can also be used as a property name when accessing the form's `elements` property, which acts both as an array-like object (accessible by number) and a ((map)) (accessible by name).
+Атрибут `name` поля форми визначає спосіб ідентифікації його значення під час відправлення форми. Він також може бути використаний як ім'я властивості при доступі до властивості `elements` форми, яка діє як масивний об'єкт (доступний за номером) і як ((map)) (доступний за ім'ям).
 
 ```{lang: html}
-<form action="example/submit.html">
-  Name: <input type="text" name="name"><br>
-  Password: <input type="password" name="password"><br>
-  <button type="submit">Log in</button>
-</form>
-<script>
-  let form = document.querySelector("form");
+<form action=«example/submit.html»>
+  Ім'я: <input type=«text» name=«name»><br></p> <br> <
+  Пароль: <input type=«password» name=«password»><br></input
+  <button type=«submit»>Увійти</button></button
+</form> </form
+<скрипт
+  let form = document.querySelector(«form»);
   console.log(form.elements[1].type);
-  // → password
+  // → пароль
   console.log(form.elements.password.type);
-  // → password
+  // → пароль
   console.log(form.elements.name.form == form);
   // → true
-</script>
+</script> </script> </script> </script> </script
 ```
 
-{{index "button (HTML tag)", "type attribute", submit, "enter key"}}
+{{index «button (HTML-тег)», «type attribute», submit, «enter key»}}
 
-A button with a `type` attribute of `submit` will, when pressed, cause the form to be submitted. Pressing [enter]{keyname} when a form field is focused has the same effect.
+Кнопка з атрибутом `type`, що має значення ` submit`, при натисканні призведе до відправлення форми. Натискання [enter]{назва клавіші}, коли поле форми сфокусовано, має такий самий ефект.
 
-{{index "submit event", "event handling", "preventDefault method", "page reload", "GET method", "POST method"}}
+{{index «submit event», «event handling», «preventDefault method», «page reload», «GET method», «POST method»}}
 
-Submitting a ((form)) normally means that the ((browser)) navigates to the page indicated by the form's `action` attribute, using either a `GET` or a `POST` ((request)). But before that happens, a `"submit"` event is fired. You can handle this event with JavaScript and prevent this default behavior by calling `preventDefault` on the event object.
+Відправлення ((форми)) зазвичай означає, що ((браузер)) переходить на сторінку, вказану в атрибуті `action` форми, використовуючи `GET` або `POST` ((запит)). Але перед тим, як це станеться, відбувається подія `«submit»`. Ви можете обробити цю подію за допомогою JavaScript і запобігти поведінці за замовчуванням, викликавши `preventDefault` на об'єкті події.
 
 ```{lang: html}
 <form>
-  Value: <input type="text" name="value">
-  <button type="submit">Save</button>
-</form>
-<script>
-  let form = document.querySelector("form");
-  form.addEventListener("submit", event => {
-    console.log("Saving value", form.elements.value.value);
+  Значення: <input type=«text» name=«value»>
+  <button type=«submit»>Зберегти</button
+</form> </form
+<скрипт
+  let form = document.querySelector(«form»);
+  form.addEventListener(«submit», event => {})
+    console.log(«Збереження значення», form.elements.value.value);
     event.preventDefault();
   });
-</script>
+</script> </span> </span> </span> </span> </p
 ```
 
-{{index "submit event", validation}}
+{{index «submit event», validation}}
 
-Intercepting `"submit"` events in JavaScript has various uses. We can write code to verify that the values the user entered make sense and immediately show an error message instead of submitting the form. Or we can disable the regular way of submitting the form entirely, as in the example, and have our program handle the input, possibly using `fetch` to send it to a server without reloading the page.
+Перехоплення події `«submit»` в JavaScript має різні застосування. Ми можемо написати код, який перевіряє, чи введені користувачем значення мають сенс, і одразу ж показує повідомлення про помилку замість того, щоб відправити форму. Або ми можемо повністю відключити звичайний спосіб надсилання форми, як у прикладі, і змусити нашу програму обробляти введені дані, можливо, використовуючи `fetch`, щоб відправити їх на сервер без перезавантаження сторінки.
 
-## Text fields
+## Текстові поля
 
-{{index "value attribute", "input (HTML tag)", "text field", "textarea (HTML tag)", [DOM, fields], [interface, object]}}
+{{index «value attribute», «input (HTML-тег)», «text field», «textarea (HTML-тег)», [DOM, fields], [interface, object]}}
 
-Fields created by `<textarea>` tags, or `<input>` tags with a type of `text` or `password`, share a common interface. Their DOM elements have a `value` property that holds their current content as a string value. Setting this property to another string changes the field's content.
+Поля, створені тегами `<textarea>` або `<input>` з типом `text` або `password`, мають спільний інтерфейс. Їхні DOM-елементи мають властивість `value`, яка зберігає їхній поточний вміст у вигляді рядкового значення. Встановлення цієї властивості на інший рядок змінює вміст поля.
 
-{{index "selectionStart property", "selectionEnd property"}}
+{{index «selectionStart property», «selectionEnd property»}}
 
-The `selectionStart` and `selectionEnd` properties of ((text field))s give us information about the ((cursor)) and ((selection)) in the ((text)). When nothing is selected, these two properties hold the same number, indicating the position of the cursor. For example, 0 indicates the start of the text, and 10 indicates the cursor is after the 10^th^ ((character)). When part of the field is selected, the two properties will differ, giving us the start and end of the selected text. Like `value`, these properties may also be written to.
+Властивості `selectionStart` і `selectionEnd` ((текстового поля)) надають нам інформацію про ((курсор)) і ((виділення)) у ((тексті)). Коли нічого не виділено, ці дві властивості мають однакове значення, що вказує на позицію курсору. Наприклад, 0 вказує на початок тексту, а 10 означає, що курсор знаходиться після 10^-го символу ((символ)). Коли частину поля виділено, ці дві властивості будуть відрізнятися, показуючи нам початок і кінець виділеного тексту. Як і `value`, ці властивості також можна записувати.
 
-{{index Khasekhemwy, "textarea (HTML tag)", keyboard, "event handling"}}
+{{index Khasekhemwy, «textarea (HTML-тег)», keyboard, «обробка подій»}}
 
-Imagine you are writing an article about Khasekhemwy, last pharaoh of the Second Dynasty, but have some trouble spelling his name. The following code wires up a `<textarea>` tag with an event handler that, when you press F2, inserts the string "Khasekhemwy" for you.
+Уявіть, що ви пишете статтю про Хасехемві, останнього фараона Другої династії, але маєте проблеми з написанням його імені. Наступний код підключає тег `<textarea>` з обробником подій, який при натисканні клавіші F2 вставляє рядок «Khasekhemwy» замість вас.
 
 ```{lang: html}
 <textarea></textarea>
 <script>
-  let textarea = document.querySelector("textarea");
-  textarea.addEventListener("keydown", event => {
-    if (event.key == "F2") {
-      replaceSelection(textarea, "Khasekhemwy");
+  let textarea = document.querySelector(«textarea»);
+  textarea.addEventListener(«keydown», event => {
+    if (event.key == «F2») {
+      replaceSelection(textarea, «Khasekhemwy»);
       event.preventDefault();
     }
   });
-  function replaceSelection(field, word) {
-    let from = field.selectionStart, to = field.selectionEnd;
+  function replaceSelection(поле, слово) {
+    нехай from = field.selectionStart, to = field.selectionEnd;
     field.value = field.value.slice(0, from) + word +
                   field.value.slice(to);
-    // Put the cursor after the word
+    // Поставити курсор після слова
     field.selectionStart = from + word.length;
     field.selectionEnd = from + word.length;
   }
 </script>
 ```
 
-{{index "replaceSelection function", "text field"}}
+{{index «replaceSelection function», «text field»}}
 
-The `replaceSelection` function replaces the currently selected part of a text field's content with the given word and then moves the ((cursor)) after that word so that the user can continue typing.
+Функція `replaceSelection` замінює поточну виділену частину вмісту текстового поля на задане слово, а потім переміщує ((курсор)) після цього слова, щоб користувач міг продовжити введення.
 
-{{index "change event", "input event"}}
+{{index «change event», «input event»}}
 
-The `"change"` event for a ((text field)) does not fire every time something is typed. Rather, it fires when the field loses ((focus)) after its content was changed. To respond immediately to changes in a text field, you should register a handler for the `"input"` event instead, which fires every time the user types a character, deletes text, or otherwise manipulates the field's content.
+Подія `«change»` для ((текстового поля)) не спрацьовує щоразу, коли щось вводиться. Натомість вона спрацьовує, коли поле втрачає фокус після зміни його вмісту. Щоб негайно реагувати на зміни у текстовому полі, вам слід зареєструвати обробник для події `«input»`, який спрацьовуватиме щоразу, коли користувач вводитиме символ, видалятиме текст або іншим чином маніпулюватиме вмістом поля.
 
-The following example shows a text field and a counter displaying the current length of the text in the field:
+У наступному прикладі показано текстове поле і лічильник, що відображає поточну довжину тексту в полі:
 
 ```{lang: html}
-<input type="text"> length: <span id="length">0</span>
-<script>
-  let text = document.querySelector("input");
-  let output = document.querySelector("#length");
-  text.addEventListener("input", () => {
+<input type=«text»> length: <span id=«length»>0</span>
+<скрипт
+  let text = document.querySelector(«input»);
+  let output = document.querySelector(«#length»);
+  text.addEventListener(«input», () => {} текст.addEventListener(«input», () => {} текст
     output.textContent = text.value.length;
   });
 </script>
 ```
 
-## Checkboxes and radio buttons
+## Прапорці та перемикачі
 
-{{index "input (HTML tag)", "checked attribute"}}
+{{index «input (HTML-тег)», «checked attribute»}}
 
-A ((checkbox)) field is a binary toggle. Its value can be extracted or changed through its `checked` property, which holds a Boolean value.
+Поле ((checkbox)) - це двійковий перемикач. Його значення можна отримати або змінити за допомогою властивості `checked`, яка містить булеве значення.
 
 ```{lang: html}
 <label>
-  <input type="checkbox" id="purple"> Make this page purple
-</label>
-<script>
-  let checkbox = document.querySelector("#purple");
-  checkbox.addEventListener("change", () => {
+  <input type=«checkbox» id=«purple»> Зробити цю сторінку фіолетовою
+</label> </label
+<скрипт
+  let checkbox = document.querySelector(«#purple»);
+  checkbox.addEventListener(«change», () => {})
     document.body.style.background =
-      checkbox.checked ? "mediumpurple" : "";
+      checkbox.checked ? «mediumpurple» : “”;
   });
 </script>
 ```
 
-{{index "for attribute", "id attribute", focus, "label (HTML tag)", labeling}}
+{{index «for attribute», «id атрибута», focus, «label (HTML-тег)», labeling}}
 
-The `<label>` tag associates a piece of document with an input ((field)). Clicking anywhere on the label will activate the field, which focuses it and toggles its value when it is a checkbox or radio button.
+Тег `<label>` пов'язує фрагмент документа з елементом вводу ((полем)). Клацання в будь-якому місці мітки активує поле, яке фокусує його і перемикає значення, якщо це прапорець або перемикач.
 
-{{index "input (HTML tag)", "multiple-choice"}}
+{{index «input (HTML-тег)», «multiple-choice»}}
 
-A ((radio button)) is similar to a checkbox, but it's implicitly linked to other radio buttons with the same `name` attribute so that only one of them can be active at any time.
+Перемикач ((radio button)) схожий на прапорець, але він неявно пов'язаний з іншими перемикачами з тим самим атрибутом `name`, тому лише один з них може бути активним у будь-який момент часу.
 
 ```{lang: html}
-Color:
+Колір:
 <label>
-  <input type="radio" name="color" value="orange"> Orange
-</label>
+  <input type=«radio» name=«color» value=«orange»> Помаранчевий
+</label></label
 <label>
-  <input type="radio" name="color" value="lightgreen"> Green
-</label>
+  <input type=«radio» name=«color» value=«lightgreen»> Зелений
+</label> </label
 <label>
-  <input type="radio" name="color" value="lightblue"> Blue
-</label>
-<script>
-  let buttons = document.querySelectorAll("[name=color]");
+  <input type=«radio» name=«color» value=«lightblue»> Синій
+</label> </label
+<скрипт
+  let buttons = document.querySelectorAll(«[name=color]»);
   for (let button of Array.from(buttons)) {
-    button.addEventListener("change", () => {
+    button.addEventListener(«change», () => {} button.addEventListener(«change», () => {})
       document.body.style.background = button.value;
     });
   }
 </script>
 ```
 
-{{index "name attribute", "querySelectorAll method"}}
+{{index «атрибут name», «метод querySelectorAll»}}
 
-The ((square brackets)) in the CSS query given to `querySelectorAll` are used to match attributes. It selects elements whose `name` attribute is `"color"`.
+((квадратні дужки)) у CSS-запиті, переданому `querySelectorAll`, використовуються для зіставлення атрибутів. Він вибирає елементи, атрибут `name` яких має значення `color`.
 
-## Select fields
+## Вибір полів
 
-{{index "select (HTML tag)", "multiple-choice", "option (HTML tag)"}}
+{{index «select (HTML-тег)», «multiple-choice», «option (HTML-тег)»}}
 
-Select fields are conceptually similar to radio buttons—they also allow the user to choose from a set of options. But where a radio button puts the layout of the options under our control, the appearance of a `<select>` tag is determined by the browser.
+Поля вибору концептуально схожі на перемикачі - вони також дозволяють користувачеві вибирати з набору опцій. Але якщо перемикач ставить розташування варіантів під наш контроль, то вигляд тегу `<select>` визначається браузером.
 
-{{index "multiple attribute", "drop-down menu"}}
+{{index «multiple attribute», «drop-down menu»}}
 
-Select fields also have a variant more akin to a list of checkboxes rather than radio boxes. When given the `multiple` attribute, a `<select>` tag will allow the user to select any number of options, rather than just a single option. Whereas a regular select field is drawn as a _drop-down_ control, which shows the inactive options only when you open it, a field with `multiple` enabled shows multiple options at the same time, allowing the user to enable or disable them individually.
+Поля вибору також мають варіант, більш схожий на список чекбоксів, а не перемикачів. Коли тег `<select>` має атрибут `multiple`, він дозволяє користувачеві вибрати будь-яку кількість варіантів, а не лише один. У той час як звичайне поле вибору відображається у вигляді _випадаючого_ списку, який показує неактивні опції лише при відкритті, поле з увімкненим атрибутом `multiple` показує декілька опцій одночасно, дозволяючи користувачеві вмикати або вимикати їх окремо.
 
-{{index "option (HTML tag)", "value attribute"}}
+{{index «опція (HTML-тег)», «атрибут значення»}}
 
-Each `<option>` tag has a value. This value can be defined with a `value` attribute. When that is not given, the ((text)) inside the option will count as its value. The `value` property of a `<select>` element reflects the currently selected option. For a `multiple` field, though, this property doesn't mean much, since it will give the value of only _one_ of the currently selected options.
+Кожен тег `<option>` має значення. Це значення може бути визначено за допомогою атрибута `value`. Якщо його не вказано, значенням опції буде вважатися ((текст)) всередині неї. Властивість `value` елемента `<select>` відображає поточну вибрану опцію. Однак для поля `multiple` ця властивість не має особливого значення, оскільки вона відображає значення лише _одного_ з поточно вибраних параметрів.
 
-{{index "select (HTML tag)", "options property", "selected attribute"}}
+{{index «select (HTML-тег)», «властивість options», «вибраний атрибут»}}
 
-The `<option>` tags for a `<select>` field can be accessed as an array-like object through the field's `options` property. Each option has a property called `selected`, which indicates whether that option is currently selected. The property can also be written to select or deselect an option.
+До тегів `<option>` для поля `<select>` можна отримати доступ як до масивного об'єкта через властивість поля `options`. Кожна опція має властивість `selected`, яка вказує, чи вибрано цю опцію на даний момент. Ця властивість також може бути використана для вибору або скасування вибору опції.
 
-{{index "multiple attribute", "binary number"}}
+{{index «multiple attribute», «binary number»}}
 
-This example extracts the selected values from a `multiple` select field and uses them to compose a binary number from individual bits. Hold [ctrl]{keyname} (or [command]{keyname} on a Mac) to select multiple options.
+Цей приклад витягує вибрані значення з поля вибору `multiple` і використовує їх для складання двійкового числа з окремих бітів. Утримуйте [ctrl]{клавіша} (або [command]{клавіша} на Mac), щоб вибрати декілька варіантів.
 
 ```{lang: html}
-<select multiple>
-  <option value="1">0001</option>
-  <option value="2">0010</option>
-  <option value="4">0100</option>
-  <option value="8">1000</option>
-</select> = <span id="output">0</span>
-<script>
-  let select = document.querySelector("select");
-  let output = document.querySelector("#output");
-  select.addEventListener("change", () => {
+<вибрати декілька>
+  <option value=«1»>0001</option>
+  <option value=«2»>0010</option>
+  <option value=«4»>0100</option>
+  <option value=«8»>1000</option>
+</select> = <span id=«output»>0</span> </span
+<скрипт
+  let select = document.querySelector(«select»);
+  let output = document.querySelector(«#output»);
+  select.addEventListener(«change», () => {})
     let number = 0;
     for (let option of Array.from(select.options)) {
       if (option.selected) {
@@ -646,51 +648,51 @@ This example extracts the selected values from a `multiple` select field and use
 </script>
 ```
 
-## File fields
+## Поля файлу
 
-{{index file, "hard drive", "filesystem", security, "file field", "input (HTML tag)"}}
+{{індекс файлу, «жорсткий диск», «файлова система», «безпека», «поле файлу», «вхід (HTML-тег)»}}
 
-File fields were originally designed as a way to ((upload)) files from the user's machine through a form. In modern browsers, they also provide a way to read such files from JavaScript programs. The field acts as a kind of gatekeeper. The script cannot simply start reading private files from the user's computer, but if the user selects a file in such a field, the browser interprets that action to mean that the script may read the file.
+Файлові поля спочатку були розроблені як спосіб ((завантаження)) файлів з комп'ютера користувача через форму. У сучасних браузерах вони також надають можливість читати такі файли з програм на JavaScript. Поле виконує роль своєрідного воротаря. Скрипт не може просто почати читати приватні файли з комп'ютера користувача, але якщо користувач вибирає файл у такому полі, браузер інтерпретує цю дію як те, що скрипт може прочитати файл.
 
-A file field usually looks like a button labeled with something like "choose file" or "browse", with information about the chosen file next to it.
+Зазвичай поле файлу виглядає як кнопка з написом на кшталт «вибрати файл» або «переглянути», з інформацією про вибраний файл поруч з нею.
 
 ```{lang: html}
-<input type="file">
+<input type=«file»>
 <script>
-  let input = document.querySelector("input");
-  input.addEventListener("change", () => {
+  let input = document.querySelector(«input»);
+  input.addEventListener(«change», () => {
     if (input.files.length > 0) {
       let file = input.files[0];
-      console.log("You chose", file.name);
-      if (file.type) console.log("It has type", file.type);
+      console.log(«Ви вибрали», file.name);
+      if (file.type) console.log(«Він має тип», file.type);
     }
   });
 </script>
 ```
 
-{{index "multiple attribute", "files property"}}
+{{index «multiple attribute», «files property»}}
 
-The `files` property of a ((file field)) element is an ((array-like object)) (once again, not a real array) containing the files chosen in the field. It is initially empty. The reason there isn't simply a `file` property is that file fields also support a `multiple` attribute, which makes it possible to select multiple files at the same time.
+Властивість `files` елемента ((файлового поля)) - це об'єкт типу масив (знову ж таки, не реальний масив), що містить файли, вибрані у полі. Початково вона є порожньою. Причиною відсутності простої властивості `file` є те, що поля файлів також підтримують атрибут `multiple`, який дозволяє вибрати декілька файлів одночасно.
 
-{{index "File type"}}
+{{індекс «Тип файлу»}}
 
-The objects in `files` have properties such as `name` (the filename), `size` (the file's size in bytes, which are chunks of 8 bits), and `type` (the media type of the file, such as `text/plain` or `image/jpeg`).
+Об'єкти у `files` мають такі властивості, як `name` (ім'я файлу), `size` (розмір файлу у байтах, які є фрагментами по 8 біт) і `type` (тип медіафайлу, наприклад, `text/plain` або `image/jpeg`).
 
-{{index ["asynchronous programming", "reading files"], "file reading", "FileReader class"}}
+{{index [«асинхронне програмування», «читання файлів», «читання файлів», «клас FileReader»}}
 
 {{id filereader}}
 
-What it does not have is a property that contains the content of the file. Getting at that is a little more involved. Since reading a file from disk can take time, the interface is asynchronous to avoid freezing the window.
+Чого він не має, так це властивості, яка містить вміст файлу. Отримання цієї властивості є дещо складнішим завданням. Оскільки читання файлу з диска може зайняти деякий час, інтерфейс є асинхронним, щоб уникнути зависання вікна.
 
 ```{lang: html}
-<input type="file" multiple>
+<input type=«file» multiple>
 <script>
-  let input = document.querySelector("input");
-  input.addEventListener("change", () => {
+  let input = document.querySelector(«input»);
+  input.addEventListener(«change», () => {})
     for (let file of Array.from(input.files)) {
       let reader = new FileReader();
-      reader.addEventListener("load", () => {
-        console.log("File", file.name, "starts with",
+      reader.addEventListener(«load», () => {
+        console.log(«File», file.name, «starts with»,
                     reader.result.slice(0, 20));
       });
       reader.readAsText(file);
@@ -699,205 +701,205 @@ What it does not have is a property that contains the content of the file. Getti
 </script>
 ```
 
-{{index "FileReader class", "load event", "readAsText method", "result property"}}
+{{index «клас FileReader», «подія load», «метод readAsText», «властивість result»}}
 
-Reading a file is done by creating a `FileReader` object, registering a `"load"` event handler for it, and calling its `readAsText` method, giving it the file we want to read. Once loading finishes, the reader's `result` property contains the file's content.
+Читання файлу здійснюється шляхом створення об'єкта `FileReader`, реєстрації для нього обробника події `load` і виклику його методу `readAsText`, передаючи йому файл, який ми хочемо прочитати. Після завершення завантаження властивість `result` читача містить вміст файлу.
 
-{{index "error event", "FileReader class", "Promise class"}}
+{{index «error event», «FileReader class», «Promise class»}}
 
-`FileReader`s also fire an `"error"` event when reading the file fails for any reason. The error object itself will end up in the reader's `error` property. This interface was designed before promises became part of the language. You could wrap it in a promise like this:
+`FileReader` також згенерує подію `error`, коли читання файлу з будь-якої причини завершиться невдачею. Сам об'єкт помилки буде поміщено у властивість `error` зчитувача. Цей інтерфейс було розроблено до того, як обіцянки стали частиною мови. Ви можете загорнути його в обіцянку на зразок цього:
 
 ```
 function readFileText(file) {
   return new Promise((resolve, reject) => {
     let reader = new FileReader();
     reader.addEventListener(
-      "load", () => resolve(reader.result));
+      «load», () => resolve(reader.result));
     reader.addEventListener(
-      "error", () => reject(reader.error));
+      «error», () => reject(reader.error));
     reader.readAsText(file);
   });
 }
 ```
 
-## Storing data client-side
+## Зберігання даних на стороні клієнта
 
-{{index "web application"}}
+{{index «web application»}}
 
-Simple ((HTML)) pages with a bit of JavaScript can be a great format for "((mini application))s"—small helper programs that automate basic tasks. By connecting a few form ((field))s with event handlers, you can do anything from converting between centimeters and inches to computing passwords from a master password and a website name.
+Прості ((HTML)) сторінки з невеликою кількістю JavaScript можуть бути чудовим форматом для «((міні-додатків))» - невеликих допоміжних програм, які автоматизують основні завдання. Поєднавши кілька форм ((полів)) з обробниками подій, ви можете робити що завгодно - від переведення сантиметрів у дюйми до обчислення паролів за головним паролем та назвою веб-сайту.
 
-{{index persistence, [binding, "as state"], [browser, storage]}}
+{{персистентність індексів, [прив'язка, «як стан»], [браузер, сховище]}}
 
-When such an application needs to remember something between sessions, you cannot use JavaScript bindings—those are thrown away every time the page is closed. You could set up a server, connect it to the internet, and have your application store something there (we'll see how to do that in [Chapter ?](node)). But that's a lot of extra work and complexity. Sometimes it's enough to just keep the data in the ((browser)).
+Коли такому додатку потрібно запам'ятати щось між сеансами, ви не можете використовувати прив'язки JavaScript - вони викидаються щоразу, коли сторінка закривається. Ви можете створити сервер, підключити його до інтернету і дозволити вашому додатку зберігати щось там (ми розглянемо, як це зробити у [Розділ ?](вузол)). Але це багато додаткової роботи і складності. Іноді достатньо просто зберігати дані у ((браузері)).
 
-{{index "localStorage object", "setItem method", "getItem method", "removeItem method"}}
+{{index «об'єкт localStorage», «метод setItem», «метод getItem», «метод removeItem»}}
 
-The `localStorage` object can be used to store data in a way that survives ((page reload))s. This object allows you to file string values under names.
+Об'єкт `localStorage` можна використовувати для зберігання даних у спосіб, який переживе ((перезавантаження сторінки)). Цей об'єкт дозволяє зберігати рядкові значення під іменами.
 
 ```
-localStorage.setItem("username", "marijn");
-console.log(localStorage.getItem("username"));
+localStorage.setItem(«ім'я користувача», «marijn»);
+console.log(localStorage.getItem(«username»));
 // → marijn
-localStorage.removeItem("username");
+localStorage.removeItem(«username»);
 ```
 
-{{index "localStorage object"}}
+{{index «localStorage object»}}
 
-A value in `localStorage` sticks around until it is overwritten or is removed with `removeItem`, or the user clears their local data.
+Значення у `localStorage` зберігається доти, доки його не буде перезаписано або видалено за допомогою `removeItem`, або доки користувач не очистить свої локальні дані.
 
-{{index security}}
+{{безпека індексації}}
 
-Sites from different ((domain))s get different storage compartments. That means data stored in `localStorage` by a given website can, in principle, be read (and overwritten) only by scripts on that same site.
+Сайти з різних ((доменів)) отримують різні сховища. Це означає, що дані, збережені у `localStorage` певним сайтом, у принципі, можуть бути прочитані (і перезаписані) лише скриптами цього ж сайту.
 
-{{index "localStorage object"}}
+{{index «localStorage object»}}
 
-Browsers do enforce a limit on the size of the data a site can store in `localStorage`. That restriction, along with the fact that filling up people's ((hard drive))s with junk is not really profitable, prevents the feature from eating up too much space.
+Браузери накладають обмеження на розмір даних, які сайт може зберігати у `localStorage`. Це обмеження, а також той факт, що заповнення людських ((жорстких дисків)) непотребом не є вигідним, запобігає тому, щоб ця функція з'їдала надто багато місця.
 
-{{index "localStorage object", "note-taking example", "select (HTML tag)", "button (HTML tag)", "textarea (HTML tag)"}}
+{{index «localStorage object», «note-taking example», «select (HTML-тег)», «button (HTML-тег)», «textarea (HTML-тег)»}}
 
-The following code implements a crude note-taking application. It keeps a set of named notes and allows the user to edit notes and create new ones.
+Наступний код реалізує простий додаток для ведення нотаток. Він зберігає набір іменованих нотаток і дозволяє користувачеві редагувати нотатки та створювати нові.
 
 ```{lang: html, startCode: true}
-Notes: <select></select> <button>Add</button><br>
-<textarea style="width: 100%"></textarea>
+Нотатки: <select></select> <button>Додати</button><br>
+<textarea style=«width: 100%»></textarea
 
-<script>
-  let list = document.querySelector("select");
-  let note = document.querySelector("textarea");
+<скрипт
+  let list = document.querySelector(«select»);
+  let note = document.querySelector(«textarea»);
 
-  let state;
+  нехай state;
   function setState(newState) {
-    list.textContent = "";
+    list.textContent = «»;
     for (let name of Object.keys(newState.notes)) {
-      let option = document.createElement("option");
+      let option = document.createElement(«option»);
       option.textContent = name;
       if (newState.selected == name) option.selected = true;
       list.appendChild(option);
     }
     note.value = newState.notes[newState.selected];
 
-    localStorage.setItem("Notes", JSON.stringify(newState));
+    localStorage.setItem(«Notes», JSON.stringify(newState));
     state = newState;
   }
-  setState(JSON.parse(localStorage.getItem("Notes")) ?? {
-    notes: {"shopping list": "Carrots\nRaisins"},
-    selected: "shopping list"
+  setState(JSON.parse(localStorage.getItem(«Notes»)) ?? {
+    notes: { «список покупок»: «Морква\nРодзинки"},
+    вибрано: «список покупок»
   });
 
-  list.addEventListener("change", () => {
+  list.addEventListener(«change», () => {})
     setState({notes: state.notes, selected: list.value});
   });
-  note.addEventListener("change", () => {
-    let {selected} = state;
+  note.addEventListener(«change», () => {
+    нехай {selected} = state;
     setState({
       notes: {...state.notes, [selected]: note.value},
-      selected
+      вибране
     });
   });
-  document.querySelector("button")
-    .addEventListener("click", () => {
-      let name = prompt("Note name");
+  document.querySelector(«button»)
+    .addEventListener(«click», () => {
+      let name = prompt(«Назва нотатки»);
       if (name) setState({
-        notes: {...state.notes, [name]: ""},
+        notes: {...state.notes, [name]: «"},
         selected: name
       });
     });
 </script>
 ```
 
-{{index "getItem method", JSON, "?? operator", "default value"}}
+{{index «метод getItem», JSON, «?? оператор», «значення за замовчуванням»}}
 
-The script gets its starting state from the `"Notes"` value stored in `localStorage` or, if that's missing, creates an example state that has only a shopping list in it. Reading a field that does not exist from `localStorage` will yield `null`. Passing `null` to `JSON.parse` will make it parse the string `"null"` and return `null`. Thus, the `??` operator can be used to provide a default value in a situation like this.
+Скрипт отримує початковий стан зі значення `«Notes»`, що зберігається в `localStorage`, або, якщо воно відсутнє, створює приклад стану, який містить лише список покупок. Читання неіснуючого поля з `localStorage` призведе до отримання значення `null`. Передача `null` до `JSON.parse` змусить його розібрати рядок `«null»` і повернути `null`. Таким чином, оператор `??` можна використовувати для надання значення за замовчуванням у подібних ситуаціях.
 
-The `setState` method makes sure the DOM is showing a given state and stores the new state to `localStorage`. Event handlers call this function to move to a new state.
+Метод `setState` переконується, що DOM відображає заданий стан, і зберігає новий стан у `localStorage`. Обробники подій викликають цю функцію для переходу до нового стану.
 
-{{index [object, creation], property, "computed property"}}
+{{індекс [об'єкт, створення], властивість, «обчислена властивість»}}
 
-The `...` syntax in the example is used to create a new object that is a clone of the old `state.notes`, but with one property added or overwritten. It uses ((spread)) syntax to first add the properties from the old object and then set a new property. The ((square brackets)) notation in the object literal is used to create a property whose name is based on some dynamic value.
+Синтаксис `...` у прикладі використовується для створення нового об'єкта, який є клоном старого `state.notes`, але з додаванням або перезаписом однієї властивості. У ньому використовується синтаксис ((дужки)), щоб спочатку додати властивості зі старого об'єкта, а потім встановити нову властивість. Позначення ((квадратні дужки)) в об'єктному літералі використовується для створення властивості, назва якої базується на деякому динамічному значенні.
 
-{{index "sessionStorage object", [browser, storage]}}
+{{index «sessionStorage object», [browser, storage]}}
 
-There is another object, similar to `localStorage`, called `sessionStorage`. The difference between the two is that the content of `sessionStorage` is forgotten at the end of each _((session))_, which for most browsers means whenever the browser is closed.
+Існує ще один об'єкт, схожий на `localStorage`, який називається `sessionStorage`. Різниця між ними полягає в тому, що вміст `sessionStorage` забувається в кінці кожного _((сеансу))_, що для більшості браузерів означає закриття браузера.
 
-## Summary
+## Підсумок
 
-In this chapter, we discussed how the HTTP protocol works. A _client_ sends a request, which contains a method (usually `GET`) and a path that identifies a resource. The _server_ then decides what to do with the request and responds with a status code and a response body. Both requests and responses may contain headers that provide additional information.
+У цій главі ми обговорили, як працює протокол HTTP. Клієнт_ надсилає запит, який містить метод (зазвичай `GET`) і шлях, який ідентифікує ресурс. Потім _сервер_ вирішує, що робити із запитом, і відповідає кодом статусу і тілом відповіді. І запити, і відповіді можуть містити заголовки, які надають додаткову інформацію.
 
-The interface through which browser JavaScript can make HTTP requests is called `fetch`. Making a request looks like this:
+Інтерфейс, через який JavaScript браузера може робити HTTP-запити, називається `fetch`. Запит виглядає наступним чином:
 
 ```
-fetch("/18_http.html").then(r => r.text()).then(text => {
-  console.log(`The page starts with ${text.slice(0, 15)}`);
+fetch(«/18_http.html»).then(r => r.text()).then(text => {
+  console.log(`Сторінка починається з ${text.slice(0, 15)}`);
 });
 ```
 
-Browsers make `GET` requests to fetch the resources needed to display a web page. A page may also contain forms, which allow information entered by the user to be sent as a request for a new page when the form is submitted.
+Браузери роблять `GET`-запити, щоб отримати ресурси, необхідні для відображення веб-сторінки. Сторінка також може містити форми, які дозволяють надсилати інформацію, введену користувачем, як запит на відкриття нової сторінки після заповнення форми.
 
-HTML can represent various types of form fields, such as text fields, checkboxes, multiple-choice fields, and file pickers. Such fields can be inspected and manipulated with JavaScript. They fire the `"change"` event when changed, fire the `"input"` event when text is typed, and receive keyboard events when they have keyboard focus. Properties like `value` (for text and select fields) or `checked` (for checkboxes and radio buttons) are used to read or set the field's content.
+HTML може представляти різні типи полів форм, такі як текстові поля, прапорці, поля з множинним вибором і перемикачі для вибору файлів. Такі поля можна переглядати та маніпулювати ними за допомогою JavaScript. Вони викликають подію «change»` при зміні, викликають подію «input»` при введенні тексту і отримують події клавіатури, коли вони мають фокус клавіатури. Такі властивості, як `value` (для текстових полів і полів вибору) або `checked` (для прапорців і перемикачів) використовуються для читання або встановлення вмісту поля.
 
-When a form is submitted, a `"submit"` event is fired on it. A JavaScript handler can call `preventDefault` on that event to disable the browser's default behavior. Form field elements may also occur outside of a form tag.
+Коли форма надсилається, для неї виконується подія `«submit»`. Обробник JavaScript може викликати `preventDefault` для цієї події, щоб вимкнути поведінку браузера за замовчуванням. Елементи полів форми також можуть знаходитися поза тегом форми.
 
-When the user has selected a file from their local filesystem in a file picker field, the `FileReader` interface can be used to access the content of this file from a JavaScript program.
+Коли користувач вибрав файл зі своєї локальної файлової системи у полі вибору файлу, інтерфейс `FileReader` може бути використаний для доступу до вмісту цього файлу з програми JavaScript.
 
-The `localStorage` and `sessionStorage` objects can be used to save information in a way that survives page reloads. The first object saves the data forever (or until the user decides to clear it), and the second saves it until the browser is closed.
+Об'єкти `localStorage` і `essionStorage` можуть бути використані для збереження інформації таким чином, щоб пережити перезавантаження сторінки. Перший об'єкт зберігає дані назавжди (або поки користувач не вирішить їх очистити), а другий зберігає їх до закриття браузера.
 
-## Exercises
+## Вправи
 
-### Content negotiation
+## Узгодження вмісту
 
-{{index "Accept header", "media type", "document format", "content negotiation (exercise)"}}
+{{індекс «Прийняти заголовок», «тип медіа», «формат документа», «узгодження вмісту (вправа)»}}
 
-One of the things HTTP can do is called _content negotiation_. The `Accept` request header is used to tell the server what type of document the client would like to get. Many servers ignore this header, but when a server knows of various ways to encode a resource, it can look at this header and send the one that the client prefers.
+Одна з можливостей HTTP називається _узгодження вмісту_. Заголовок запиту `Accept` використовується для того, щоб повідомити серверу, який тип документа бажає отримати клієнт. Багато серверів ігнорують цей заголовок, але коли сервер знає про різні способи кодування ресурсу, він може подивитися на цей заголовок і відправити той, якому віддає перевагу клієнт.
 
-{{index "MIME type"}}
+{{index «MIME type»}}
 
-The URL [_https://eloquentjavascript.net/author_](https://eloquentjavascript.net/author) is configured to respond with either plaintext, HTML, or JSON, depending on what the client asks for. These formats are identified by the standardized _((media type))s_ `text/plain`, `text/html`, and `application/json`.
+URL-адресу [_https://eloquentjavascript.net/author_](https://eloquentjavascript.net/author) налаштовано на відповідь у вигляді звичайного тексту, HTML або JSON, залежно від того, що запитує клієнт. Ці формати ідентифікуються за допомогою стандартних _((тип медіа))s_ `text/plain`, `text/html` та `application/json`.
 
-{{index "headers property", "fetch function"}}
+{{index «property headers», «fetch function»}}
 
-Send requests to fetch all three formats of this resource. Use the `headers` property in the options object passed to `fetch` to set the header named `Accept` to the desired media type.
+Надсилайте запити для отримання всіх трьох форматів цього ресурсу. Використовуйте властивість `headers` в об'єкті options, переданому функції `fetch`, щоб встановити заголовок з назвою `Accept` на потрібний тип медіа.
 
-Finally, try asking for the media type `application/rainbows+unicorns` and see which status code that produces.
+Нарешті, спробуйте запитати тип медіа `application/ rainbows+unicorns` і подивіться, який код статусу буде видано.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 ```
 
 if}}
 
 {{hint
 
-{{index "content negotiation (exercise)"}}
+{{index «узгодження контенту (вправа)»}}
 
-Base your code on the `fetch` examples [earlier in the chapter](http#fetch).
+Базуйте свій код на прикладах `fetch` [раніше у розділі] (http#fetch).
 
-{{index "406 (HTTP status code)", "Accept header"}}
+{{index «406 (код стану HTTP)», «Прийняти заголовок»}}
 
-Asking for a bogus media type will return a response with code 406, "Not acceptable", which is the code a server should return when it can't fulfill the `Accept` header.
+Запит несправжнього типу носія поверне відповідь з кодом 406, «Неприйнятно», який сервер має повертати, коли він не може виконати заголовок `Accept`.
 
-hint}}
+підказка}}
 
-### A JavaScript workbench
+### Робоче середовище JavaScript
 
-{{index "JavaScript console", "workbench (exercise)"}}
+{{index «JavaScript console», «workbench (exercise)»}}
 
-Build an interface that allows users to type and run pieces of JavaScript code.
+Створіть інтерфейс, який дозволяє користувачам вводити та виконувати фрагменти JavaScript коду.
 
-{{index "textarea (HTML tag)", "button (HTML tag)", "Function constructor", "error message"}}
+{{index «textarea (HTML-тег)», «button (HTML-тег)», «конструктор функцій», «повідомлення про помилку»}}
 
-Put a button next to a `<textarea>` field that, when pressed, uses the `Function` constructor we saw in [Chapter ?](modules#eval) to wrap the text in a function and call it. Convert the return value of the function, or any error it raises, to a string and display it below the text field.
+Помістіть кнопку поруч з полем `<textarea>`, яка при натисканні використовує конструктор `Function`, який ми бачили в [Розділ ?](modules#eval), щоб обернути текст у функцію і викликати її. Перетворіть значення, що повертається функцією, або будь-яку помилку, яку вона викликає, у рядок і виведіть його під текстовим полем.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{lang: html, test: no}
-<textarea id="code">return "hi";</textarea>
-<button id="button">Run</button>
-<pre id="output"></pre>
+<textarea id=«code»>повернути «hi»;</textarea
+<button id=«button»>Запустити</button
+<pre id=«output»></pre> </pre
 
 <script>
-  // Your code here.
+  // Ваш код тут.
 </script>
 ```
 
@@ -905,50 +907,50 @@ if}}
 
 {{hint
 
-{{index "click event", "mousedown event", "Function constructor", "workbench (exercise)"}}
+{{індекс «подія кліку», «подія наведення миші», «конструктор функцій», «робочий стіл (вправа)»}}
 
-Use `document.querySelector` or `document.getElementById` to get access to the elements defined in your HTML. An event handler for `"click"` or `"mousedown"` events on the button can get the `value` property of the text field and call `Function` on it.
+Використовуйте `document.querySelector` або `document.getElementById` для отримання доступу до елементів, визначених у вашому HTML. Обробник подій `«click»` або `«mousedown»` на кнопці може отримати властивість `value` текстового поля і викликати `Function` на ньому.
 
-{{index "try keyword", "exception handling"}}
+{{index «try keyword», «обробка виключень»}}
 
-Make sure you wrap both the call to `Function` and the call to its result in a `try` block so you can catch the exceptions it produces. In this case, we really don't know what type of exception we are looking for, so catch everything.
+Переконайтеся, що ви обернули виклик `Function` і виклик її результату в блок `try`, щоб ви могли перехоплювати виключення, які вона генерує. У цьому випадку ми дійсно не знаємо, який тип виключення ми шукаємо, тому перехоплюйте все.
 
-{{index "textContent property", output, text, "createTextNode method", "newline character"}}
+{{index «textContent property», output, text, «createTextNode method», «newline character»}}
 
-The `textContent` property of the output element can be used to fill it with a string message. Or, if you want to keep the old content around, create a new text node using `document.createTextNode` and append it to the element. Remember to add a newline character to the end so that not all output appears on a single line.
+Властивість `textContent` елемента output можна використовувати для заповнення його рядковим повідомленням. Або, якщо ви хочете зберегти старий вміст, створіть новий текстовий вузол за допомогою `document.createTextNode` і додайте його до елемента. Не забудьте додати символ переходу на новий рядок у кінці, щоб не виводити всі дані в одному рядку.
 
-hint}}
+підказка}}
 
-### Conway's Game of Life
+### Гра життя Конвея
 
-{{index "game of life (exercise)", "artificial life", "Conway's Game of Life"}}
+{{індекс «гра життя (вправа)», «штучне життя», «Гра життя Конвея»}}
 
-Conway's Game of Life is a simple ((simulation)) that creates artificial "life" on a ((grid)), each cell of which is either alive or not. In each ((generation)) (turn), the following rules are applied:
+Гра життя Конвея - це проста ((симуляція)), яка створює штучне «життя» на ((сітці)), кожна клітинка якої є або живою, або ні. У кожному ((поколінні)) (ході) застосовуються наступні правила:
 
-* Any live ((cell)) with fewer than two or more than three live   ((neighbor))s dies.
+* Будь-яка жива ((клітинка)) з менш ніж двома або більш ніж трьома живими ((сусідами)) вмирає.
 
-* Any live cell with two or three live neighbors lives on to the next   generation.
+* Будь-яка жива клітина з двома або трьома живими сусідами переходить у наступне покоління.
 
-* Any dead cell with exactly three live neighbors becomes a live cell.
+* Будь-яка мертва клітина з рівно трьома живими сусідами стає живою клітиною.
 
-A _neighbor_ is defined as any adjacent cell, including diagonally adjacent ones.
+Сусідом вважається будь-яка сусідня клітина, включаючи сусідні по діагоналі.
 
-{{index "pure function"}}
+{{index «чиста функція»}}
 
-Note that these rules are applied to the whole grid at once, not one square at a time. That means the counting of neighbors is based on the situation at the start of the generation, and changes happening to neighbor cells during this generation should not influence the new state of a given cell.
+Зверніть увагу, що ці правила застосовуються до всієї сітки одразу, а не до однієї клітинки за раз. Це означає, що підрахунок сусідів базується на ситуації на початку генерації, і зміни, що відбуваються з сусідніми клітинками протягом цієї генерації, не повинні впливати на новий стан даної клітинки.
 
-{{index "Math.random function"}}
+{{index «Math.random function»}}
 
-Implement this game using whichever ((data structure)) you find appropriate. Use `Math.random` to populate the grid with a random pattern initially. Display it as a grid of ((checkbox)) ((field))s, with a ((button)) next to it to advance to the next ((generation)). When the user checks or unchecks the checkboxes, their changes should be included when computing the next generation.
+Реалізуйте цю гру, використовуючи будь-яку ((структуру даних)), яку ви вважаєте за потрібне. Використовуйте `Math.random` для початкового заповнення сітки випадковим шаблоном. Відобразіть її у вигляді сітки ((прапорець)) ((поле)) з ((кнопка)) поруч, щоб перейти до наступного ((покоління)). Коли користувач встановлює або знімає прапорці, їх зміни слід враховувати при обчисленні наступного покоління.
 
-{{if interactive
+{{if інтерактивний
 
 ```{lang: html, test: no}
-<div id="grid"></div>
-<button id="next">Next generation</button>
+<div id=«grid»></div>
+<button id=«next»>Наступне покоління</button
 
 <script>
-  // Your code here.
+  // Ваш код тут.
 </script>
 ```
 
@@ -956,20 +958,20 @@ if}}
 
 {{hint
 
-{{index "game of life (exercise)"}}
+{{index «гра життя (вправа)»}}
 
-To solve the problem of having the changes conceptually happen at the same time, try to see the computation of a ((generation)) as a ((pure function)), which takes one ((grid)) and produces a new grid that represents the next turn.
+Щоб вирішити проблему того, щоб зміни концептуально відбувалися одночасно, спробуйте розглядати обчислення ((генерації)) як ((чисту функцію)), яка бере одну ((сітку)) і створює нову сітку, яка представляє наступний хід.
 
-Representing the matrix can be done with a single array of width × height elements, storing values row by row, so, for example, the third element in the fifth row is (using zero-based indexing) stored at position 4 × _width_ + 2. You can count live ((neighbor))s with two nested loops, looping over adjacent coordinates in both dimensions. Take care not to count cells outside of the field and to ignore the cell in the center, whose neighbors we are counting.
+Матрицю можна представити єдиним масивом елементів ширини × висоти, зберігаючи значення рядок за рядком, так, наприклад, третій елемент у п'ятому рядку (з використанням нульової індексації) зберігається у позиції 4 × _ширина_ + 2. Ви можете порахувати живі ((сусідні)) клітинки за допомогою двох вкладених циклів, перебираючи сусідні координати в обох вимірах. Слідкуйте за тим, щоб не рахувати клітинки за межами поля та ігнорувати клітинку в центрі, сусідів якої ми рахуємо.
 
-{{index "event handling", "change event"}}
+{{index «event handling», «change event»}}
 
-Ensuring that changes to ((checkbox))es take effect on the next generation can be done in two ways. An event handler could notice these changes and update the current grid to reflect them, or you could generate a fresh grid from the values in the checkboxes before computing the next turn.
+Переконатися, що зміни до ((checkbox))es набудуть чинності у наступному поколінні, можна двома способами. Обробник подій може помітити ці зміни і оновити поточну сітку, щоб відобразити їх, або ви можете згенерувати нову сітку на основі значень у прапорцях перед обчисленням наступного ходу.
 
-If you choose to go with event handlers, you might want to attach ((attribute))s that identify the position that each checkbox corresponds to so that it is easy to find out which cell to change.
+Якщо ви вирішите використовувати обробники подій, ви можете додати ((атрибут))и, які ідентифікують позицію, якій відповідає кожна позначка, щоб було легко дізнатися, яку клітинку потрібно змінити.
 
-{{index drawing, "table (HTML tag)", "br (HTML tag)"}}
+{{index drawing, «table (HTML-тег)», «br (HTML-тег)»}}
 
-To draw the grid of checkboxes, you can either use a `<table>` element (see [Chapter ?](dom#exercise_table)) or simply put them all in the same element and put `<br>` (line break) elements between the rows.
+Для малювання сітки прапорців можна використати елемент `<table>` (див. [Глава ?](dom#exercise_table)) або просто розмістити їх усі в одному елементі, а між рядками поставити елементи `<br>` (переведення рядка).
 
-hint}}
+підказка}}

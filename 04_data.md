@@ -1,63 +1,63 @@
-{{meta {load_files: ["code/journal.js", "code/chapter/04_data.js"], zip: "node/html"}}}
+{{meta {load_files: [«code/journal.js», «code/chapter/04_data.js»], zip: «node/html"}}}}
 
-# Data Structures: Objects and Arrays
+# Структури даних: Об'єкти та масиви
 
-{{quote {author: "Charles Babbage", title: "Passages from the Life of a Philosopher (1864)", chapter: true}
+{{quote {author: «Charles Babbage», title: «Passages from the Life of a Philosopher (1864)», chapter: true}}
 
-On two occasions I have been asked, 'Pray, Mr. Babbage, if you put into the machine wrong figures, will the right answers come out?' [...] I am not able rightly to apprehend the kind of confusion of ideas that could provoke such a question.
+Двічі мене запитували: «Скажіть, містере Беббідж, якщо ви введете в машину неправильні цифри, чи будуть на виході правильні відповіді?» [...] Я не в змозі зрозуміти, яка плутанина ідей може спровокувати таке запитання.
 
 quote}}
 
-{{index "Babbage, Charles"}}
+{{index «Беббідж, Чарльз»}}
 
-{{figure {url: "img/chapter_picture_4.jpg", alt: "Illustration of a squirrel next to a pile of books and a pair of glasses. A moon and stars are visible in the background.", chapter: framed}}}
+{{figure {url: «img/chapter_picture_4.jpg», alt: «Ілюстрація білки поруч з купою книг і парою окулярів. На задньому плані видно місяць і зорі.», “chapter”, “framed” }}}
 
-{{index object, "data structure"}}
+{{index object, «структура даних»}}
 
-Numbers, Booleans, and strings are the atoms from which ((data)) structures are built. Many types of information require more than one atom, though. _Objects_ allow us to group values—including other objects—to build more complex structures.
+Числа, булеві числа та рядки - це атоми, з яких будуються структури ((даних)). Однак, багато типів інформації потребують більше одного атома. Об'єкти_ дозволяють нам групувати значення, включно з іншими об'єктами, для побудови більш складних структур.
 
-The programs we have built so far have been limited by the fact that they were operating only on simple data types. After learning the basics of data structures in this chapter, you'll know enough to start writing useful programs.
+Програми, які ми створювали до цього часу, були обмежені тим, що оперували лише простими типами даних. Вивчивши основи структур даних у цій главі, ви будете знати достатньо, щоб почати писати корисні програми.
 
-The chapter will work through a more or less realistic programming example, introducing concepts as they apply to the problem at hand. The example code will often build on functions and bindings introduced earlier in the book.
+У главі розглядатимуться більш-менш реалістичні приклади програмування, які вводять поняття, що застосовуються до проблеми, яка розглядається. Код прикладу часто базуватиметься на функціях і зв'язуваннях, описаних у попередніх розділах книги.
 
 {{if book
 
-The online coding ((sandbox)) for the book ([_https://eloquentjavascript.net/code_](https://eloquentjavascript.net/code)) provides a way to run code in the context of a particular chapter. If you decide to work through the examples in another environment, be sure to first download the full code for this chapter from the sandbox page.
+Онлайн-пісочниця («пісочниця») для книги ([https://eloquentjavascript.net/code_](https://eloquentjavascript.net/code)) дає змогу виконувати код у контексті певної глави. Якщо ви вирішите опрацювати приклади в іншому середовищі, обов'язково завантажте повний код цієї глави зі сторінки пісочниці.
 
 if}}
 
-## The weresquirrel
+## Білка-перевертень
 
-{{index "weresquirrel example", lycanthropy}}
+{{index «weresquirrel example», lycanthropy}}
 
-Every now and then, usually between 8 p.m. and 10 p.m., ((Jacques)) finds himself transforming into a small furry rodent with a bushy tail.
+Час від часу, зазвичай між 20:00 та 22:00, ((Жак)) перетворюється на маленького пухнастого гризуна з густим хвостом.
 
-On one hand, Jacques is quite glad that he doesn't have classic lycanthropy. Turning into a squirrel does cause fewer problems than turning into a wolf. Instead of having to worry about accidentally eating the neighbor (_that_ would be awkward), he worries about being eaten by the neighbor's cat. After two occasions of waking up on a precariously thin branch in the crown of an oak, naked and disoriented, he has taken to locking the doors and windows of his room at night and putting a few walnuts on the floor to keep himself busy.
+З одного боку, Жак радий, що у нього немає класичної лікантропії. Перетворення на білку спричиняє менше проблем, ніж перетворення на вовка. Замість того, щоб турбуватися про те, що він випадково з'їсть сусіда (_це_ було б незручно), він боїться, що його з'їсть сусідський кіт. Після того, як він двічі прокидався на хиткій тонкій гілці в кроні дуба, голий і дезорієнтований, він почав замикати на ніч двері і вікна своєї кімнати і класти на підлогу кілька волоських горіхів, щоб зайняти себе чимось.
 
-But Jacques would prefer to get rid of his condition entirely. The irregular occurrences of the transformation make him suspect that they might be triggered by something. For a while, he believed that it happened only on days when he had been near oak trees. However, avoiding oak trees did not solve the problem.
+Але Жак волів би повністю позбутися свого стану. Нерегулярні випадки перетворень змушують його підозрювати, що вони можуть бути чимось спровоковані. Деякий час він вважав, що це відбувалося лише в ті дні, коли він перебував біля дубів. Однак уникання дубів не вирішило проблему.
 
-{{index journal}}
+{{індекс журналу}}
 
-Switching to a more scientific approach, Jacques has started keeping a daily log of everything he does on a given day and whether he changed form. With this data he hopes to narrow down the conditions that trigger the transformations.
+Перейшовши до більш наукового підходу, Жак почав вести щоденний журнал, в якому записує все, що він робив у той чи інший день, і чи змінював він форму. За допомогою цих даних він сподівається звузити коло умов, які спричиняють трансформації.
 
-The first thing he needs is a data structure to store this information.
+Перше, що йому потрібно - це структура даних для зберігання цієї інформації.
 
-## Datasets
+## Набори даних
 
-{{index ["data structure", collection], [memory, organization]}}
+{{index [«структура даних», колекція], [пам'ять, організація]}}
 
-To work with a chunk of digital data, we first have to find a way to represent it in our machine's memory. Say, for example, that we want to represent a ((collection)) of the numbers 2, 3, 5, 7, and 11.
+Щоб працювати з масивом цифрових даних, нам спочатку потрібно знайти спосіб представити їх у пам'яті нашої машини. Скажімо, наприклад, що ми хочемо представити ((колекцію)) чисел 2, 3, 5, 7 та 11.
 
-{{index string}}
+{{індексний рядок}}
 
-We could get creative with strings—after all, strings can have any length, so we can put a lot of data into them—and use `"2 3 5 7 11"` as our representation. But this is awkward. We'd have to somehow extract the digits and convert them back to numbers to access them.
+Ми могли б пофантазувати з рядками - зрештою, рядки можуть мати будь-яку довжину, тож ми можемо записати у них багато даних - і використати `«2 3 5 7 11»` як наше представлення. Але це незручно. Нам доведеться якось витягувати цифри і перетворювати їх назад у числа, щоб отримати до них доступ.
 
-{{index [array, creation], "[] (array)"}}
+{{index [масив, твір], «[] (масив)»}}
 
-Fortunately, JavaScript provides a data type specifically for storing sequences of values. It is called an _array_ and is written as a list of values between ((square brackets)), separated by commas.
+На щастя, JavaScript надає тип даних спеціально для зберігання послідовностей значень. Він називається _масив_ і записується як список значень між ((квадратними дужками)), розділених комами.
 
 ```
-let listOfNumbers = [2, 3, 5, 7, 11];
+нехай listOfNumbers = [2, 3, 5, 7, 11];
 console.log(listOfNumbers[2]);
 // → 5
 console.log(listOfNumbers[0]);
@@ -66,74 +66,74 @@ console.log(listOfNumbers[2 - 1]);
 // → 3
 ```
 
-{{index "[] (subscript)", [array, indexing]}}
+{{index «[] (підрядковий індекс)», [масив, індексація]}}
 
-The notation for getting at the elements inside an array also uses ((square brackets)). A pair of square brackets immediately after an expression, with another expression inside of them, will look up the element in the left-hand expression that corresponds to the _((index))_ given by the expression in the brackets.
+У позначенні доступу до елементів всередині масиву також використовується ((квадратні дужки)). Пара квадратних дужок одразу після виразу з іншим виразом усередині них шукатиме елемент у лівому виразі, який відповідає _((індекс))_, заданому виразом у дужках.
 
 {{id array_indexing}}
-{{index "zero-based counting"}}
+{{index «відлік з нуля»}}
 
-The first index of an array is zero, not one, so the first element is retrieved with `listOfNumbers[0]`. Zero-based counting has a long tradition in technology and in certain ways makes a lot of sense, but it takes some getting used to. Think of the index as the number of items to skip, counting from the start of the array.
+Перший індекс масиву дорівнює нулю, а не одиниці, тому перший елемент отримується за допомогою `listOfNumbers[0]`. Нульовий відлік має давню традицію в технологіях і певним чином має великий сенс, але до нього потрібно звикнути. Подумайте про індекс як про кількість елементів, які слід пропустити, рахуючи від початку масиву.
 
 {{id properties}}
 
-## Properties
+## Властивості
 
-{{index "Math object", "Math.max function", ["length property", "for string"], [object, property], "period character", [property, access]}}
+{{index «математичний об'єкт», «функція Math.max», [«властивість довжини», «для рядка»], [об'єкт, властивість], «символ крапки», [властивість, доступ]}}
 
-We've seen a few expressions like `myString.length` (to get the length of a string) and `Math.max` (the maximum function) in past chapters. These expressions access a _property_ of some value. In the first case, we access the `length` property of the value in `myString`. In the second, we access the property named `max` in the `Math` object (which is a collection of mathematics-related constants and functions).
+У попередніх розділах ми бачили декілька виразів на кшталт `myString.length` (для отримання довжини рядка) та `Math.max` (максимальна функція). Ці вирази отримують доступ до _властивості_ деякого значення. У першому випадку ми отримуємо доступ до властивості `length` значення у `myString`. У другому випадку ми отримуємо доступ до властивості `max` об'єкта `Math` (який є колекцією констант і функцій, пов'язаних з математикою).
 
-{{index [property, access], null, undefined}}
+{{index [властивість, доступ], null, undefined}}
 
-Almost all JavaScript values have properties. The exceptions are `null` and `undefined`. If you try to access a property on one of these nonvalues, you get an error:
+Майже всі значення JavaScript мають властивості. Винятками є `null` та `undefined`. Якщо ви спробуєте отримати доступ до властивості для одного з цих не-значень, ви отримаєте помилку:
 
 ```{test: no}
 null.length;
-// → TypeError: null has no properties
+// → TypeError: null не має властивостей
 ```
 
-{{indexsee "dot character", "period character"}}
-{{index "[] (subscript)", "period character", "square brackets", "computed property", [property, access]}}
+{{indexsee «символ крапки», «символ крапки»}}
+{{індекс «[] (підрядковий)», «символ крапки», «квадратні дужки», «обчислювана властивість», [властивість, доступ]}}
 
-The two main ways to access properties in JavaScript are with a dot and with square brackets. Both `value.x` and `value[x]` access a property on `value`—but not necessarily the same property. The difference is in how `x` is interpreted. When using a dot, the word after the dot is the literal name of the property. When using square brackets, the expression between the brackets is _evaluated_ to get the property name. Whereas `value.x` fetches the property of `value` named "x", `value[x]` takes the value of the variable named `x` and uses that, converted to a string, as the property name.
+Два основних способи доступу до властивостей у JavaScript - це крапка та квадратні дужки. І `value.x`, і `value[x]` отримують доступ до властивості на `value` - але не обов'язково до тієї самої властивості. Різниця полягає у тому, як інтерпретується `x`. При використанні крапки, слово після крапки є буквальною назвою властивості. При використанні квадратних дужок вираз між дужками _обчислюється_, щоб отримати назву властивості. Тоді як `value.x` отримує властивість `value` з іменем «x», `value[x]` бере значення змінної з іменем `x` і використовує його, перетворене у рядок, як назву властивості.
 
-If you know that the property in which you are interested is called _color_, you say `value.color`. If you want to extract the property named by the value held in the binding `i`, you say `value[i]`. Property names are strings. They can be any string, but the dot notation works only with names that look like valid binding names—starting with a letter or underscore, and containing only letters, numbers, and underscores. If you want to access a property named _2_ or _John Doe_, you must use square brackets: `value[2]` or `value["John Doe"]`.
+Якщо ви знаєте, що властивість, яка вас цікавить, називається _color_, ви пишете `value.color`. Якщо ви хочете отримати властивість, названу за значенням, що міститься у прив'язці `i`, ви пишете `value[i]`. Назви властивостей є рядками. Це може бути будь-який рядок, але крапкова нотація працює лише з іменами, які виглядають як правильні імена прив'язок - починаються з літери або символу підкреслення і містять лише літери, цифри та символи підкреслення. Якщо ви хочете отримати доступ до властивості з іменем _2_ або _John Doe_, ви повинні використовувати квадратні дужки: `value[2]` або `value[«John Doe»]`.
 
-The elements in an ((array)) are stored as the array's properties, using numbers as property names. Because you can't use the dot notation with numbers and usually want to use a binding that holds the index anyway, you have to use the bracket notation to get at them.
+Елементи у ((масиві)) зберігаються як властивості масиву, використовуючи числа як імена властивостей. Оскільки ви не можете використовувати крапкові позначення для чисел і зазвичай хочете використовувати прив'язку, яка утримує індекс, вам доведеться використовувати дужкові позначення, щоб дістатися до них.
 
-{{index ["length property", "for array"], [array, "length of"]}}
+{{index [«властивість довжини», «для масиву»], [масив, «довжина»]}}
 
-Just like strings, arrays have a `length` property that tells us how many elements the array has.
+Подібно до рядків, масиви мають властивість `length`, яка показує, скільки елементів має масив.
 
 {{id methods}}
 
-## Methods
+## Методи
 
-{{index [function, "as property"], method, string}}
+{{index [функція, «як властивість»], метод, рядок}}
 
-Both string and array values contain, in addition to the `length` property, a number of properties that hold function values.
+Значення рядків та масивів містять, окрім властивості `length`, ряд властивостей, які зберігають значення функцій.
 
 ```
-let doh = "Doh";
+нехай doh = «Doh»;
 console.log(typeof doh.toUpperCase);
-// → function
+// → функція
 console.log(doh.toUpperCase());
 // → DOH
 ```
 
-{{index "case conversion", "toUpperCase method", "toLowerCase method"}}
+{{індекс «перетворення регістру», «метод toUpperCase», «метод toLowerCase»}}
 
-Every string has a `toUpperCase` property. When called, it will return a copy of the string in which all letters have been converted to uppercase. There is also `toLowerCase`, going the other way.
+Кожен рядок має властивість `toUpperCase`. При виклику вона повертає копію рядка, в якому всі літери було перетворено у верхній регістр. Існує також метод `toLowerCase`, який працює у зворотному напрямку.
 
-{{index "this binding"}}
+{{index «this binding»}}
 
-Interestingly, even though the call to `toUpperCase` does not pass any arguments, the function somehow has access to the string `"Doh"`, the value whose property we called. You'll find out how this works in [Chapter ?](object#obj_methods).
+Цікаво, що хоча виклик `toUpperCase` не передає жодних аргументів, функція якимось чином має доступ до рядка `«Doh»`, значення, властивість якого ми викликали. Ви дізнаєтесь, як це працює у [Глава ?](об'єкт#методи_об'єкта).
 
-Properties that contain functions are generally called _methods_ of the value they belong to, as in "`toUpperCase` is a method of a string".
+Властивості, що містять функції, зазвичай називаються _методами_ значення, до якого вони належать, як у «`toUpperCase` є методом рядка».
 
 {{id array_methods}}
 
-This example demonstrates two methods you can use to manipulate arrays.
+У цьому прикладі продемонстровано два методи, які можна використовувати для маніпулювання масивами.
 
 ```
 let sequence = [1, 2, 3];
@@ -147,28 +147,28 @@ console.log(sequence);
 // → [1, 2, 3, 4]
 ```
 
-{{index collection, array, "push method", "pop method"}}
+{{index collection, array, «метод push», «метод pop»}}
 
-The `push` method adds values to the end of an array. The `pop` method does the opposite, removing the last value in the array and returning it.
+Метод `push` додає значення в кінець масиву. Метод `pop` робить навпаки, видаляє останнє значення з масиву і повертає його.
 
-{{index ["data structure", stack]}}
+{{index [«структура даних», стек]}}
 
-These somewhat silly names are the traditional terms for operations on a _((stack))_. A stack, in programming, is a data structure that allows you to push values into it and pop them out again in the opposite order so that the thing that was added last is removed first. Stacks are common in programming—you might remember the function ((call stack)) from [the previous chapter](functions#stack), which is an instance of the same idea.
+Ці дещо безглузді назви є традиційними термінами для операцій над  стеком _((stack))_. Стек у програмуванні - це структура даних, яка дозволяє записувати в неї значення і витягувати їх у зворотному порядку, так що те, що було додано останнім, видаляється першим. Стеки дуже поширені у програмуванні - ви можете згадати функцію ((викликати стек)) з [попередньої глави](функції#стек), яка є прикладом тієї ж самої ідеї.
 
-## Objects
+## Об'єкти
 
-{{index journal, "weresquirrel example", array, record}}
+{{index journal, «weresquirrel example», array, record}}
 
-Back to the weresquirrel. A set of daily log entries can be represented as an array, but the entries do not consist of just a number or a string—each entry needs to store a list of activities and a Boolean value that indicates whether Jacques turned into a squirrel or not. Ideally, we would like to group these together into a single value and then put those grouped values into an array of log entries.
+Повернемося до weresquirrel. Набір щоденних записів журналу можна представити у вигляді масиву, але записи не складаються з одного числа або рядка - кожен запис повинен зберігати список дій і булеве значення, яке вказує, чи перетворився Жак на білку, чи ні. В ідеалі, ми хотіли б згрупувати ці дані в одне значення, а потім помістити ці згруповані значення у масив записів журналу.
 
-{{index [syntax, object], [property, definition], [braces, object], "{} (object)"}}
+{{індекс [синтаксис, об'єкт], [властивість, визначення], [дужки, об'єкт], «{} (об'єкт)»}}
 
-Values of the type _((object))_ are arbitrary collections of properties. One way to create an object is by using braces as an expression.
+Значення типу _((об'єкт))_ є довільними колекціями властивостей. Одним із способів створення об'єкта є використання фігурних дужок як виразу.
 
 ```
 let day1 = {
   squirrel: false,
-  events: ["work", "touched tree", "pizza", "running"]
+  events: [«робота», «торкнулася дерева», «піца», «біг»]
 };
 console.log(day1.squirrel);
 // → false
@@ -179,113 +179,113 @@ console.log(day1.wolf);
 // → false
 ```
 
-{{index [quoting, "of object properties"], "colon character"}}
+{{index [цитування, «властивостей об'єкта»], «двокрапка»}}
 
-Inside the braces, you write a list of properties separated by commas. Each property has a name followed by a colon and a value. When an object is written over multiple lines, indenting it as shown in this example helps with readability. Properties whose names aren't valid binding names or valid numbers must be quoted:
+Усередині фігурних дужок ви пишете список властивостей, розділених комами. Кожна властивість має назву, за якою слідує двокрапка і значення. Якщо об'єкт записано у декількох рядках, відступи, як показано у цьому прикладі, допомагають зробити його більш читабельним. Властивості, назви яких не є допустимими іменами прив'язок або допустимими числами, слід брати у лапки:
 
 ```
 let descriptions = {
-  work: "Went to work",
-  "touched tree": "Touched a tree"
+  work: «Пішов на роботу»,
+  «торкнувся дерева": «Торкнувся дерева»
 };
 ```
 
-{{index [braces, object]}}
+{{index [дужки, об'єкт]}}
 
-This means that braces have _two_ meanings in JavaScript. At the start of a ((statement)), they begin a ((block)) of statements. In any other position, they describe an object. Fortunately, it is rarely useful to start a statement with an object in braces, so the ambiguity between these two is not much of a problem. The one case where this does come up is when you want to return an object from a shorthand arrow function—you can't write `n => {prop: n}` since the braces will be interpreted as a function body. Instead, you have to put a set of parentheses around the object to make it clear that it is an expression.
+Це означає, що фігурні дужки мають _два_ значення у JavaScript. На початку ((оператора)) вони починають ((блок)) операторів. У будь-якій іншій позиції вони описують об'єкт. На щастя, рідко буває корисно починати оператор з об'єкта в дужках, тому неоднозначність між цими двома значеннями не є великою проблемою. Єдиний випадок, коли вона виникає, це коли ви хочете повернути об'єкт зі скороченої стрілочної функції - ви не можете написати `n => {prop: n}`, оскільки дужки буде інтерпретовано як тіло функції. Замість цього вам слід взяти об'єкт у круглі дужки, щоб було зрозуміло, що він є виразом.
 
 {{index undefined}}
 
-Reading a property that doesn't exist will give you the value `undefined`.
+Читання неіснуючої властивості призведе до отримання значення `undefined`.
 
-{{index [property, assignment], mutability, "= operator"}}
+{{індекс [властивість, присвоєння], мінливість, «= оператор»}}
 
-It is possible to assign a value to a property expression with the `=` operator. This will replace the property's value if it already existed or create a new property on the object if it didn't.
+Можна присвоїти значення виразу властивості за допомогою оператора `=`. Це замінить значення властивості, якщо воно вже існувало, або створить нову властивість на об'єкті, якщо воно не існувало.
 
-{{index "tentacle (analogy)", [property, "model of"], [binding, "model of"]}}
+{{індекс «щупальце (аналогія)», [властивість, «модель з»], [прив'язка, «модель з»]}}
 
-To briefly return to our tentacle model of ((binding))s—property bindings are similar. They _grasp_ values, but other bindings and properties might be holding onto those same values. You can think of objects as octopuses with any number of tentacles, each of which has a name written on it.
+Якщо коротко повернутися до нашої моделі щупальця ((зв'язування))s-властивостей, то зв'язування подібні. Вони _хоплять_ значення, але інші зв'язки та властивості можуть утримувати ті самі значення. Ви можете уявити об'єкти як восьминогів з довільною кількістю щупалець, на кожному з яких записано ім'я.
 
-{{index "delete operator", [property, deletion]}}
+{{index «оператор видалення», [властивість, видалення]}}
 
-The `delete` operator cuts off a tentacle from such an octopus. It is a unary operator that, when applied to an object property, will remove the named property from the object. This is not a common thing to do, but it is possible.
+Оператор `delete` відрізає щупальце від такого восьминога. Це унарний оператор, який при застосуванні до властивості об'єкта видаляє названу властивість з об'єкта. Це не дуже поширена дія, але вона можлива.
 
 ```
-let anObject = {left: 1, right: 2};
+нехай anObject = {left: 1, right: 2};
 console.log(anObject.left);
 // → 1
-delete anObject.left;
+видалити anObject.left;
 console.log(anObject.left);
-// → undefined
-console.log("left" in anObject);
+// → невизначено
+console.log(«left» в anObject);
 // → false
-console.log("right" in anObject);
+console.log(«right» in anObject);
 // → true
 ```
 
-{{index "in operator", [property, "testing for"], object}}
+{{індекс «оператор in», [властивість, «перевірка на»], об'єкт}}
 
-The binary `in` operator, when applied to a string and an object, tells you whether that object has a property with that name. The difference between setting a property to `undefined` and actually deleting it is that in the first case, the object still _has_ the property (it just doesn't have a very interesting value), whereas in the second case, the property is no longer present and `in` will return `false`.
+Бінарний оператор `in`, застосовуючись до рядка та об'єкта, повідомляє, чи має цей об'єкт властивість з такою назвою. Різниця між встановленням властивості у значення `undefined` та її видаленням полягає у тому, що у першому випадку об'єкт все ще _має_ властивість (просто вона має не дуже цікаве значення), тоді як у другому випадку властивість більше не існує і `in` поверне `false`.
 
-{{index "Object.keys function"}}
+{{index «Object.keys function»}}
 
-To find out what properties an object has, you can use the `Object.keys` function. Give the function an object and it will return an array of strings—the object's property names:
+Щоб дізнатися, які властивості має об'єкт, можна скористатися функцією `Object.keys`. Передайте функції об'єкт, і вона поверне масив рядків - назви властивостей об'єкта:
 
 ```
 console.log(Object.keys({x: 0, y: 0, z: 2}));
-// → ["x", "y", "z"]
+// → [«x», «y», «z»]
 ```
 
-There's an `Object.assign` function that copies all properties from one object into another:
+Існує функція `Object.assign`, яка копіює всі властивості з одного об'єкта в інший:
 
 ```
-let objectA = {a: 1, b: 2};
+нехай objectA = {a: 1, b: 2};
 Object.assign(objectA, {b: 3, c: 4});
 console.log(objectA);
 // → {a: 1, b: 3, c: 4}
 ```
 
-{{index array, collection}}
+{{індексний масив, колекція}}
 
-Arrays, then, are just a kind of object specialized for storing sequences of things. If you evaluate `typeof []`, it produces `"object"`. You can visualize arrays as long, flat octopuses with all their tentacles in a neat row, labeled with numbers.
+Отже, масиви - це просто різновид об'єктів, що спеціалізуються на зберіганні послідовностей речей. Якщо ви обчислюєте `typeof []`, то отримуєте `«об'єкт»`. Ви можете візуалізувати масиви у вигляді довгих пласких восьминогів з усіма щупальцями, витягнутими в акуратний ряд і позначеними числами.
 
-{{index journal, "weresquirrel example"}}
+{{index journal, «weresquirrel example»}}
 
-Jacques will represent the journal that Jacques keeps as an array of objects:
+Журнал, який веде Жак, буде представлено у вигляді масиву об'єктів:
 
 ```{test: wrap}
 let journal = [
-  {events: ["work", "touched tree", "pizza",
-            "running", "television"],
+  {events: [«робота», «торкнувся дерева», «піца»,
+            «біг», “телевізор”],
    squirrel: false},
-  {events: ["work", "ice cream", "cauliflower",
-            "lasagna", "touched tree", "brushed teeth"],
+  {events: [«робота», «морозиво», «цвітна капуста»,
+            «лазанья», “торкнувся дерева”, “почистив зуби”],
    squirrel: false},
-  {events: ["weekend", "cycling", "break", "peanuts",
-            "beer"],
+  {events: [«вихідні», «катання на велосипеді», «перерва», «арахіс»,
+            «пиво"],
    squirrel: true},
-  /* And so on... */
+  /* І так далі... */
 ];
 ```
 
-## Mutability
+## Мутабельність
 
-We will get to actual programming soon, but first, there's one more piece of theory to understand.
+Незабаром ми перейдемо до власне програмування, але спочатку нам потрібно зрозуміти ще одну частину теорії.
 
-{{index mutability, "side effect", number, string, Boolean, [object, mutability]}}
+{{індексна змінюваність, «побічний ефект», число, рядок, булевий, [об'єкт, змінюваність]}}
 
-We saw that object values can be modified. The types of values discussed in earlier chapters, such as numbers, strings, and Booleans, are all _((immutable))_—it is impossible to change values of those types. You can combine them and derive new values from them, but when you take a specific string value, that value will always remain the same. The text inside it cannot be changed. If you have a string that contains `"cat"`, it is not possible for other code to change a character in your string to make it spell `"rat"`.
+Ми бачили, що значення об'єктів можна змінювати. Типи значень, про які йшлося у попередніх розділах, такі як числа, рядки та булеві типи, є _((незмінними))_- значення цих типів неможливо змінити. Ви можете комбінувати їх і отримувати з них нові значення, але коли ви берете конкретне значення рядка, це значення завжди залишатиметься незмінним. Текст всередині нього не може бути змінений. Якщо у вас є рядок, який містить `«cat»`, інший код не зможе змінити символ у вашому рядку так, щоб він писався як `«rat»`.
 
-Objects work differently. You _can_ change their properties, causing a single object value to have different content at different times.
+Об'єкти працюють по-іншому. Ви _можете_ змінювати їхні властивості, що призводить до того, що одне значення об'єкта може мати різний вміст у різний час.
 
-{{index [object, identity], identity, [memory, organization], mutability}}
+{{індекс [об'єкт, ідентичність], ідентичність, [пам'ять, організація], мінливість}}
 
-When we have two numbers, 120 and 120, we can consider them precisely the same number, whether or not they refer to the same physical bits. With objects, there is a difference between having two references to the same object and having two different objects that contain the same properties. Consider the following code:
+Коли ми маємо два числа, 120 і 120, ми можемо вважати їх одним і тим самим числом, незалежно від того, чи відносяться вони до одних і тих самих фізичних бітів, чи ні. У випадку з об'єктами існує різниця між двома посиланнями на один і той самий об'єкт і двома різними об'єктами, які містять однакові властивості. Розглянемо наступний код:
 
 ```
-let object1 = {value: 10};
+let object1 = {значення: 10};
 let object2 = object1;
-let object3 = {value: 10};
+let object3 = {значення: 10};
 
 console.log(object1 == object2);
 // → true
@@ -299,31 +299,31 @@ console.log(object3.value);
 // → 10
 ```
 
-{{index "tentacle (analogy)", [binding, "model of"]}}
+{{index «tentacle (аналогія)», [binding, «model of»]}}
 
-The `object1` and `object2` bindings grasp the _same_ object, which is why changing `object1` also changes the value of `object2`. They are said to have the same _identity_. The binding `object3` points to a different object, which initially contains the same properties as `object1` but lives a separate life.
+Зв'язки `об'єкт1` та `об'єкт2` схоплюють один і той  самий об'єкт, тому при зміні `об'єкта1` змінюється і значення `об'єкта2`. Кажуть, що вони мають однакову _ідентичність_. Зв'язка `об'єкт3` вказує на інший об'єкт, який спочатку містить ті ж властивості, що й `об'єкт1`, але живе окремим життям.
 
-{{index "const keyword", "let keyword", [binding, "as state"]}}
+{{індекс «ключове слово const», «ключове слово let», [прив'язка, «як стан»]}}
 
-Bindings can also be changeable or constant, but this is separate from the way their values behave. Even though number values don't change, you can use a `let` binding to keep track of a changing number by changing the value at which the binding points. Similarly, though a `const` binding to an object can itself not be changed and will continue to point at the same object, the _contents_ of that object might change.
+Зв'язки також можуть бути змінними або постійними, але це не впливає на поведінку їхніх значень. Навіть якщо значення чисел не змінюються, ви можете використовувати прив'язку `let`, щоб відстежувати зміну числа, змінюючи значення, на яке вказує прив'язка. Аналогічно, хоча прив'язка `const` до об'єкта сама по собі не може бути змінена і продовжуватиме вказувати на той самий об'єкт, _вміст_ цього об'єкта може змінитися.
 
 ```{test: no}
 const score = {visitors: 0, home: 0};
-// This is okay
+// Це нормально
 score.visitors = 1;
-// This isn't allowed
+// Так не можна
 score = {visitors: 1, home: 1};
 ```
 
-{{index "== operator", [comparison, "of objects"], "deep comparison"}}
+{{index «== operator», [comparison, «of objects»], «deep comparison»}}
 
-When you compare objects with JavaScript's `==` operator, it compares by identity: it will produce `true` only if both objects are precisely the same value. Comparing different objects will return `false`, even if they have identical properties. There is no "deep" comparison operation built into JavaScript that compares objects by contents, but it is possible to write it yourself (which is one of the [exercises](data#exercise_deep_compare) at the end of this chapter).
+Коли ви порівнюєте об'єкти за допомогою оператора `==` у JavaScript, він порівнює їх за тотожністю: він видасть значення `true` лише у тому випадку, якщо обидва об'єкти мають однакове значення. Порівняння різних об'єктів поверне значення `false`, навіть якщо вони мають ідентичні властивості. У JavaScript немає вбудованої операції «глибокого» порівняння, яка порівнює об'єкти за вмістом, але її можна написати самостійно (це одна з [вправ](data#вправа_глибоке_порівняння) в кінці цього розділу).
 
-## The lycanthrope's log
+## Журнал лікантропа
 
-{{index "weresquirrel example", lycanthropy, "addEntry function"}}
+{{index «weresquirrel example», lycanthropy, «addEntry function»}}
 
-Jacques starts up his JavaScript interpreter and sets up the environment he needs to keep his ((journal)):
+Жак запускає свій інтерпретатор JavaScript і налаштовує середовище, необхідне для ведення свого ((журналу)):
 
 ```{includeCode: true}
 let journal = [];
@@ -333,40 +333,40 @@ function addEntry(events, squirrel) {
 }
 ```
 
-{{index [braces, object], "{} (object)", [property, definition]}}
+{{індекс [дужки, об'єкт], «{} (об'єкт)», [властивість, визначення]}}
 
-Note that the object added to the journal looks a little odd. Instead of declaring properties like `events: events`, it just gives a property name: `events`. This is shorthand that means the same thing—if a property name in brace notation isn't followed by a value, its value is taken from the binding with the same name.
+Зверніть увагу, що доданий до журналу об'єкт виглядає дещо дивно. Замість оголошення властивостей на кшталт `events: events`, він просто дає назву властивості: `events`. Це скорочення, яке означає те саме - якщо після імені властивості у дужках не вказано значення, його значення береться з однойменного зв'язування.
 
-Every evening at 10 p.m.—or sometimes the next morning, after climbing down from the top shelf of his bookcase—Jacques records the day:
+Щовечора о 22:00, а іноді й наступного ранку, спустившись з верхньої полиці книжкової шафи, Жак записує день:
 
 ```
-addEntry(["work", "touched tree", "pizza", "running",
-          "television"], false);
-addEntry(["work", "ice cream", "cauliflower", "lasagna",
-          "touched tree", "brushed teeth"], false);
-addEntry(["weekend", "cycling", "break", "peanuts",
-          "beer"], true);
+addEntry([«робота», «торкнувся дерева», «піца», «біг»,
+          «телевізор"], false);
+addEntry([«робота», «морозиво», «цвітна капуста», «лазанья»,
+          «торкнувся ялинки», “почистив зуби”], false);
+addEntry([«вихідні», «їзда на велосипеді», «перерва», «арахіс»,
+          «пиво"], true);
 ```
 
-Once he has enough data points, he intends to use statistics to find out which of these events may be related to the squirrelifications.
+Після того, як у нього буде достатньо точок даних, він має намір використати статистику, щоб з'ясувати, які з цих подій можуть бути пов'язані з білками.
 
-{{index correlation}}
+{{Індексна кореляція}}
 
-_Correlation_ is a measure of ((dependence)) between statistical variables. A statistical variable is not quite the same as a programming variable. In statistics you typically have a set of _measurements_, and each variable is measured for every measurement. Correlation between variables is usually expressed as a value that ranges from -1 to 1. Zero correlation means the variables are not related. A correlation of 1 indicates that the two are perfectly related—if you know one, you also know the other. Negative 1 also means that the variables are perfectly related but are opposites—when one is true, the other is false.
+Кореляція - це міра ((залежності)) між статистичними змінними. Статистична змінна - це не зовсім те саме, що програмна змінна. У статистиці ви зазвичай маєте набір _вимірювань_, і кожна змінна вимірюється для кожного вимірювання. Кореляція між змінними зазвичай виражається значенням, яке знаходиться в діапазоні від -1 до 1. Нульова кореляція означає, що змінні не пов'язані між собою. Кореляція, що дорівнює 1, вказує на те, що вони ідеально пов'язані - якщо ви знаєте одну змінну, ви також знаєте й іншу. Від'ємне значення 1 також означає, що змінні ідеально пов'язані, але є протилежними - коли одна з них істинна, інша хибна.
 
-{{index "phi coefficient"}}
+{{індекс «фі-коефіцієнт»}}
 
-To compute the measure of correlation between two Boolean variables, we can use the _phi coefficient_ (_ϕ_). This is a formula whose input is a ((frequency table)) containing the number of times the different combinations of the variables were observed. The output of the formula is a number between -1 and 1 that describes the correlation.
+Для обчислення міри кореляції між двома булевими змінними можна використати _фі-коефіцієнт_ (_ϕ_). Це формула, на вхід якої подається ((таблиця частот)), що містить кількість разів, коли спостерігалися різні комбінації змінних. Виходом формули є число від -1 до 1, яке описує кореляцію.
 
-We could take the event of eating ((pizza)) and put that in a frequency table like this, where each number indicates the number of times that combination occurred in our measurements.
+Ми могли б взяти подію поїдання ((піци)) і помістити її в таку таблицю частот, де кожне число вказує на кількість разів, коли ця комбінація зустрічалася в наших вимірах.
 
-{{figure {url: "img/pizza-squirrel.svg", alt: "A two-by-two table showing the pizza variable on the horizontal, and the squirrel variable on the vertical axis. Each cell show how many time that combination occurred. In 76 cases, neither happened. In 9 cases, only pizza was true. In 4 cases only squirrel was true. And in one case both occurred.", width: "7cm"}}}
+{{figure {url: «img/pizza-squirrel.svg», alt: «Таблиця два на два, де по горизонталі відкладено змінну піца, а по вертикалі - змінну білка. Кожна клітинка показує, скільки разів зустрічалася ця комбінація. У 76 випадках не трапилося жодної з них. У 9 випадках правдивою була лише піца. У 4 випадках - тільки білка. І в одному випадку з'явилися обидва варіанти.», width: “7cm”}}}.
 
-If we call that table _n_, we can compute _ϕ_ using the following formula:
+Якщо ми назвемо цю таблицю _n_, ми можемо обчислити _ϕ_ за наступною формулою:
 
 {{if html
 
-<div> <table style="border-collapse: collapse; margin-left: 1em;"><tr>   <td style="vertical-align: middle"><em>ϕ</em> =</td>   <td style="padding-left: .5em">     <div style="border-bottom: 1px solid black; padding: 0 7px;"><em>n</em><sub>11</sub><em>n</em><sub>00</sub> −       <em>n</em><sub>10</sub><em>n</em><sub>01</sub></div>     <div style="padding: 0 7px;">√<span style="border-top: 1px solid black; position: relative; top: 2px;">       <span style="position: relative; top: -4px"><em>n</em><sub>1•</sub><em>n</em><sub>0•</sub><em>n</em><sub>•1</sub><em>n</em><sub>•0</sub></span>     </span></div>   </td> </tr></table> </div>
+<div> <table style=«border-collapse: collapse; margin-left: 1em;»><tr> <td style=«vertical-align: middle»><em>ϕ</em> =</td> <td style=«padding-left: .5em»> <div style="border-bottom: 1px solid black; padding: 0 7px;«><em>n</em><sub>11</sub><em>n</em><sub>00</sub> - <em>n</em><sub>10</sub><em>n</em><sub>01</sub></div> <div style=»padding: 0 7px;«>√<span style=»border-top: 1px solid black; position: relative; top: 2px;«><span style=»position: relative; top: -4px"><em>n</em><sub>1-</sub><em>n</em><sub>0-</sub><em>n</em><sub>-1</sub><em>n</em><sub>-0</sub></span> </span></div></div> </td> </tr></table> </div> </div></table
 
 if}}
 
@@ -376,27 +376,27 @@ if}}
 
 if}}
 
-(If at this point you're putting the book down to focus on a terrible flashback to 10th grade math class—hold on! I do not intend to torture you with endless pages of cryptic notation—it's just this one formula for now. And even with this one, all we do is turn it into JavaScript.)
+(Якщо в цей момент ви відкладаєте книгу, щоб зосередитися на жахливому спогаді про урок математики в 10-му класі - зачекайте! Я не маю наміру мучити вас нескінченними сторінками загадкових позначень - поки що це лише одна формула. І навіть з нею все, що ми робимо, це перетворюємо її на JavaScript).
 
-The notation [_n_~01~]{if html}[[$n_{01}$]{latex}]{if tex} indicates the number of measurements where the first variable (squirrelness) is false (0) and the second variable (pizza) is true (1). In the pizza table, [_n_~01~]{if html}[[$n_{01}$]{latex}]{if tex} is 9.
+Запис [_n_~01~]{if html}[[$n_{01}$]{latex}]{if tex} вказує на кількість вимірів, де перша змінна (squirrelness) дорівнює false (0), а друга змінна (pizza) - true (1). У таблиці піци [_n_~01~]{if html}[[$n_{01}$]{latex}]{if tex} дорівнює 9.
 
-The value [_n_~1•~]{if html}[[$n_{1\bullet}$]{latex}]{if tex} refers to the sum of all measurements where the first variable is true, which is 5 in the example table. Likewise, [_n_~•0~]{if html}[[$n_{\bullet0}$]{latex}]{if tex} refers to the sum of the measurements where the second variable is false.
+Значення [_n_~1-~]{if html}[[$n_{1\bullet}$]{latex}]{if tex} відноситься до суми всіх вимірів, де перша змінна дорівнює true, що у прикладі таблиці дорівнює 5. Аналогічно, [_n_~-0~]{if html}[[$n_{\bullet0}$]{latex}]{if tex} позначає суму вимірів, де друга змінна є хибною.
 
-{{index correlation, "phi coefficient"}}
+{{індексна кореляція, «фі-коефіцієнт»}}
 
-So for the pizza table, the part above the division line (the dividend) would be 1×76−4×9 = 40, and the part below it (the divisor) would be the square root of 5×85×10×80, or [√340,000]{if html}[[$\sqrt{340,000}$]{latex}]{if tex}. This comes out to _ϕ_ ≈ 0.069, which is tiny. Eating ((pizza)) does not appear to have influence on the transformations.
+Отже, для столу з піцою частина над лінією поділу (дільник) буде 1×76-4×9 = 40, а частина під нею (дільник) буде квадратним коренем з 5×85×10×80, або [√340,000]{if html}[[$\sqrt{340,000}$]{latex}]{if tex}. Виходить _ϕ_ ≈ 0.069, що дуже мало. Вживання їжі ((піци)), схоже, не впливає на перетворення.
 
-## Computing correlation
+## Обчислення кореляції
 
-{{index [array, "as table"], [nesting, "of arrays"]}}
+{{index [array, «as table»], [nesting, «of arrays»]}}
 
-We can represent a two-by-two ((table)) in JavaScript with a four-element array (`[76, 9, 4, 1]`). We could also use other representations, such as an array containing two two-element arrays (`[[76, 9], [4, 1]]`) or an object with property names like `"11"` and `"01"`, but the flat array is simple and makes the expressions that access the table pleasantly short. We'll interpret the indices to the array as two-((bit)) ((binary number))s, where the leftmost (most significant) digit refers to the squirrel variable and the rightmost (least significant) digit refers to the event variable. For example, the binary number `10` refers to the case where Jacques did turn into a squirrel, but the event (say, "pizza") didn't occur. This happened four times. And since binary `10` is 2 in decimal notation, we will store this number at index 2 of the array.
+Ми можемо представити два на два ((таблицю)) у JavaScript масивом з чотирьох елементів (`[76, 9, 4, 1]`). Ми також можемо використовувати інші представлення, такі як масив, що містить два двоелементних масиви (`[[76, 9], [4, 1]]`) або об'єкт з іменами властивостей типу `«11»` і `«01»`, але плаский масив є простим і робить вирази, які отримують доступ до таблиці, приємно короткими. Ми будемо інтерпретувати індекси масиву як two-((біт)) ((двійкове число))s, де крайня ліва (старша) цифра відноситься до змінної squirrel, а крайня права (молодша) цифра відноситься до змінної event. Наприклад, двійкове число `10` означає випадок, коли Жак перетворився на білку, але подія (скажімо, «піца») не відбулася. Це сталося чотири рази. А оскільки двійкове число `10` дорівнює 2 у десятковій системі числення, ми будемо зберігати це число під індексом 2 масиву.
 
-{{index "phi coefficient", "phi function"}}
+{{index «phi коефіцієнт», «phi функція»}}
 
 {{id phi_function}}
 
-This is the function that computes the _ϕ_ coefficient from such an array:
+Це функція, яка обчислює коефіцієнт _ϕ_ з такого масиву:
 
 ```{includeCode: strip_log, test: clip}
 function phi(table) {
@@ -411,62 +411,62 @@ console.log(phi([76, 9, 4, 1]));
 // → 0.068599434
 ```
 
-{{index "square root", "Math.sqrt function"}}
+{{index «square root», «Math.sqrt function»}}
 
-This is a direct translation of the _ϕ_ formula into JavaScript. `Math.sqrt` is the square root function, as provided by the `Math` object in a standard JavaScript environment. We have to add two fields from the table to get fields like [n~1•~]{if html}[[$n_{1\bullet}$]{latex}]{if tex} because the sums of rows or columns are not stored directly in our data structure.
+Це прямий переклад формули _ϕ_ на JavaScript. `Math.sqrt` - це функція квадратного кореня, що надається об'єктом `Math` у стандартному середовищі JavaScript. Ми повинні додати два поля з таблиці, щоб отримати поля типу [n~1-~]{if html}[[$n_{1\bullet}$]{latex}]{if tex}, оскільки суми рядків або стовпців не зберігаються безпосередньо в нашій структурі даних.
 
-{{index "JOURNAL dataset"}}
+{{index «JOURNAL dataset»}}
 
-Jacques keeps his journal for three months. The resulting ((dataset)) is available in the [coding sandbox](https://eloquentjavascript.net/code#4) for this chapter[ ([_https://eloquentjavascript.net/code#4_](https://eloquentjavascript.net/code#4))]{if book}, where it is stored in the `JOURNAL` binding, and in a downloadable [file](https://eloquentjavascript.net/code/journal.js).
+Жак веде свій щоденник протягом трьох місяців. Результуючий ((набір даних)) доступний у [пісочниці кодування](https://eloquentjavascript.net/code#4) для цієї глави [[https://eloquentjavascript.net/code#4_](https://eloquentjavascript.net/code#4))]{if book}, де він зберігається у прив'язці `JOURNAL`, а також у завантажуваному [файлі](https://eloquentjavascript.net/code/journal.js).
 
-{{index "tableFor function"}}
+{{index «tableFor function»}}
 
-To extract a two-by-two ((table)) for a specific event from the journal, we must loop over all the entries and tally how many times the event occurs in relation to squirrel transformations:
+Щоб витягти з журналу таблицю два на два ((таблицю)) для певної події, ми повинні перебрати всі записи і підрахувати, скільки разів ця подія зустрічається відносно білкових перетворень:
 
 ```{includeCode: strip_log}
 function tableFor(event, journal) {
-  let table = [0, 0, 0, 0];
+  let table = [0, 0, 0, 0, 0];
   for (let i = 0; i < journal.length; i++) {
     let entry = journal[i], index = 0;
     if (entry.events.includes(event)) index += 1;
     if (entry.squirrel) index += 2;
     table[index] += 1;
   }
-  return table;
+  повернути таблицю;
 }
 
-console.log(tableFor("pizza", JOURNAL));
+console.log(tableFor(«pizza», JOURNAL));
 // → [76, 9, 4, 1]
 ```
 
-{{index [array, searching], "includes method"}}
+{{index [масив, пошук], «includes метод»}}
 
-Arrays have an `includes` method that checks whether a given value exists in the array. The function uses that to determine whether the event name it is interested in is part of the event list for a given day.
+Масиви мають метод `includes`, який перевіряє, чи існує задане значення в масиві. Функція використовує цей метод, щоб визначити, чи є назва події, яка її цікавить, у списку подій на певний день.
 
-{{index [array, indexing]}}
+{{index [масив, індексація]}}
 
-The body of the loop in `tableFor` figures out which box in the table each journal entry falls into by checking whether the entry contains the specific event it's interested in and whether the event happens alongside a squirrel incident. The loop then adds one to the correct box in the table.
+Тіло циклу в `tableFor` з'ясовує, до якої комірки в таблиці потрапляє кожен запис журналу, перевіряючи, чи містить цей запис конкретну подію, яка його цікавить, і чи відбувається ця подія разом з інцидентом з білкою. Потім цикл додає одиницю до відповідної клітинки в таблиці.
 
-We now have the tools we need to compute individual ((correlation))s. The only step remaining is to find a correlation for every type of event that was recorded and see whether anything stands out.
+Тепер у нас є інструменти, необхідні для обчислення індивідуальних ((кореляцій)). Єдиний крок, що залишився - знайти кореляцію для кожного типу подій, що були записані, і подивитися, чи не виділяється щось особливе.
 
 {{id for_of_loop}}
 
-## Array loops
+## Цикли з масивами
 
-{{index "for loop", loop, [array, iteration]}}
+{{index «for loop», loop, [array, iteration]}}
 
-In the `tableFor` function, there's a loop like this:
+У функції `tableFor` є такий цикл:
 
 ```
 for (let i = 0; i < JOURNAL.length; i++) {
   let entry = JOURNAL[i];
-  // Do something with entry
+  // Зробити щось з entry
 }
 ```
 
-This kind of loop is common in classical JavaScript—going over arrays one element at a time is something that comes up a lot, and to do that you'd run a counter over the length of the array and pick out each element in turn.
+Цей тип циклу є поширеним у класичному JavaScript - перебір масивів по одному елементу за раз є чимось, що часто зустрічається, і для цього вам доведеться запускати лічильник довжини масиву і вибирати кожен елемент по черзі.
 
-There is a simpler way to write such loops in modern JavaScript:
+У сучасному JavaScript є простіший спосіб написання таких циклів:
 
 ```
 for (let entry of JOURNAL) {
@@ -474,21 +474,21 @@ for (let entry of JOURNAL) {
 }
 ```
 
-{{index "for/of loop"}}
+{{індекс «for/of циклу»}}
 
-When a `for` loop uses the word `of` after its variable definition, it will loop over the elements of the value given after `of`. This works not only for arrays but also for strings and some other data structures. We'll discuss _how_ it works in [Chapter ?](object).
+Коли цикл `for` використовує слово `of` після визначення змінної, він буде перебирати елементи значення, вказаного після `of`. Це працює не тільки для масивів, але й для рядків та деяких інших структур даних. Ми обговоримо _як_ це працює у [Розділ ?](об'єкт).
 
-{{id analysis}}
+{{id аналіз}}
 
-## The final analysis
+## Остаточний аналіз
 
-{{index journal, "weresquirrel example", "journalEvents function"}}
+{{index journal, «weresquirrel example», «journalEvents function»}}
 
-We need to compute a correlation for every type of event that occurs in the dataset. To do that, we first need to _find_ every type of event.
+Нам потрібно обчислити кореляцію для кожного типу подій, які трапляються у наборі даних. Для цього нам спочатку потрібно _знайти_ кожен тип подій.
 
-{{index "includes method", "push method"}}
+{{index «includes method», «push method»}}
 
-```{includeCode: "strip_log"}
+```{includeCode: «strip_log"}} ```{includeCode: “strip_log”}
 function journalEvents(journal) {
   let events = [];
   for (let entry of journal) {
@@ -498,79 +498,79 @@ function journalEvents(journal) {
       }
     }
   }
-  return events;
+  повертає події;
 }
 
 console.log(journalEvents(JOURNAL));
-// → ["carrot", "exercise", "weekend", "bread", …]
+// → [«морква», «вправи», «вихідні», «хліб», ...]
 ```
 
-By adding any event names that aren't already in it to the `events` array, the function collects every type of event.
+Додаючи до масиву `events` будь-які назви подій, яких там ще немає, функція збирає всі типи подій.
 
-Using that function, we can see all the ((correlation))s:
+Використовуючи цю функцію, ми можемо побачити всі ((кореляції))и:
 
 ```{test: no}
 for (let event of journalEvents(JOURNAL)) {
-  console.log(event + ":", phi(tableFor(event, JOURNAL)));
+  console.log(event + «:», phi(tableFor(event, JOURNAL));
 }
-// → carrot:   0.0140970969
+// → carrot: 0.0140970969
 // → exercise: 0.0685994341
 // → weekend:  0.1371988681
-// → bread:   -0.0757554019
-// → pudding: -0.0648203724
-// And so on...
+// → хліб: -0.0757554019
+// → пудинг: -0.0648203724
+// І так далі...
 ```
 
-Most correlations seem to lie close to zero. Eating carrots, bread, or pudding apparently does not trigger squirrel-lycanthropy. The transformations _do_ seem to occur somewhat more often on weekends. Let's filter the results to show only correlations greater than 0.1 or less than -0.1:
+Більшість кореляцій, схоже, близькі до нуля. Поїдання моркви, хліба чи пудингу, очевидно, не викликає білкоподібної лікантропії. Трансформації , здається, відбуваються дещо частіше на вихідних. Давайте відфільтруємо результати, щоб показати лише кореляції, більші за 0.1 або менші за -0.1:
 
 ```{test: no, startCode: true}
 for (let event of journalEvents(JOURNAL)) {
   let correlation = phi(tableFor(event, JOURNAL));
   if (correlation > 0.1 || correlation < -0.1) {
-    console.log(event + ":", correlation);
+    console.log(event + «:», correlation);
   }
 }
-// → weekend:        0.1371988681
-// → brushed teeth: -0.3805211953
-// → candy:          0.1296407447
-// → work:          -0.1371988681
-// → spaghetti:      0.2425356250
-// → reading:        0.1106828054
-// → peanuts:        0.5902679812
+// → вихідні:        0.1371988681
+// → почищені зуби: -0.3805211953
+// → цукерки: 0.1296407447
+// → робота: -0.1371988681
+// → спагеті: 0.2425356250
+// → читання:        0.1106828054
+// → арахіс: 0.5902679812
 ```
 
-Aha! There are two factors with a ((correlation)) clearly stronger than the others. Eating ((peanuts)) has a strong positive effect on the chance of turning into a squirrel, whereas brushing teeth has a significant negative effect.
+Ага! Є два фактори з ((кореляція)), які явно сильніші за інші. Вживання ((арахісу)) має сильний позитивний вплив на шанс перетворитися на білку, тоді як чищення зубів має значний негативний вплив.
 
-Interesting. Let's try something.
+Цікаво. Давай спробуємо.
 
 ```
 for (let entry of JOURNAL) {
-  if (entry.events.includes("peanuts") &&
-     !entry.events.includes("brushed teeth")) {
-    entry.events.push("peanut teeth");
+  if (entry.events.includes(«peanuts») &&
+     !entry.events.includes(«почищені зуби»)) { } }
+    entry.events.push(«peanuts teeth»);
   }
 }
-console.log(phi(tableFor("peanut teeth", JOURNAL)));
+console.log(phi(tableFor(«peanut teeth», JOURNAL)));
 // → 1
 ```
 
-That's a strong result. The phenomenon occurs precisely when Jacques eats ((peanuts)) and fails to brush his teeth. If only he weren't such a slob about dental hygiene, he'd never even have noticed his affliction.
+Це сильний результат. Явище відбувається саме тоді, коли Жак їсть ((арахіс)) і не чистить зуби. Якби він не був таким недбайливим щодо гігієни зубів, він би навіть не помітив своєї недуги.
 
-Knowing this, Jacques stops eating peanuts altogether and finds that his transformations stop.
+Усвідомивши це, Жак припиняє їсти арахіс і виявляє, що його перетворення зупинилися.
 
-{{index "weresquirrel example"}}
+{{index «weresquirrel example»}}
 
-But it takes only a few months for him to notice that something is missing from this entirely human way of living. Without his feral adventures, Jacques hardly feels alive at all. He decides he'd rather be a full-time wild animal. After building a beautiful little tree house in the forest and equipping it with a peanut butter dispenser and a ten-year supply of peanut butter, he changes form one last time, and lives the short and energetic life of a squirrel.
+Але минає лише кілька місяців, і він помічає, що чогось не вистачає в цьому цілком людському способі життя. Без своїх здичавілих пригод Жак навряд чи відчуває себе живим. Він вирішує, що краще бути диким звіром на повну ставку. Побудувавши в лісі гарний будиночок на дереві, обладнавши його дозатором для арахісового масла та десятирічним запасом арахісового масла, він востаннє змінює форму і починає жити коротким та енергійним життям білки.
 
-## Further arrayology
+## Подальша теорія масивів
 
-{{index [array, methods], [method, array]}}
+{{index [масив, методи], [метод, масив]}}
 
-Before finishing the chapter, I want to introduce you to a few more object-related concepts. I'll start with some generally useful array methods.
+Перш ніж закінчити розділ, я хочу познайомити вас з деякими іншими поняттями, пов'язаними з об'єктами. Я почну з деяких загальновживаних методів роботи з масивами.
 
-{{index "push method", "pop method", "shift method", "unshift method"}}
+{{index «метод push», «метод pop», «метод shift», «метод unshift»}}
 
-We saw `push` and `pop`, which add and remove elements at the end of an array, [earlier](data#array_methods) in this chapter. The corresponding methods for adding and removing things at the start of an array are called `unshift` and `shift`.
+Раніше у цій главі ми розглядали методи `push` і `pop`, які додають і видаляють елементи в кінці масиву [раніше] (data#array_methods). Відповідні методи для додавання та видалення елементів на початку масиву називаються `unshift` та `shift`.
 
 ```
 let todoList = [];
@@ -585,13 +585,13 @@ function rememberUrgently(task) {
 }
 ```
 
-{{index "task management example"}}
+{{index «приклад керування завданнями»}}
 
-This program manages a queue of tasks. You add tasks to the end of the queue by calling `remember("groceries")`, and when you're ready to do something, you call `getTask()` to get (and remove) the front item from the queue. The `rememberUrgently` function also adds a task but adds it to the front instead of the back of the queue.
+Ця програма керує чергою завдань. Ви додаєте завдання в кінець черги викликом `remember(«groceries»)`, а коли ви готові щось зробити, викликаєте `getTask()`, щоб отримати (і видалити) перший елемент з черги. Функція `rememberUrgently` також додає завдання, але додає його на початок, а не в кінець черги.
 
-{{index [array, searching], "indexOf method", "lastIndexOf method"}}
+{{index [масив, пошук], «indexOf method», «lastIndexOf method»}}
 
-To search for a specific value, arrays provide an `indexOf` method. The method searches through the array from the start to the end and returns the index at which the requested value was found—or -1 if it wasn't found. To search from the end instead of the start, there's a similar method called `lastIndexOf`:
+Для пошуку певного значення в масивах передбачено метод `indexOf`. Метод здійснює пошук у масиві від початку до кінця і повертає індекс, за яким було знайдено шукане значення, або -1, якщо його не було знайдено. Для пошуку з кінця, а не з початку, існує аналогічний метод, який називається `lastIndexOf`:
 
 ```
 console.log([1, 2, 3, 2, 1].indexOf(2));
@@ -600,11 +600,11 @@ console.log([1, 2, 3, 2, 1].lastIndexOf(2));
 // → 3
 ```
 
-Both `indexOf` and `lastIndexOf` take an optional second argument that indicates where to start searching.
+І `indexOf`, і `lastIndexOf` приймають необов'язковий другий аргумент, який вказує, де починати пошук.
 
-{{index "slice method", [array, indexing]}}
+{{index «метод зрізу», [масив, індексування]}}
 
-Another fundamental array method is `slice`, which takes start and end indices and returns an array that has only the elements between them. The start index is inclusive and the end index is exclusive.
+Іншим фундаментальним методом роботи з масивами є `slice`, який отримує початковий та кінцевий індекси і повертає масив, що містить лише елементи між ними. Початковий індекс є інклюзивним, а кінцевий - ексклюзивним.
 
 ```
 console.log([0, 1, 2, 3, 4].slice(2, 4));
@@ -613,108 +613,108 @@ console.log([0, 1, 2, 3, 4].slice(2));
 // → [2, 3, 4]
 ```
 
-{{index [string, indexing]}}
+{{index [рядок, індексація]}}
 
-When the end index is not given, `slice` will take all of the elements after the start index. You can also omit the start index to copy the entire array.
+Якщо кінцевий індекс не вказано, ``slice` візьме всі елементи після початкового індексу. Ви також можете опустити початковий індекс, щоб скопіювати весь масив.
 
-{{index concatenation, "concat method"}}
+{{індексна конкатенація, «метод concat»}}
 
-The `concat` method can be used to append arrays together to create a new array, similar to what the `+` operator does for strings.
+Метод `concat` можна використовувати для додавання масивів разом для створення нового масиву, подібно до того, як це робить оператор `+` для рядків.
 
-The following example shows both `concat` and `slice` in action. It takes an array and an index and returns a new array that is a copy of the original array with the element at the given index removed:
+У наступному прикладі показано як `concat`, так і `lice` у дії. Він отримує масив та індекс і повертає новий масив, який є копією вихідного масиву з вилученим елементом за вказаним індексом:
 
 ```
-function remove(array, index) {
+функція remove(масив, індекс) {
   return array.slice(0, index)
     .concat(array.slice(index + 1));
 }
-console.log(remove(["a", "b", "c", "d", "e"], 2));
-// → ["a", "b", "d", "e"]
+console.log(remove([«a», «b», «c», «d», «e»], 2));
+// → [«a», «b», «c», «d», «e»]
 ```
 
-If you pass `concat` an argument that is not an array, that value will be added to the new array as if it were a one-element array.
+Якщо передати `concat` аргумент, який не є масивом, це значення буде додано до нового масиву так, як якщо б це був одноелементний масив.
 
-## Strings and their properties
+## Рядки та їх властивості
 
-{{index [string, properties]}}
+{{index [рядок, властивості]}}
 
-We can read properties like `length` and `toUpperCase` from string values. But if we try to add a new property, it doesn't stick.
+Ми можемо читати властивості типу `length` та `toUpperCase` зі значень рядків. Але якщо ми спробуємо додати нову властивість, вона не буде додана.
 
 ```
-let kim = "Kim";
+нехай kim = «Кім»;
 kim.age = 88;
 console.log(kim.age);
 // → undefined
 ```
 
-Values of type string, number, and Boolean are not objects, and though the language doesn't complain if you try to set new properties on them, it doesn't actually store those properties. As mentioned earlier, such values are immutable and cannot be changed.
+Значення типу string, number та Boolean не є об'єктами, і хоча мова не скаржиться, якщо ви намагаєтеся встановити для них нові властивості, насправді вона не зберігає ці властивості. Як згадувалося раніше, такі значення є незмінними і не можуть бути змінені.
 
-{{index [string, methods], "slice method", "indexOf method", [string, searching]}}
+{{index [рядок, методи], «метод зрізу», «індекс методу», [рядок, пошук]}}
 
-But these types do have built-in properties. Every string value has a number of methods. Some very useful ones are `slice` and `indexOf`, which resemble the array methods of the same name:
+Але ці типи мають вбудовані властивості. Кожне значення рядка має ряд методів. Дуже корисними з них є `lice` та `indexOf`, які нагадують однойменні методи роботи з масивами:
 
 ```
-console.log("coconuts".slice(4, 7));
-// → nut
-console.log("coconut".indexOf("u"));
+console.log(«coconuts».slice(4, 7));
+// → горіх
+console.log(«coconut».indexOf(«u»));
 // → 5
 ```
 
-One difference is that a string's `indexOf` can search for a string containing more than one character, whereas the corresponding array method looks only for a single element:
+Однією з відмінностей є те, що `indexOf` рядка може шукати рядок, що містить більше одного символу, тоді як відповідний метод масиву шукає лише один елемент:
 
 ```
-console.log("one two three".indexOf("ee"));
+console.log(«one two three».indexOf(«ee»));
 // → 11
 ```
 
-{{index [whitespace, trimming], "trim method"}}
+{{index [пробіли, обрізання], «метод обрізання»}}
 
-The `trim` method removes whitespace (spaces, newlines, tabs, and similar characters) from the start and end of a string:
+Метод `trim` видаляє пробіли (пробіли, нові рядки, табуляції та подібні символи) з початку та кінця рядка:
 
 ```
-console.log("  okay \n ".trim());
+console.log(» okay \n ».trim());
 // → okay
 ```
 
 {{id padStart}}
 
-The `zeroPad` function from the [previous chapter](functions) also exists as a method. It is called `padStart` and takes the desired length and padding character as arguments:
+Функція `zeroPad` з [попереднього розділу](функції) також існує у вигляді методу. Вона називається `padStart` і приймає бажану довжину та символ пробілу як аргументи:
 
 ```
-console.log(String(6).padStart(3, "0"));
+console.log(String(6).padStart(3, «0»));
 // → 006
 ```
 
 {{id split}}
 
-{{index "split method"}}
+{{index «метод розбиття»}}
 
-You can split a string on every occurrence of another string with `split` and join it again with `join`:
+Ви можете розбивати рядок при кожному входженні іншого рядка за допомогою ``split`` і знову приєднувати його за допомогою ``join``:
 
 ```
-let sentence = "Secretarybirds specialize in stomping";
-let words = sentence.split(" ");
+let sentence = «Секретарські пташки спеціалізуються на тупотінні»;
+let words = sentence.split(» »);
 console.log(words);
-// → ["Secretarybirds", "specialize", "in", "stomping"]
-console.log(words.join(". "));
-// → Secretarybirds. specialize. in. stomping
+// → [«Секретарські пташки», «спеціалізуються», «на», «тупотінні»].
+console.log(words.join(». »));
+// → Секретарські пташки. спеціалізуються. на. тупотінні
 ```
 
-{{index "repeat method"}}
+{{index «repeat method»}}
 
-A string can be repeated with the `repeat` method, which creates a new string containing multiple copies of the original string, glued together:
+Рядок можна повторити за допомогою методу `repeat`, який створює новий рядок, що містить декілька копій початкового рядка, склеєних між собою:
 
 ```
-console.log("LA".repeat(3));
+console.log(«LA».repeat(3));
 // → LALALA
 ```
 
-{{index ["length property", "for string"], [string, indexing]}}
+{{index [«властивість довжини», «для рядка»], [рядок, індексація]}}
 
-We have already seen the string type's `length` property. Accessing the individual characters in a string looks like accessing array elements (with a complication that we'll discuss in [Chapter ?](higher_order#code_units)).
+Ми вже бачили властивість `length` типу string. Доступ до окремих символів у рядку схожий на доступ до елементів масиву (з ускладненням, яке ми обговоримо у [Глава ?](вищий_порядок#кодові_одиниці)).
 
 ```
-let string = "abc";
+let string = «abc»;
 console.log(string.length);
 // → 3
 console.log(string[1]);
@@ -723,11 +723,11 @@ console.log(string[1]);
 
 {{id rest_parameters}}
 
-## Rest parameters
+## Решта параметрів
 
-{{index "Math.max function", "period character", "max example", spread, [array, "of rest arguments"]}}
+{{index «Math.max функція», «символ крапки», «max приклад», spread, [array, «of rest arguments»]}}
 
-It can be useful for a function to accept any number of ((argument))s. For example, `Math.max` computes the maximum of _all_ the arguments it is given. To write such a function, you put three dots before the function's last ((parameter)), like this:
+Для функції може бути корисно приймати будь-яку кількість ((аргументів)). Наприклад, `Math.max` обчислює максимальне значення _всіх_ аргументів, які їй надано. Щоб записати таку функцію, ви ставите три крапки перед останнім ((параметром)) функції, ось так:
 
 ```{includeCode: strip_log}
 function max(...numbers) {
@@ -741,79 +741,79 @@ console.log(max(4, 1, 9, -2));
 // → 9
 ```
 
-When such a function is called, the _((rest parameter))_ is bound to an array containing all further arguments. If there are other parameters before it, their values aren't part of that array. When, as in `max`, it is the only parameter, it will hold all arguments.
+Коли викликається така функція, _((решта параметрів))_ прив'язується до масиву, що містить усі подальші аргументи. Якщо перед нею є інші параметри, їхні значення не входять до цього масиву. Коли, як у `max`, це єдиний параметр, він міститиме всі аргументи.
 
-{{index [function, application]}}
+{{index [функція, програма]}}
 
-You can use a similar three-dot notation to _call_ a function with an array of arguments.
+Ви можете використовувати подібний запис з трьома крапками для _виклику_ функції з масивом аргументів.
 
 ```
-let numbers = [5, 1, 7];
+нехай числа = [5, 1, 7];
 console.log(max(...numbers));
 // → 7
 ```
 
-This "((spread))s" out the array into the function call, passing its elements as separate arguments. It is possible to include an array like that along with other arguments, as in `max(9, ...numbers, 2)`.
+Це «((розгортання)» масиву у виклик функції, передаючи його елементи як окремі аргументи. Такий масив можна включати разом з іншими аргументами, як у `max(9, ...numbers, 2)`.
 
-{{index "[] (array)"}}
+{{індекс «[] (масив)»}}
 
-Square bracket array notation similarly allows the triple-dot operator to spread another array into the new array:
-
-```
-let words = ["never", "fully"];
-console.log(["will", ...words, "understand"]);
-// → ["will", "never", "fully", "understand"]
-```
-
-{{index "{} (object)"}}
-
-This works even in curly brace objects, where it adds all properties from another object. If a property is added multiple times, the last value to be added wins:
+Записи масивів у квадратних дужках аналогічно дозволяють оператору з трьома крапками поширювати інший масив у новий масив:
 
 ```
-let coordinates = {x: 10, y: 0};
+нехай words = [«never», «fully»];
+console.log([«will», ...words, «understand»]);
+// → [«will», «never», «fully», «understand»].
+```
+
+{{index «{} (об'єкт)»}}
+
+Це працює навіть в об'єктах з фігурними дужками, де додаються всі властивості з іншого об'єкта. Якщо властивість додається декілька разів, перемагає останнє додане значення:
+
+```
+нехай координати = {x: 10, y: 0};
 console.log({...coordinates, y: 5, z: 1});
 // → {x: 10, y: 5, z: 1}
 ```
 
-## The Math object
+## Об'єкт Math
 
-{{index "Math object", "Math.min function", "Math.max function", "Math.sqrt function", minimum, maximum, "square root"}}
+{{індекс «Math object», «Math.min function», «Math.max function», «Math.sqrt function», мінімум, максимум, «квадратний корінь»}}
 
-As we've seen, `Math` is a grab bag of number-related utility functions such as `Math.max` (maximum), `Math.min` (minimum), and `Math.sqrt` (square root).
+Як ми вже бачили, `Math` - це набір утиліт, пов'язаних з числами, таких як `Math.max` (максимум), `Math.min` (мінімум) та `Math.sqrt` (квадратний корінь).
 
-{{index namespace, [object, property]}}
+{{index простір імен, [об'єкт, властивість]}}
 
 {{id namespace_pollution}}
 
-The `Math` object is used as a container to group a bunch of related functionality. There is only one `Math` object, and it is almost never useful as a value. Rather, it provides a _namespace_ so that all these functions and values do not have to be global bindings.
+Об'єкт `Math` використовується як контейнер для групування пов'язаної функціональності. Існує лише один об'єкт `Math`, і він майже ніколи не використовується як значення. Скоріше, він забезпечує _простір імен_, щоб усі ці функції та значення не були глобальними прив'язками.
 
-{{index [binding, naming]}}
+{{index [прив'язка, іменування]}}
 
-Having too many global bindings "pollutes" the namespace. The more names have been taken, the more likely you are to accidentally overwrite the value of some existing binding. For example, it's not unlikely you'll want to name something `max` in one of your programs. Since JavaScript's built-in `max` function is tucked safely inside the `Math` object, you don't have to worry about overwriting it.
+Занадто велика кількість глобальних прив'язок «забруднює» простір імен. Чим більше імен, тим більша ймовірність того, що ви випадково перезапишете значення якогось існуючого зв'язування. Наприклад, цілком ймовірно, що ви захочете назвати щось `max` в одній з ваших програм. Оскільки вбудована в JavaScript функція `max` надійно схована всередині об'єкта `Math`, вам не потрібно турбуватися про її перезапис.
 
-{{index "let keyword", "const keyword"}}
+{{index «let keyword», «const keyword»}}
 
-Many languages will stop you, or at least warn you, when you are defining a binding with a name that is already taken. JavaScript does this for bindings you declared with `let` or `const` but—perversely—not for standard bindings nor for bindings declared with `var` or `function`.
+Багато мов зупинять вас або принаймні попередять, коли ви визначаєте прив'язку з іменем, яке вже зайнято. JavaScript робить це для прив'язок, оголошених за допомогою `let` або `const`, але, навпаки, не для стандартних прив'язок або прив'язок, оголошених за допомогою `var` або `function`.
 
-{{index "Math.cos function", "Math.sin function", "Math.tan function", "Math.acos function", "Math.asin function", "Math.atan function", "Math.PI constant", cosine, sine, tangent, "PI constant", pi}}
+{{index «Math.cos function», «Math.sin function», «Math.tan function», «Math.acos function», «Math.asin function», «Math.atan function», «Math.PI constant», косинус, синус, тангенс, «PI constant», пі}}
 
-Back to the `Math` object. If you need to do ((trigonometry)), `Math` can help. It contains `cos` (cosine), `sin` (sine), and `tan` (tangent), as well as their inverse functions, `acos`, `asin`, and `atan`, respectively. The number π (pi)—or at least the closest approximation that fits in a JavaScript number—is available as `Math.PI`. There is an old programming tradition of writing the names of ((constant)) values in all caps.
+Повернемося до об'єкта `Math`. Якщо вам потрібно виконати ((тригонометрію)), об'єкт `Math` може допомогти. Він містить функції `cos` (косинус), `sin` (синус) і `tan` (тангенс), а також обернені до них функції `acos`, `asin` і `atan` відповідно. Число π (пі) - або, принаймні, найближче наближення, яке вписується в JavaScript-число - доступне як `Math.PI`. Існує стара традиція програмування - писати імена ((константних)) значень великими літерами.
 
 ```{test: no}
 function randomPointOnCircle(radius) {
   let angle = Math.random() * 2 * Math.PI;
   return {x: radius * Math.cos(angle),
-          y: radius * Math.sin(angle)};
+          y: радіус * Math.sin(angle)};
 }
 console.log(randomPointOnCircle(2));
 // → {x: 0.3667, y: 1.966}
 ```
 
-If you're not familiar with sines and cosines, don't worry. I'll explain them when they are used in [Chapter ?](dom#sin_cos).
+Якщо ви не знайомі з синусами і косинусами, не хвилюйтеся. Я поясню їх, коли вони будуть використані у [Главі ?](dom#sin_cos).
 
-{{index "Math.random function", "random number"}}
+{{index «Math.random function», «random number»}}
 
-The previous example used `Math.random`. This is a function that returns a new pseudorandom number between 0 (inclusive) and 1 (exclusive) every time you call it:
+У попередньому прикладі було використано `Math.random`. Це функція, яка повертає нове псевдовипадкове число від 0 (включно) до 1 (виключено) при кожному виклику:
 
 ```{test: no}
 console.log(Math.random());
@@ -824,30 +824,30 @@ console.log(Math.random());
 // → 0.40180766698904335
 ```
 
-{{index "pseudorandom number", "random number"}}
+{{index «pseudorandom number», «random number»}}
 
-Though computers are deterministic machines—they always react the same way if given the same input—it is possible to have them produce numbers that appear random. To do that, the machine keeps some hidden value, and whenever you ask for a new random number, it performs complicated computations on this hidden value to create a new value. It stores a new value and returns some number derived from it. That way, it can produce ever new, hard-to-predict numbers in a way that _seems_ random.
+Хоча комп'ютери є детермінованими машинами - вони завжди реагують однаково на однакові вхідні дані - існує можливість змусити їх видавати числа, які виглядають випадковими. Для цього машина зберігає деяке приховане значення, і щоразу, коли ви запитуєте нове випадкове число, вона виконує складні обчислення над цим прихованим значенням, щоб створити нове значення. Вона зберігає нове значення і повертає деяке число, отримане з нього. Таким чином, він може створювати нові, важко передбачувані числа, які  виглядають випадковими.
 
-{{index rounding, "Math.floor function"}}
+{{округлення індексу, «функція Math.floor»}}
 
-If we want a whole random number instead of a fractional one, we can use `Math.floor` (which rounds down to the nearest whole number) on the result of `Math.random`:
+Якщо ми хочемо отримати ціле випадкове число замість дробового, ми можемо використати функцію `Math.floor` (яка округляє до найближчого цілого числа) до результату функції `Math.random`:
 
 ```{test: no}
 console.log(Math.floor(Math.random() * 10));
 // → 2
 ```
 
-Multiplying the random number by 10 gives us a number greater than or equal to 0 and below 10. Since `Math.floor` rounds down, this expression will produce, with equal chance, any number from 0 through 9.
+Множення випадкового числа на 10 дає нам число більше або рівне 0 і менше 10. Оскільки `Math.floor` округлює у меншу сторону, цей вираз з однаковою ймовірністю дасть будь-яке число від 0 до 9.
 
-{{index "Math.ceil function", "Math.round function", "Math.abs function", "absolute value"}}
+{{індекс «функція Math.ceil», «функція Math.round», «функція Math.abs», «абсолютне значення»}}
 
-There are also the functions `Math.ceil` (for "ceiling", which rounds up to a whole number), `Math.round` (to the nearest whole number), and `Math.abs`, which takes the absolute value of a number, meaning it negates negative values but leaves positive ones as they are.
+Існують також функції `Math.ceil` (для «стелі», яка округлює до цілого числа), `Math.round` (до найближчого цілого числа) та `Math.abs`, яка бере абсолютне значення числа, тобто від'ємні значення відкидаються, а додатні залишаються як є.
 
-## Destructuring
+## Деструктуризація
 
-{{index "phi function"}}
+{{index «phi function»}}
 
-Let's return to the `phi` function for a moment.
+Повернімося на мить до функції `phi`.
 
 ```{test: wrap}
 function phi(table) {
@@ -859,9 +859,9 @@ function phi(table) {
 }
 ```
 
-{{index "destructuring binding", parameter}}
+{{index «destructuring binding», параметр}}
 
-One reason this function is awkward to read is that we have a binding pointing at our array, but we'd much prefer to have bindings for the _elements_ of the array—that is, `let n00 = table[0]` and so on. Fortunately, there is a succinct way to do this in JavaScript:
+Однією з причин, чому цю функцію незручно читати, є те, що ми маємо прив'язку, яка вказує на наш масив, але ми воліли б мати прив'язки для _елементів_ масиву - тобто, `let n00 = table[0]` і так далі. На щастя, у JavaScript є лаконічний спосіб зробити це:
 
 ```
 function phi([n00, n01, n10, n11]) {
@@ -871,46 +871,46 @@ function phi([n00, n01, n10, n11]) {
 }
 ```
 
-{{index "let keyword", "var keyword", "const keyword", [binding, destructuring]}}
+{{індекс «ключове слово let», «ключове слово var», «ключове слово const», [зв'язування, деструктурування]}}
 
-This also works for bindings created with `let`, `var`, or `const`. If you know that the value you are binding is an array, you can use ((square brackets)) to "look inside" of the value, binding its contents.
+Це також працює для зв'язування, створеного за допомогою `let`, `var` або `const`. Якщо ви знаєте, що значення, яке ви зв'язуєте, є масивом, ви можете використовувати ((квадратні дужки)), щоб «зазирнути всередину» значення, зв'язавши його вміст.
 
-{{index [object, property], [braces, object]}}
+{{індекс [об'єкт, властивість], [дужки, об'єкт]}}
 
-A similar trick works for objects, using braces instead of square brackets.
+Аналогічний трюк працює і для об'єктів, якщо замість квадратних дужок використовувати дужки.
 
 ```
-let {name} = {name: "Faraji", age: 23};
+let {name} = {name: «Faraji», age: 23};
 console.log(name);
 // → Faraji
 ```
 
 {{index null, undefined}}
 
-Note that if you try to destructure `null` or `undefined`, you get an error, much as you would if you directly try to access a property of those values.
+Зверніть увагу, що якщо ви спробуєте деструктурувати `null` або `undefined`, ви отримаєте помилку, так само як і при спробі прямого доступу до властивості цих значень.
 
-## Optional property access
+## Необов'язковий доступ до властивості
 
-{{index "optional chaining", "period character"}}
+{{index «необов'язковий ланцюжок», «символ крапки»}}
 
-When you aren't sure whether a given value produces an object, but still want to read a property from it when it does, you can use a variant of the dot notation: `object?.property`.
+Якщо ви не впевнені, що дане значення створює об'єкт, але хочете прочитати властивість з нього, якщо створює, ви можете використати варіант крапкового запису: `об'єкт?.властивість`.
 
 ```
 function city(object) {
   return object.address?.city;
 }
-console.log(city({address: {city: "Toronto"}}));
-// → Toronto
-console.log(city({name: "Vera"}));
+console.log(city({адреса: {місто: «Торонто»}}));
+// → Торонто
+console.log(city({ім'я: «Віра»}));
 // → undefined
 ```
 
-The expression `a?.b` means the same as `a.b` when `a` isn't null or undefined. When it is, it evaluates to `undefined`. This can be convenient when, as in the example, you aren't sure that a given property exists or when a variable might hold an undefined value.
+Вираз `a?.b` означає те саме, що й `a.b`, якщо `a` не є нульовим або невизначеним. У протилежному випадку він обчислюється як `невизначений`. Це може бути зручно, коли, як у прикладі, ви не впевнені, що певна властивість існує, або коли змінна може мати невизначене значення.
 
-A similar notation can be used with square bracket access, and even with function calls, by putting `?.` in front of the parentheses or brackets:
+Подібну нотацію можна використовувати з доступом у квадратних дужках, і навіть з викликами функцій, ставлячи `?.` перед дужками або дужками:
 
 ```
-console.log("string".notAMethod?.());
+console.log(«string».notAMethod?.());
 // → undefined
 console.log({}.arrayProp?.[0]);
 // → undefined
@@ -918,80 +918,80 @@ console.log({}.arrayProp?.[0]);
 
 ## JSON
 
-{{index [array, representation], [object, representation], "data format", [memory, organization]}}
+{{індекс [масив, представлення], [об'єкт, представлення], «формат даних», [пам'ять, організація]}}
 
-Because properties grasp their value rather than contain it, objects and arrays are stored in the computer's memory as sequences of bits holding the _((address))es_—the place in memory—of their contents. An array with another array inside of it consists of (at least) one memory region for the inner array and another for the outer array, containing (among other things) a number that represents the address of the inner array.
+Оскільки властивості схоплюють значення, а не містять його, об'єкти та масиви зберігаються у пам'яті комп'ютера як послідовності бітів, що містять _((адресу))es_- місце у пам'яті - їхнього вмісту. Масив з іншим масивом всередині складається з (принаймні) однієї області пам'яті для внутрішнього масиву та іншої для зовнішнього масиву, що містить (серед іншого) число, яке представляє адресу внутрішнього масиву.
 
-If you want to save data in a file for later or send it to another computer over the network, you have to somehow convert these tangles of memory addresses to a description that can be stored or sent. You _could_ send over your entire computer memory along with the address of the value you're interested in, I suppose, but that doesn't seem like the best approach.
+Якщо ви хочете зберегти дані у файлі для подальшого використання або відправити їх на інший комп'ютер по мережі, ви повинні якось перетворити ці плутанину адрес пам'яті в опис, який можна зберігати або надсилати. Можна було б передати всю пам'ять комп'ютера разом з адресою значення, яке вас цікавить, але це не найкращий підхід.
 
-{{indexsee "JavaScript Object Notation", JSON}}
+{{індекс див. «JavaScript Object Notation», JSON}}
 
-{{index serialization, "World Wide Web"}}
+{{index serialization, «World Wide Web»}}
 
-What we can do is _serialize_ the data. That means it is converted into a flat description. A popular serialization format is called _((JSON))_ (pronounced "Jason"), which stands for JavaScript Object Notation. It is widely used as a data storage and communication format on the web, even with languages other than JavaScript.
+Що ми можемо зробити, так це _серіалізувати_ дані. Це означає, що вони перетворюються на плаский опис. Популярний формат серіалізації називається _((JSON))_ (вимовляється як «Джейсон»), що означає JavaScript Object Notation. Він широко використовується як формат для зберігання даних і комунікації в Інтернеті, навіть з іншими мовами, крім JavaScript.
 
-{{index [array, notation], [object, creation], [quoting, "in JSON"], comment}}
+{{індекс [масив, нотація], [об'єкт, створення], [цитування, «в JSON»], коментар}}
 
-JSON looks similar to JavaScript's way of writing arrays and objects, with a few restrictions. All property names have to be surrounded by double quotes, and only simple data expressions are allowed—no function calls, bindings, or anything that involves actual computation. Comments are not allowed in JSON.
+JSON виглядає подібно до способу запису масивів та об'єктів у JavaScript, з деякими обмеженнями. Всі імена властивостей повинні бути оточені подвійними лапками, і дозволені тільки прості вирази даних - ніяких викликів функцій, прив'язок або будь-чого, що передбачає фактичні обчислення. Коментарі в JSON заборонені.
 
-A journal entry might look like this when represented as JSON data:
+Запис у журналі може мати такий вигляд, якщо його подати у вигляді даних JSON:
 
-```{lang: "json"}
+```{lang: «json"}
 {
-  "squirrel": false,
-  "events": ["work", "touched tree", "pizza", "running"]
+  «squirrel": false,
+  «events": [«work», «touched tree», «pizza», «running»]
 }
 ```
 
-{{index "JSON.stringify function", "JSON.parse function", serialization, deserialization, parsing}}
+{{index «JSON.stringify function», «JSON.parse function», серіалізація, десеріалізація, парсинг}}
 
-JavaScript gives us the functions `JSON.stringify` and `JSON.parse` to convert data to and from this format. The first takes a JavaScript value and returns a JSON-encoded string. The second takes such a string and converts it to the value it encodes:
+JavaScript надає нам функції `JSON.stringify` і `JSON.parse` для перетворення даних у цей формат і з нього. Перша приймає значення JavaScript і повертає JSON-кодований рядок. Друга приймає такий рядок і перетворює його в закодоване значення:
 
 ```
 let string = JSON.stringify({squirrel: false,
-                             events: ["weekend"]});
+                             події: [«weekend»]});
 console.log(string);
-// → {"squirrel":false,"events":["weekend"]}
+// → {«squirrel»:false, «events»:[«weekend»]}
 console.log(JSON.parse(string).events);
-// → ["weekend"]
+// → [«weekend»]
 ```
 
-## Summary
+## Підсумок
 
-Objects and arrays provide ways to group several values into a single value. This allows us to put a bunch of related things in a bag and run around with the bag instead of wrapping our arms around all of the individual things and trying to hold on to them separately.
+Об'єкти та масиви надають можливість групувати декілька значень в одне. Це дозволяє нам покласти купу пов'язаних між собою речей у сумку і бігати з цією сумкою, замість того, щоб обхоплювати кожну річ окремо і намагатися втримати її окремо.
 
-Most values in JavaScript have properties, with the exceptions being `null` and `undefined`. Properties are accessed using `value.prop` or `value["prop"]`. Objects tend to use names for their properties and store more or less a fixed set of them. Arrays, on the other hand, usually contain varying amounts of conceptually identical values and use numbers (starting from 0) as the names of their properties.
+Більшість значень в JavaScript мають властивості, за винятком `null` та `undefined`. Доступ до властивостей здійснюється за допомогою `value.prop` або `value[«prop»]`. Об'єкти, як правило, використовують імена для своїх властивостей і зберігають більш-менш фіксований їх набір. Масиви, з іншого боку, зазвичай містять різну кількість концептуально однакових значень і використовують числа (починаючи з 0) як імена своїх властивостей.
 
-There _are_ some named properties in arrays, such as `length` and a number of methods. Methods are functions that live in properties and (usually) act on the value of which they are a property.
+У масивах _існують_ деякі іменовані властивості, такі як `length` і ряд методів. Методи - це функції, які живуть у властивостях і (зазвичай) діють над значенням, властивістю якого вони є.
 
-You can iterate over arrays using a special kind of `for` loop: `for (let element of array)`.
+Ви можете циклічно перебирати масиви за допомогою спеціального виду циклу `for`: `for (нехай елемент масиву)`.
 
-## Exercises
+## Вправи
 
-### The sum of a range
+### Сума діапазону
 
-{{index "summing (exercise)"}}
+{{index «підсумовування (вправа)»}}
 
-The [introduction](intro) of this book alluded to the following as a nice way to compute the sum of a range of numbers:
+У [вступі](intro) цієї книги згадується наступна вправа як гарний спосіб обчислення суми діапазону чисел:
 
 ```{test: no}
 console.log(sum(range(1, 10)));
 ```
 
-{{index "range function", "sum function"}}
+{{index «функція діапазону», «функція суми»}}
 
-Write a `range` function that takes two arguments, `start` and `end`, and returns an array containing all the numbers from `start` up to and including `end`.
+Напишіть функцію `range`, яка отримує два аргументи, `start` і `end`, і повертає масив, що містить усі числа від `start` до `end` включно.
 
-Next, write a `sum` function that takes an array of numbers and returns the sum of these numbers. Run the example program and see whether it does indeed return 55.
+Далі напишіть функцію `сума`, яка отримує масив чисел і повертає суму цих чисел. Запустіть програму на виконання і перевірте, чи дійсно вона повертає 55.
 
-{{index "optional argument"}}
+{{index «необов'язковий аргумент»}}
 
-As a bonus assignment, modify your `range` function to take an optional third argument that indicates the "step" value used when building the array. If no step is given, the elements should go up by increments of one, corresponding to the old behavior. The function call `range(1, 10, 2)` should return `[1, 3, 5, 7, 9]`. Make sure this also works with negative step values so that `range(5, 2, -1)` produces `[5, 4, 3, 2]`.
+Як бонусне завдання, модифікуйте вашу функцію `range`, щоб вона приймала необов'язковий третій аргумент, який вказує на значення «кроку», що використовується при побудові масиву. Якщо крок не вказано, елементи будуть збільшуватися на одиницю, що відповідає старій поведінці. Виклик функції `range(1, 10, 2)` повинен повернути `[1, 3, 5, 7, 9]`. Переконайтеся, що це працює і з від'ємними значеннями кроку, щоб `range(5, 2, -1)` повертав `[5, 4, 3, 2]`.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
 console.log(range(1, 10));
 // → [1, 2, 3, 4, 5, 6, 7, 8, 9, 10]
@@ -1005,44 +1005,44 @@ if}}
 
 {{hint
 
-{{index "summing (exercise)", [array, creation], "square brackets"}}
+{{index «підсумовування (вправа)», [масив, створення], «квадратні дужки»}}
 
-Building up an array is most easily done by first initializing a binding to `[]` (a fresh, empty array) and repeatedly calling its `push` method to add a value. Don't forget to return the array at the end of the function.
+Створення масиву найпростіше здійснити, спочатку ініціалізувавши прив'язку до `[]` (свіжого, порожнього масиву) і повторно викликавши його метод `push` для додавання значень. Не забудьте повернути масив в кінці функції.
 
-{{index [array, indexing], comparison}}
+{{index [масив, індексація], порівняння}}
 
-Since the end boundary is inclusive, you'll need to use the `<=` operator rather than `<` to check for the end of your loop.
+Оскільки межа кінця є інклюзивною, вам потрібно використовувати оператор `<=`, а не `<`, щоб перевірити кінець циклу.
 
-The step parameter can be an optional parameter that defaults (using the `=` operator) to 1.
+Параметр step може бути необов'язковим параметром, який за замовчуванням (за допомогою оператора `=`) дорівнює 1.
 
-{{index "range function", "for loop"}}
+{{index «функція діапазону», «for loop»}}
 
-Having `range` understand negative step values is probably best done by writing two separate loops—one for counting up and one for counting down—because the comparison that checks whether the loop is finished needs to be `>=` rather than `<=` when counting downward.
+Щоб функція `range` розуміла від'ємні значення кроку, можливо, найкраще написати два окремі цикли - один для підрахунку вгору і один для підрахунку вниз, оскільки порівняння, яке перевіряє, чи завершено цикл, має бути `>=`, а не `<=` при підрахунку вниз.
 
-It might also be worthwhile to use a different default step, namely, -1, when the end of the range is smaller than the start. That way, `range(5, 2)` returns something meaningful rather than getting stuck in an ((infinite loop)). It is possible to refer to previous parameters in the default value of a parameter.
+Можливо, також варто використовувати інший крок за замовчуванням, а саме -1, коли кінець діапазону менший за початок. Таким чином, `range(5, 2)` поверне щось значуще, а не застрягне у ((нескінченному циклі)). У значенні параметра за замовчуванням можна посилатися на попередні параметри.
 
-hint}}
+підказка}}
 
-### Reversing an array
+### Реверсування масиву
 
-{{index "reversing (exercise)", "reverse method", [array, methods]}}
+{{index «реверсування (вправа)», «реверсний метод», [масив, методи]}}
 
-Arrays have a `reverse` method that changes the array by inverting the order in which its elements appear. For this exercise, write two functions, `reverseArray` and `reverseArrayInPlace`. The first, `reverseArray`, should take an array as its argument and produce a _new_ array that has the same elements in the inverse order. The second, `reverseArrayInPlace`, should do what the `reverse` method does: _modify_ the array given as its argument by reversing its elements. Neither may use the standard `reverse` method.
+Масиви мають метод `reverse`, який змінює масив, інвертуючи порядок появи його елементів. У цій вправі напишіть дві функції, `reverseArray` та `reverseArrayInPlace`. Перша, `reverseArray`, повинна приймати масив як аргумент і створювати _новий_ масив, який містить ті самі елементи у зворотному порядку. Другий, `reverseArrayInPlace`, повинен робити те саме, що і метод `reverse`: _модифікувати_ масив, заданий як аргумент, шляхом зміни місцями його елементів. Не можна використовувати стандартний метод `reverse`.
 
-{{index efficiency, "pure function", "side effect"}}
+{{Ефективність індексу, «чиста функція», «побічний ефект»}}
 
-Thinking back to the notes about side effects and pure functions in the [previous chapter](functions#pure), which variant do you expect to be useful in more situations? Which one runs faster?
+Згадуючи нотатки про побічні ефекти та чисті функції у [попередній главі](functions#pure), який варіант, на вашу думку, може бути корисним у більшій кількості ситуацій? Який з них працює швидше?
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
-let myArray = ["A", "B", "C"];
+let myArray = [«A», «B», «C»];
 console.log(reverseArray(myArray));
-// → ["C", "B", "A"];
+// → [«C», «B», «A»];
 console.log(myArray);
-// → ["A", "B", "C"];
+// → [«A», «B», «C»];
 let arrayValue = [1, 2, 3, 4, 5];
 reverseArrayInPlace(arrayValue);
 console.log(arrayValue);
@@ -1053,25 +1053,25 @@ if}}
 
 {{hint
 
-{{index "reversing (exercise)"}}
+{{index «реверсування (вправа)»}}
 
-There are two obvious ways to implement `reverseArray`. The first is to simply go over the input array from front to back and use the `unshift` method on the new array to insert each element at its start. The second is to loop over the input array backward and use the `push` method. Iterating over an array backward requires a (somewhat awkward) `for` specification, like `(let i = array.length - 1; i >= 0; i--)`.
+Існує два очевидних способи реалізації `reverseArray`. Перший - просто переглянути вхідний масив спереду назад і використати метод `unshift` для нового масиву, щоб вставити кожен елемент на його початку. Другий спосіб - циклічно переглянути вхідний масив у зворотному напрямку і використати метод `push`. Обхід масиву у зворотному напрямку вимагає (дещо незручної) специфікації `for`, наприклад, `(let i = array.length - 1; i >= 0; i--)`.
 
-{{index "slice method"}}
+{{index «slice method»}}
 
-Reversing the array in place is harder. You have to be careful not to overwrite elements that you will later need. Using `reverseArray` or otherwise copying the whole array (`array.slice()` is a good way to copy an array) works but is cheating.
+Повернути масив на місце складніше. Потрібно бути обережним, щоб не перезаписати елементи, які знадобляться пізніше. Використання `reverseArray` або копіювання масиву цілком (`array.slice()` є гарним способом копіювання масиву) працює, але є шахрайством.
 
-The trick is to _swap_ the first and last elements, then the second and second-to-last, and so on. You can do this by looping over half the length of the array (use `Math.floor` to round down—you don't need to touch the middle element in an array with an odd number of elements) and swapping the element at position `i` with the one at position `array.length - 1 - i`. You can use a local binding to briefly hold onto one of the elements, overwrite that one with its mirror image, and then put the value from the local binding in the place where the mirror image used to be.
+Хитрість полягає у тому, щоб «поміняти місцями » перший і останній елементи, потім другий і передостанній, і так далі. Ви можете зробити це, пройшовши половину довжини масиву (використовуйте `Math.floor` для округлення вниз - вам не потрібно торкатися середнього елемента у масиві з непарною кількістю елементів) і помінявши елемент у позиції `i` на елемент у позиції `array.length - 1 - i`. Ви можете використати локальне прив'язування, щоб ненадовго затримати один з елементів, перезаписати його дзеркальним відображенням, а потім помістити значення з локального прив'язування на місце, де було дзеркальне відображення.
 
-hint}}
+підказка}}
 
 {{id list}}
 
-### A list
+### Список
 
-{{index ["data structure", list], "list (exercise)", "linked list", array, collection}}
+{{index [«структура даних», список], «список (вправа)», «зв'язаний список», масив, колекція}}
 
-As generic blobs of values, objects can be used to build all sorts of data structures. A common data structure is the _list_ (not to be confused with arrays). A list is a nested set of objects, with the first object holding a reference to the second, the second to the third, and so on:
+Як загальні згустки значень, об'єкти можна використовувати для побудови різноманітних структур даних. Поширеною структурою даних є _список_ (не плутати з масивами). Список - це вкладений набір об'єктів, де перший об'єкт містить посилання на другий, другий на третій і так далі:
 
 ```{includeCode: true}
 let list = {
@@ -1086,28 +1086,28 @@ let list = {
 };
 ```
 
-The resulting objects form a chain, as shown in the following diagram:
+Отримані об'єкти утворюють ланцюжок, як показано на наступній схемі:
 
-{{figure {url: "img/linked-list.svg", alt: "A diagram showing the memory structure of a linked list. There are 3 cells, each with a value field holding a number, and a 'rest' field with an arrow to the rest of the list. The first cell's arrow points at the second cell, the second cell's arrow at the last cell, and the last cell's 'rest' field holds null.",width: "8cm"}}}
+{{figure {url: «img/linked-list.svg», alt: «Діаграма, що показує структуру пам'яті зв'язаного списку. Є 3 комірки, кожна з яких має поле значення, що містить число, і поле «решта» зі стрілкою до решти списку. Стрілка першої комірки вказує на другу комірку, стрілка другої комірки - на останню комірку, а поле «решта» останньої комірки містить нуль.»,width: “8cm”}}}
 
-{{index "structure sharing", [memory, structure sharing]}}
+{{index «structure sharing», [memory, structure sharing]}}
 
-A nice thing about lists is that they can share parts of their structure. For example, if I create two new values `{value: 0, rest: list}` and `{value: -1, rest: list}` (with `list` referring to the binding defined earlier), they are both independent lists, but they share the structure that makes up their last three elements. The original list is also still a valid three-element list.
+Приємною особливістю списків є те, що вони можуть ділитися частинами своєї структури. Наприклад, якщо я створюю два нових значення `{value: 0, rest: list}` і `{value: -1, rest: list}` (де `list` посилається на прив'язку, визначену раніше), вони обидва є незалежними списками, але мають спільну структуру, яка складається з останніх трьох елементів. Початковий список також залишається правильним списком з трьох елементів.
 
-Write a function `arrayToList` that builds up a list structure like the one shown when given `[1, 2, 3]` as argument. Also write a `listToArray` function that produces an array from a list. Add the helper functions `prepend`, which takes an element and a list and creates a new list that adds the element to the front of the input list, and `nth`, which takes a list and a number and returns the element at the given position in the list (with zero referring to the first element) or `undefined` when there is no such element.
+Напишіть функцію `arrayToList`, яка створює структуру списку, подібну до тієї, що показано на прикладі з аргументом `[1, 2, 3]`. Також напишіть функцію `listToArray`, яка створює масив зі списку. Додайте допоміжні функції `prepend`, яка отримує елемент і список і створює новий список, який додає елемент на початок вхідного списку, і `nth`, яка отримує список і число і повертає елемент на заданій позиції у списку (нуль означає перший елемент) або `undefined`, якщо такого елемента не існує.
 
-{{index recursion}}
+{{Індексна рекурсія}}
 
-If you haven't already, also write a recursive version of `nth`.
+Якщо ви цього ще не зробили, також напишіть рекурсивну версію `nth`.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
 console.log(arrayToList([10, 20]));
 // → {value: 10, rest: {value: 20, rest: null}}
-console.log(listToArray(arrayToList([10, 20, 30])));
+console.log(listToArray(arrayToList([10, 20, 30]));
 // → [10, 20, 30]
 console.log(prepend(10, prepend(20, null)));
 // → {value: 10, rest: {value: 20, rest: null}}
@@ -1119,55 +1119,55 @@ if}}
 
 {{hint
 
-{{index "list (exercise)", "linked list"}}
+{{index «list (exercise)», «linked list»}}
 
-Building up a list is easier when done back to front. So `arrayToList` could iterate over the array backward (see the previous exercise) and, for each element, add an object to the list. You can use a local binding to hold the part of the list that was built so far and use an assignment like `list = {value: X, rest: list}` to add an element.
+Побудова списку є простішою, коли це робиться від початку до кінця. Отже, `arrayToList` може ітераційно переглядати масив у зворотному напрямку (див. попередню вправу) і для кожного елемента додавати об'єкт до списку. Ви можете використати локальне прив'язування, щоб утримувати частину списку, яку було створено, і використовувати присвоювання на кшталт `list = {value: X, rest: list}` для додавання елемента.
 
-{{index "for loop"}}
+{{index «for loop»}}
 
-To run over a list (in `listToArray` and `nth`), a `for` loop specification like this can be used:
+Для пробігу по списку (у `listToArray` та `nth`) можна використовувати специфікацію циклу `for` на кшталт цього:
 
 ```
 for (let node = list; node; node = node.rest) {}
 ```
 
-Can you see how that works? Every iteration of the loop, `node` points to the current sublist, and the body can read its `value` property to get the current element. At the end of an iteration, `node` moves to the next sublist. When that is `null`, we have reached the end of the list, and the loop is finished.
+Бачите, як це працює? Кожну ітерацію циклу `node` вказує на поточний підсписок, а тіло може прочитати його властивість `value`, щоб отримати поточний елемент. В кінці ітерації `node` переходить до наступного підсписку. Коли цей підсписок дорівнює `null`, ми досягли кінця списку, і цикл завершено.
 
-{{index recursion}}
+{Рекурсія індексів
 
-The recursive version of `nth` will, similarly, look at an ever smaller part of the "tail" of the list and at the same time count down the index until it reaches zero, at which point it can return the `value` property of the node it is looking at. To get the zeroth element of a list, you simply take the `value` property of its head node. To get element _N_ + 1, you take the *N*th element of the list that's in this list's `rest` property.
+Рекурсивна версія `nth` аналогічно переглядатиме дедалі меншу частину «хвоста» списку і водночас відраховуватиме індекс доти, доки він не досягне нуля, після чого зможе повернути властивість `value` вузла, на який вона дивиться. Щоб отримати нульовий елемент списку, ви просто берете властивість `value` його головного вузла. Щоб отримати елемент _N_ + 1, ви берете *N*-йелемент списку, який знаходиться у властивості `rest` цього списку.
 
-hint}}
+підказка}}
 
 {{id exercise_deep_compare}}
 
-### Deep comparison
+### Глибоке порівняння
 
-{{index "deep comparison (exercise)", [comparison, deep], "deep comparison", "== operator"}}
+{{index «deep comparison (exercise)», [comparison, deep], «deep comparison», «== operator»}}
 
-The `==` operator compares objects by identity, but sometimes you'd prefer to compare the values of their actual properties.
+Оператор `==` порівнює об'єкти за тотожністю, але іноді вам потрібно порівняти значення їхніх реальних властивостей.
 
-Write a function `deepEqual` that takes two values and returns `true` only if they are the same value or are objects with the same properties, where the values of the properties are equal when compared with a recursive call to `deepEqual`.
+Напишіть функцію `deepEqual`, яка отримує два значення і повертає `true` тільки якщо вони мають однакове значення або є об'єктами з однаковими властивостями, де значення властивостей рівні при порівнянні з рекурсивним викликом `deepEqual`.
 
-{{index null, "=== operator", "typeof operator"}}
+{{index null, «=== оператор», «typeof оператор»}}
 
-To find out whether values should be compared directly (using the `===` operator for that) or have their properties compared, you can use the `typeof` operator. If it produces `"object"` for both values, you should do a deep comparison. But you have to take one silly exception into account: because of a historical accident, `typeof null` also produces `"object"`.
+Щоб дізнатися, чи потрібно порівнювати значення безпосередньо (використовуючи для цього оператор `===`), чи порівнювати їхні властивості, ви можете скористатися оператором `typeof`. Якщо він видає `«об'єкт»` для обох значень, вам слід виконати глибоке порівняння. Але ви повинні взяти до уваги один дурний виняток: через історичну випадковість, `typeof null` також повертає `«об'єкт»`.
 
-{{index "Object.keys function"}}
+{{index «Функція Object.keys»}}
 
-The `Object.keys` function will be useful when you need to go over the properties of objects to compare them.
+Функція `Object.keys` буде корисною, коли вам потрібно переглянути властивості об'єктів для їх порівняння.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
-let obj = {here: {is: "an"}, object: 2};
+let obj = {тут: {is: «an"}, object: 2};
 console.log(deepEqual(obj, obj));
 // → true
 console.log(deepEqual(obj, {here: 1, object: 2}));
 // → false
-console.log(deepEqual(obj, {here: {is: "an"}, object: 2}));
+console.log(deepEqual(obj, {here: {is: «an»}, object: 2}));
 // → true
 ```
 
@@ -1175,16 +1175,16 @@ if}}
 
 {{hint
 
-{{index "deep comparison (exercise)", [comparison, deep], "typeof operator", "=== operator"}}
+{{index «глибоке порівняння (вправа)», [comparison, deep], «typeof operator», «=== operator»}}
 
-Your test for whether you are dealing with a real object will look something like `typeof x == "object" && x != null`. Be careful to compare properties only when _both_ arguments are objects. In all other cases you can just immediately return the result of applying `===`.
+Ваш тест на те, чи маєте ви справу з реальним об'єктом, буде виглядати приблизно так: `typeof x == «object» && x != null`. Будьте обережні і порівнюйте властивості лише тоді, коли _обидва_ аргументи є об'єктами. У всіх інших випадках можна просто одразу повернути результат застосування `===`.
 
-{{index "Object.keys function"}}
+{{index «Функція Object.keys»}}
 
-Use `Object.keys` to go over the properties. You need to test whether both objects have the same set of property names and whether those properties have identical values. One way to do that is to ensure that both objects have the same number of properties (the lengths of the property lists are the same). And then, when looping over one of the object's properties to compare them, always first make sure the other actually has a property by that name. If they have the same number of properties and all properties in one also exist in the other, they have the same set of property names.
+Використовуйте `Object.keys` для перегляду властивостей. Вам потрібно перевірити, чи обидва об'єкти мають однаковий набір назв властивостей і чи ці властивості мають однакові значення. Один із способів зробити це - переконатися, що обидва об'єкти мають однакову кількість властивостей (довжини списків властивостей однакові). А потім, циклічно переглядаючи властивості одного з об'єктів для їх порівняння, завжди спочатку переконайтеся, що інший об'єкт дійсно має властивість з такою назвою. Якщо вони мають однакову кількість властивостей і всі властивості одного з них також існують в іншому, то вони мають однаковий набір назв властивостей.
 
-{{index "return value"}}
+{{index «return value»}}
 
-Returning the correct value from the function is best done by immediately returning `false` when a mismatch is found and returning `true` at the end of the function.
+Найкраще повертати правильне значення з функції, негайно повертаючи значення `false`, якщо знайдено невідповідність, і повертаючи значення `true` в кінці функції.
 
-hint}}
+підказка}}

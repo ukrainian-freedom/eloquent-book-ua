@@ -1,137 +1,136 @@
-# The Document Object Model
+# Об'єктна модель документа
 
-{{quote {author: "Friedrich Nietzsche", title: "Beyond Good and Evil", chapter: true}
+{{quote {author: «Фрідріх Ніцше», author, title: «По той бік добра і зла», author: “Фрідріх Ніцше”, title: “По той бік добра і зла”, chapter: true}}
 
-Too bad! Same old story! Once you've finished building your house you notice you've accidentally learned something that you really should have known—before you started.
+Дуже погано! Все та ж стара історія! Закінчивши будувати будинок, ви помічаєте, що випадково дізналися щось таке, що мали б знати ще до того, як почали будувати.
 
 quote}}
+{{figure {url: «img/chapter_picture_14.jpg», alt: «Ілюстрація із зображенням дерева, на гілках якого висять літери, малюнки та шестерні», »chapter: «Обрамлення"}}}
 
-{{figure {url: "img/chapter_picture_14.jpg", alt: "Illustration showing a tree with letters, pictures, and gears hanging on its branches", chapter: "framed"}}}
+{{індексне малювання, розбір}}
 
-{{index drawing, parsing}}
+Коли ви відкриваєте веб-сторінку, ваш браузер отримує її текст ((HTML)) і розбирає його, подібно до нашого синтаксичного аналізатора з [Розділ ?](мова#синтаксичний аналіз). Браузер створює модель ((структури)) документа і використовує цю модель для відображення сторінки на екрані.
 
-When you open a web page, your browser retrieves the page's ((HTML)) text and parses it, much like our parser from [Chapter ?](language#parsing) parsed programs. The browser builds up a model of the document's ((structure)) and uses this model to draw the page on the screen.
+{{index «жива структура даних»}}
 
-{{index "live data structure"}}
+Таке представлення ((документа)) є однією з іграшок, які програма на JavaScript має у своїй ((пісочниці)). Це структура даних, яку ви можете читати або змінювати. Вона діє як « жива » структура даних: коли її змінюють, сторінка на екрані оновлюється, щоб відобразити зміни.
 
-This representation of the ((document)) is one of the toys that a JavaScript program has available in its ((sandbox)). It is a ((data structure)) that you can read or modify. It acts as a _live_ data structure: when it's modified, the page on the screen is updated to reflect the changes.
+## Структура документа
 
-## Document structure
+{{index [HTML, структура]}}
 
-{{index [HTML, structure]}}
+Ви можете уявити HTML-документ як вкладений набір ((box))ів. Такі теги, як `<body>` і `</body>`, містять інші ((tag))и, які, у свою чергу, містять інші теги або ((text)). Ось приклад документа з [попередньої глави] (браузер):
 
-You can imagine an HTML document as a nested set of ((box))es. Tags such as `<body>` and `</body>` enclose other ((tag))s, which in turn contain other tags or ((text)). Here's the example document from the [previous chapter](browser):
-
-```{lang: html, sandbox: "homepage"}
+```{lang: html, sandbox: «homepage»}
 <!doctype html>
 <html>
   <head>
-    <title>My home page</title>
-  </head>
+    <title>Моя домашня сторінка</title>
+  </head> </head>
   <body>
-    <h1>My home page</h1>
-    <p>Hello, I am Marijn and this is my home page.</p>
-    <p>I also wrote a book! Read it
-      <a href="http://eloquentjavascript.net">here</a>.</p>
-  </body>
+    <h1>Моя домашня сторінка</h1>
+    <p>Привіт, мене звуть Марін, і це моя домашня сторінка.
+    <А ще я написала книгу! Прочитайте її
+      <a href=«http://eloquentjavascript.net»>тут</a>.</p>
+  </p> <p>
 </html>
 ```
 
-This page has the following structure:
+Ця сторінка має наступну структуру:
 
-{{figure {url: "img/html-boxes.svg", alt: "Diagram showing an HTML document as a set of nested boxes. The outer box is labeled 'html' and contains two boxes labeled 'head' and 'body'. Inside those are further boxes, with some of the innermost boxes containing the document's text.", width: "7cm"}}}
+{{figure {url: «img/html-boxes.svg», alt: «Діаграма, що показує HTML-документ у вигляді набору вкладених блоків. Зовнішній блок позначено як «html» і містить два блоки, позначені як «head» і «body». Всередині них знаходяться інші блоки, деякі з яких містять текст документа.», width: “7cm”}}}.
 
-{{indexsee "Document Object Model", DOM}}
+{{Дивіться «Об'єктна модель документа», DOM}}
 
-The data structure the browser uses to represent the document follows this shape. For each box, there is an object, which we can interact with to find out things such as what HTML tag it represents and which boxes and text it contains. This representation is called the _Document Object Model_, or _((DOM))_ for short.
+Структура даних, яку браузер використовує для представлення документа, має такий вигляд. Для кожного поля існує об'єкт, з яким ми можемо взаємодіяти, щоб з'ясувати, який HTML-тег він представляє, які поля і текст у ньому містяться. Таке представлення називається _об'єктною моделлю документа_, або скорочено _((DOM))_.
 
-{{index "documentElement property", "head property", "body property", "html (HTML tag)", "body (HTML tag)", "head (HTML tag)"}}
+{{index «property documentElement», «head property», «body property», «html (HTML-тег)», «body (HTML-тег)», «head (HTML-тег)»}}
 
-The global binding `document` gives us access to these objects. Its `documentElement` property refers to the object representing the `<html>` tag. Since every HTML document has a head and a body, it also has `head` and `body` properties pointing at those elements.
+Глобальна прив'язка `document` дає нам доступ до цих об'єктів. Його властивість `documentElement` посилається на об'єкт, що представляє тег `<html>`. Оскільки кожен HTML-документ має заголовок і тіло, він також має властивості `head` і `body`, що вказують на ці елементи.
 
-## Trees
+## Дерева
 
-{{index [nesting, "of objects"]}}
+{{index [вкладеність, «об'єктів»]}}
 
-Think back to the ((syntax tree))s from [Chapter ?](language#parsing) for a moment. Their structures are strikingly similar to the structure of a browser's document. Each _((node))_ may refer to other nodes, _children_, which in turn may have their own children. This shape is typical of nested structures, where elements can contain subelements that are similar to themselves.
+Пригадайте на мить ((дерево синтаксису))и з [Розділу ?](синтаксичний#аналіз мови). Їхні структури напрочуд схожі на структуру документа у браузері. Кожен _((вузол))_ може посилатися на інші вузли, _дочірні_, які, у свою чергу, можуть мати власних дітей. Така форма характерна для вкладених структур, де елементи можуть містити подібні до себе піделементи.
 
-{{index "documentElement property", [DOM, tree]}}
+{{index «property documentElement», [DOM, tree]}}
 
-We call a data structure a _((tree))_ when it has a branching structure, no ((cycle))s (a node may not contain itself, directly or indirectly), and a single, well-defined _((root))_. In the case of the DOM, `document.documentElement` serves as the root.
+Ми називаємо структуру даних _((деревом))_, коли вона має розгалужену структуру, не має ((циклу))_ (вузол не може містити сам себе, прямо чи опосередковано) та єдиний, чітко визначений _((корінь))_. У випадку DOM, `document.documentElement` слугує коренем.
 
-{{index sorting, ["data structure", "tree"], "syntax tree"}}
+{{індексне сортування, [«структура даних», «дерево»], «синтаксичне дерево»}}
 
-Trees come up a lot in computer science. In addition to representing recursive structures such as HTML documents or programs, they are often used to maintain sorted ((set))s of data because elements can usually be found or inserted more efficiently in a tree than in a flat array.
+Дерева часто зустрічаються у комп'ютерних науках. Окрім представлення рекурсивних структур, таких як HTML-документи або програми, вони часто використовуються для зберігання відсортованих ((множин)) даних, оскільки елементи зазвичай можна знайти або вставити ефективніше у дереві, ніж у пласкому масиві.
 
-{{index "leaf node", "Egg language"}}
+{{index «leaf node», «Egg language»}}
 
-A typical tree has different kinds of ((node))s. The syntax tree for [the Egg language](language) had identifiers, values, and application nodes. Application nodes may have children, whereas identifiers and values are _leaves_, or nodes without children.
+Типове дерево має різні типи ((node))s. Дерево синтаксису для [яєчної мови](мова) має ідентифікатори, значення та вузли застосування. Вузли застосування можуть мати дочірні вузли, тоді як ідентифікатори та значення є _листям_, або вузлами без дочірніх вузлів.
 
-{{index "body property", [HTML, structure]}}
+{{index «body property», [HTML, структура]}}
 
-The same goes for the DOM. Nodes for _((element))s_, which represent HTML tags, determine the structure of the document. These can have ((child node))s. An example of such a node is `document.body`. Some of these children can be ((leaf node))s, such as pieces of ((text)) or ((comment)) nodes.
+Те ж саме стосується і DOM. Вузли для _((element))s_, які представляють теги HTML, визначають структуру документа. Вони можуть мати ((дочірній вузол))s. Прикладом такого вузла є `document.body`. Деякі з цих дочірніх вузлів можуть бути ((листовий вузол)), наприклад, частини вузлів ((текст)) або ((коментар)).
 
-{{index "text node", element, "ELEMENT_NODE code", "COMMENT_NODE code", "TEXT_NODE code", "nodeType property"}}
+{{index «text node», element, «ELEMENT_NODE code», «COMMENT_NODE code», «TEXT_NODE code», «nodeType property»}}
 
-Each DOM node object has a `nodeType` property, which contains a code (number) that identifies the type of node. Elements have code 1, which is also defined as the constant property `Node.ELEMENT_NODE`. Text nodes, representing a section of text in the document, get code 3 (`Node.TEXT_NODE`). Comments have code 8 (`Node.COMMENT_NODE`).
+Кожен об'єкт DOM-вузла має властивість `nodeType`, яка містить код (число), що ідентифікує тип вузла. Елементи мають код 1, який також визначається як константна властивість `Node.ELEMENT_NODE`. Текстові вузли, що представляють фрагмент тексту в документі, отримують код 3 (`Node.TEXT_NODE`). Коментарі мають код 8 (`Node.COMMENT_NODE`).
 
-Another way to visualize our document ((tree)) is as follows:
+Інший спосіб візуалізації нашого документа ((дерево)) наступний:
 
-{{figure {url: "img/html-tree.svg", alt: "Diagram showing the HTML document as a tree, with arrows from parent nodes to child nodes", width: "8cm"}}}
+{{figure {url: «img/html-tree.svg», alt: «Діаграма, що показує HTML-документ у вигляді дерева, зі стрілками від батьківських вузлів до дочірніх», width: “8cm”}}}.
 
-The leaves are text nodes, and the arrows indicate parent-child relationships between nodes.
+Листя - це текстові вузли, а стрілки вказують на зв'язки між вузлами типу «батьки-нащадки».
 
 {{id standard}}
 
-## The standard
+## Стандарт
 
-{{index "programming language", [interface, design], [DOM, interface]}}
+{{index «мова програмування», [інтерфейс, дизайн], [DOM, інтерфейс]}}
 
-Using cryptic numeric codes to represent node types is not a very JavaScript-like thing to do. Later in this chapter, we'll see that other parts of the DOM interface also feel cumbersome and alien. This is because the DOM interface wasn't designed for JavaScript alone. Rather, it tries to be a language-neutral interface that can be used in other systems as well—not just for HTML but also for ((XML)), which is a generic ((data format)) with an HTML-like syntax.
+Використання криптографічних числових кодів для представлення типів вузлів не дуже схоже на JavaScript. Пізніше у цій главі ми побачимо, що інші частини інтерфейсу DOM також здаються громіздкими і чужорідними. Це тому, що інтерфейс DOM був розроблений не лише для JavaScript. Скоріше, він намагається бути мовно-нейтральним інтерфейсом, який можна використовувати і в інших системах, не тільки для HTML, але і для ((XML)), який є загальним ((форматом даних)) з синтаксисом, схожим на HTML.
 
-{{index consistency, integration}}
+{{послідовність індексів, інтеграція}}
 
-This is unfortunate. Standards are often useful. But in this case, the advantage (cross-language consistency) isn't all that compelling. Having an interface that is properly integrated with the language you're using will save you more time than having a familiar interface across languages.
+Це прикро. Стандарти часто бувають корисними. Але у цьому випадку перевага (міжмовна узгодженість) не є настільки переконливою. Наявність інтерфейсу, належним чином інтегрованого з мовою, якою ви користуєтеся, заощадить вам більше часу, ніж наявність знайомого інтерфейсу різними мовами.
 
-{{index "array-like object", "NodeList type"}}
+{{index «array-like object», «NodeList type»}}
 
-As an example of this poor integration, consider the `childNodes` property that element nodes in the DOM have. This property holds an array-like object with a `length` property and properties labeled by numbers to access the child nodes. But it is an instance of the `NodeList` type, not a real array, so it does not have methods such as `slice` and `map`.
+Як приклад поганої інтеграції, розглянемо властивість `childNodes`, яку мають вузли елементів у DOM. Ця властивість містить масивний об'єкт з властивістю `length` та властивостями, позначеними числами, для доступу до дочірніх вузлів. Але це екземпляр типу `NodeList`, а не справжній масив, тому він не має таких методів, як `slice` і `map`.
 
-{{index [interface, design], [DOM, construction], "side effect"}}
+{{index [інтерфейс, дизайн], [DOM, конструкція], «побічний ефект»}}
 
-Then there are issues that are simply caused by poor design. For example, there is no way to create a new node and immediately add children or ((attribute))s to it. Instead, you have to first create it and then add the children and attributes one by one, using side effects. Code that interacts heavily with the DOM tends to get long, repetitive, and ugly.
+Є проблеми, які просто викликані поганим дизайном. Наприклад, немає можливості створити новий вузол і одразу додати до нього дочірні вузли або ((атрибут))и. Натомість, ви повинні спочатку створити його, а потім додати дочірні елементи та атрибути один за одним, використовуючи побічні ефекти. Код, який інтенсивно взаємодіє з DOM, має тенденцію ставати довгим, повторюваним і потворним.
 
-{{index library}}
+{{бібліотека індексів}}
 
-But these flaws aren't fatal. Since JavaScript allows us to create our own ((abstraction))s, it is possible to design improved ways to express the operations we are performing. Many libraries intended for browser programming come with such tools.
+Але ці недоліки не є фатальними. Оскільки JavaScript дозволяє створювати власні ((абстракції)), можна розробляти кращі способи вираження операцій, які ми виконуємо. Багато бібліотек, призначених для програмування у браузері, містять такі інструменти.
 
-## Moving through the tree
+## Переміщення по дереву
 
-{{index pointer}}
+{{покажчик індексу}}
 
-DOM nodes contain a wealth of ((link))s to other nearby nodes. The following diagram illustrates these:
+Вузли DOM містять безліч посилань ((link)) на інші сусідні вузли. Наступна діаграма ілюструє це:
 
-{{figure {url: "img/html-links.svg", alt: "Diagram that shows the links between DOM nodes. The 'body' node is shown as a box, with a 'firstChild' arrow pointing at the 'h1' node at its start, a 'lastChild' arrow pointing at the last paragraph node, and 'childNodes' arrow pointing at an array of links to all its children. The middle paragraph has a 'previousSibling' arrow pointing at the node before it, a 'nextSibling' arrow to the node after it, and a 'parentNode' arrow pointing at the 'body' node.", width: "6cm"}}}
+{{figure {url: «img/html-links.svg», alt: «Діаграма, яка показує зв'язки між вузлами DOM. Вузол «body» показано у вигляді рамки зі стрілкою «firstChild», що вказує на вузол «h1» на його початку, стрілка «lastChild» - на вузол останнього абзацу, а стрілка «childNodes» - на масив посилань на всі його дочірні вузли. Середній абзац має стрілку «previousSibling», що вказує на вузол перед ним, стрілку «nextSibling» на вузол після нього і стрілку «parentNode», що вказує на вузол «body».», width: “6cm”}}}.
 
-{{index "child node", "parentNode property", "childNodes property"}}
+{{index «child node», «parentNode property», «childNodes property»}}
 
-Although the diagram shows only one link of each type, every node has a `parentNode` property that points to the node it is part of, if any. Likewise, every element node (node type 1) has a `childNodes` property that points to an ((array-like object)) holding its children.
+Хоча на діаграмі показано лише один зв'язок кожного типу, кожен вузол має властивість `parentNode`, яка вказує на вузол, частиною якого він є, якщо такий є. Аналогічно, кожен вузол-елемент (вузол типу 1) має властивість `childNodes`, яка вказує на об'єкт ((масивний об'єкт)), що містить його дочірні вузли.
 
-{{index "firstChild property", "lastChild property", "previousSibling property", "nextSibling property"}}
+{{index «firstChild property», «lastChild property», «previousSibling property», «nextSibling property»}}
 
-In theory, you could move anywhere in the tree using just these parent and child links. But JavaScript also gives you access to a number of additional convenience links. The `firstChild` and `lastChild` properties point to the first and last child elements or have the value `null` for nodes without children. Similarly, `previousSibling` and `nextSibling` point to adjacent nodes, which are nodes with the same parent that appear immediately before or after the node itself. For a first child, `previousSibling` will be null, and for a last child, `nextSibling` will be null.
+Теоретично, ви можете переміщатися будь-куди в дереві, використовуючи лише ці батьківські та дочірні посилання. Але JavaScript також надає вам доступ до низки додаткових зручних посилань. Властивості `firstChild` і `lastChild` вказують на перший і останній дочірні елементи або мають значення `null` для вузлів без дочірніх елементів. Аналогічно, властивості `previousSibling` та `nextSibling` вказують на сусідні вузли, тобто вузли з тим самим батьком, які з'являються безпосередньо перед або після самого вузла. Для першого нащадка `previousSibling` буде нульовим, а для останнього нащадка `nextSibling` буде нульовим.
 
-{{index "children property", "text node", element}}
+{{index «children property», «text node», element}}
 
-There's also the `children` property, which is like `childNodes` but contains only element (type 1) children, not other types of child nodes. This can be useful when you aren't interested in text nodes.
+Існує також властивість `children`, яка подібна до `childNodes`, але містить лише дочірні елементи (тип 1), а не інші типи дочірніх вузлів. Це може бути корисно, якщо вас не цікавлять текстові вузли.
 
-{{index "talksAbout function", recursion, [nesting, "of objects"]}}
+{{index «talksAbout function», recursion, [nesting, «of objects»]}}
 
-When dealing with a nested data structure like this one, recursive functions are often useful. The following function scans a document for ((text node))s containing a given string and returns `true` when it has found one:
+При роботі з такою вкладеною структурою даних, як ця, часто корисними є рекурсивні функції. Наступна функція сканує документ на наявність ((текстовий вузол))ів, що містять заданий рядок, і повертає `true`, якщо вона його знайшла:
 
 {{id talksAbout}}
 
-```{sandbox: "homepage"}
+```{sandbox: «homepage»}
 function talksAbout(node, string) {
   if (node.nodeType == Node.ELEMENT_NODE) {
     for (let child of node.childNodes) {
@@ -140,94 +139,94 @@ function talksAbout(node, string) {
       }
     }
     return false;
-  } else if (node.nodeType == Node.TEXT_NODE) {
+  } else if (node.nodeType == Node.TEXT_NODE) { { } return false; } else if (node.nodeType == Node.TEXT_NODE) {
     return node.nodeValue.indexOf(string) > -1;
   }
 }
 
-console.log(talksAbout(document.body, "book"));
+console.log(talksAbout(document.body, «book»));
 // → true
 ```
 
-{{index "nodeValue property"}}
+{{index «властивість nodeValue»}}
 
-The `nodeValue` property of a text node holds the string of text that it represents.
+Властивість `nodeValue` текстового вузла містить рядок тексту, який він представляє.
 
-## Finding elements
+## Пошук елементів
 
-{{index [DOM, querying], "body property", "hard-coding", [whitespace, "in HTML"]}}
+{{індекс [DOM, запит], «властивість тіла», «жорстке кодування», [пробіли, «у HTML»]}}
 
-Navigating these ((link))s among parents, children, and siblings is often useful. But if we want to find a specific node in the document, reaching it by starting at `document.body` and following a fixed path of properties is a bad idea. Doing so bakes assumptions into our program about the precise structure of the document—a structure you might want to change later. Another complicating factor is that text nodes are created even for the whitespace between nodes. The example document's `<body>` tag has not just three children (`<h1>` and two `<p>` elements), but seven: those three, plus the spaces before, after, and between them.
+Навігація за цими ((посиланнями)) між батьками, дітьми та братами і сестрами часто буває корисною. Але якщо ми хочемо знайти певний вузол у документі, починати пошук з `document.body` і йти по фіксованому шляху властивостей - погана ідея. Це створює у нашій програмі припущення про точну структуру документа - структуру, яку ви, можливо, захочете змінити пізніше. Іншим ускладнюючим фактором є те, що текстові вузли створюються навіть для пробілів між вузлами. Тег `<body>` у прикладі документа має не три дочірні елементи (`<h1>` і два елементи `<p>`), а сім: ці три елементи, а також пробіли перед, після і між ними.
 
-{{index "search problem", "href attribute", "getElementsByTagName method"}}
+{{index «search problem», «href attribute», «getElementsByTagName method»}}
 
-If we want to get the `href` attribute of the link in that document, we don't want to say something like "Get the second child of the sixth child of the document body". It'd be better if we could say "Get the first link in the document". And we can.
+Якщо ми хочемо отримати атрибут `href` посилання в цьому документі, ми не хочемо говорити щось на кшталт «Отримати другий дочірній елемент шостого дочірнього елемента тіла документа». Було б краще, якби ми могли сказати «Отримати перше посилання у документі». І ми можемо це зробити.
 
-```{sandbox: "homepage"}
-let link = document.body.getElementsByTagName("a")[0];
+```{sandbox: «домашня сторінка»}
+let link = document.body.getElementsByTagName(«a»)[0];
 console.log(link.href);
 ```
 
-{{index "child node"}}
+{{index «child node»}}
 
-All element nodes have a `getElementsByTagName` method, which collects all elements with the given tag name that are descendants (direct or indirect children) of that node and returns them as an ((array-like object)).
+Усі вузли елементів мають метод `getElementsByTagName`, який збирає всі елементи з заданою назвою тегу, що є нащадками (прямими або непрямими нащадками) цього вузла, і повертає їх у вигляді об'єкта типу масив).
 
-{{index "id attribute", "getElementById method"}}
+{{index «атрибут id», «метод getElementById»}}
 
-To find a specific _single_ node, you can give it an `id` attribute and use `document.getElementById` instead.
+Щоб знайти конкретний _окремий_ вузол, ви можете надати йому атрибут `id` і замість цього використовувати `document.getElementById`.
 
 ```{lang: html}
-<p>My ostrich Gertrude:</p>
-<p><img id="gertrude" src="img/ostrich.png"></p>
+<p>Мій страус Гертруда:</p>
+<p><img id=«gertrude» src=«img/ostrich.png»></p>
 
 <script>
-  let ostrich = document.getElementById("gertrude");
+  let ostrich = document.getElementById(«gertrude»);
   console.log(ostrich.src);
 </script>
 ```
 
-{{index "getElementsByClassName method", "class attribute"}}
+{{index «метод getElementsByClassName», «атрибут класу»}}
 
-A third, similar method is `getElementsByClassName`, which, like `getElementsByTagName`, searches through the contents of an element node and retrieves all elements that have the given string in their `class` attribute.
+Третій, схожий метод - `getElementsByClassName`, який, як і `getElementsByTagName`, шукає вміст вузла елементів і повертає всі елементи, які мають заданий рядок у своєму атрибуті `class`.
 
-## Changing the document
+## Зміна документа
 
-{{index "side effect", "removeChild method", "appendChild method", "insertBefore method", [DOM, construction], [DOM, modification]}}
+{{index «side effect», «removeChild метод», «appendChild метод», «insertBefore метод», [DOM, побудова], [DOM, модифікація]}}
 
-Almost everything about the DOM data structure can be changed. The shape of the document tree can be modified by changing parent-child relationships. Nodes have a `remove` method to remove them from their current parent node. To add a child node to an element node, we can use `appendChild`, which puts it at the end of the list of children, or `insertBefore`, which inserts the node given as the first argument before the node given as the second argument.
+Майже все в структурі даних DOM можна змінювати. Форма дерева документа може бути змінена шляхом зміни відношень між батьком і дочірнім елементом. Вузли мають метод `remove` для видалення їх від поточного батьківського вузла. Щоб додати дочірній вузол до вузла-елемента, можна використати `appendChild`, який додає його в кінець списку дочірніх вузлів, або `insertBefore`, який вставляє вузол, заданий як перший аргумент, перед вузлом, заданим як другий аргумент.
 
 ```{lang: html}
-<p>One</p>
-<p>Two</p>
-<p>Three</p>
+<p>Один</p>
+<p>Два</p>
+<p>Три</p>
 
-<script>
-  let paragraphs = document.body.getElementsByTagName("p");
+<скрипт
+  let paragraphs = document.body.getElementsByTagName(«p»);
   document.body.insertBefore(paragraphs[2], paragraphs[0]);
-</script>
+</script> </script> </script> </script> </script> </script> <
 ```
 
-A node can exist in the document in only one place. Thus, inserting paragraph _Three_ in front of paragraph _One_ will first remove it from the end of the document and then insert it at the front, resulting in _Three_/_One_/_Two_. All operations that insert a node somewhere will, as a ((side effect)), cause it to be removed from its current position (if it has one).
+Вузол може існувати в документі тільки в одному місці. Таким чином, вставка абзацу _Три_ перед абзацом _Один_ спочатку видалить його з кінця документа, а потім вставить на початку, в результаті чого вийде _Три_/_Один_/_Два_. Усі операції, які вставляють вузол кудись, як ((побічний ефект)) призведуть до його видалення з поточної позиції (якщо вона є).
 
-{{index "insertBefore method", "replaceChild method"}}
+{{index «insertBefore метод», «replaceChild метод»}}
 
-The `replaceChild` method is used to replace a child node with another one. It takes as arguments two nodes: a new node and the node to be replaced. The replaced node must be a child of the element the method is called on. Note that both `replaceChild` and `insertBefore` expect the _new_ node as their first argument.
+Метод `replaceChild` використовується для заміни дочірньої вершини на іншу. Він приймає в якості аргументів два вузли: новий вузол і вузол, який потрібно замінити. Замінюваний вузол повинен бути дочірнім елементом елемента, для якого викликається метод. Зверніть увагу, що і `replaceChild`, і `insertBefore` очікують _new_ вузол як свій перший аргумент.
 
-## Creating nodes
+## Створення вузлів
 
-{{index "alt attribute", "img (HTML tag)", "createTextNode method"}}
+{{index «атрибут alt», «img (HTML-тег)», «метод createTextNode»}}
 
-Say we want to write a script that replaces all ((image))s (`<img>` tags) in the document with the text held in their `alt` attributes, which specifies an alternative textual representation of the image. This involves not only removing the images but also adding a new text node to replace them.
+Припустимо, ми хочемо написати скрипт, який замінить усі ((image))и (теги `<img>`) у документі текстом, що міститься у їхніх атрибутах `alt`, які визначають альтернативне текстове представлення зображення. Це передбачає не лише видалення зображень, але й додавання нового текстового вузла на їх місце.
 
 ```{lang: html}
-<p>The <img src="img/cat.png" alt="Cat"> in the
-  <img src="img/hat.png" alt="Hat">.</p>
+<p>Зображення <img src=«img/cat.png» alt=«Cat»> у розділі
+  <img src=«img/hat.png» alt=«Hat»>.</p>
 
-<p><button onclick="replaceImages()">Replace</button></p>
+<p><button onclick=«replaceImages()»>Замінити</button></p></p>
 
-<script>
+<скрипт
   function replaceImages() {
-    let images = document.body.getElementsByTagName("img");
+    let images = document.body.getElementsByTagName(«img»);
     for (let i = images.length - 1; i >= 0; i--) {
       let image = images[i];
       if (image.alt) {
@@ -239,279 +238,279 @@ Say we want to write a script that replaces all ((image))s (`<img>` tags) in the
 </script>
 ```
 
-{{index "text node"}}
+{{index «text node»}}
 
-Given a string, `createTextNode` gives us a text node that we can insert into the document to make it show up on the screen.
+На основі рядка `createTextNode` створює текстовий вузол, який ми можемо вставити у документ, щоб він з'явився на екрані.
 
-{{index "live data structure", "getElementsByTagName method", "childNodes property"}}
+{{індекс «жива структура даних», «метод getElementsByTagName», «властивість childNodes»}}
 
-The loop that goes over the images starts at the end of the list. This is necessary because the node list returned by a method like `getElementsByTagName` (or a property like `childNodes`) is _live_. That is, it is updated as the document changes. If we started from the front, removing the first image would cause the list to lose its first element so that the second time the loop repeats, where `i` is 1, it would stop because the length of the collection is now also 1.
+Цикл, який перебирає зображення, починається з кінця списку. Це необхідно тому, що список вузлів, який повертається методом типу `getElementsByTagName` (або властивістю типу `childNodes`), є _живим_. Тобто, він оновлюється при зміні документа. Якби ми почали з початку, видалення першого зображення призвело б до втрати першого елемента списку, тому при другому повторенні циклу, де `i` дорівнює 1, він би зупинився, оскільки довжина колекції тепер також дорівнює 1.
 
-{{index "slice method"}}
+{{index «slice method»}}
 
-If you want a _solid_ collection of nodes, as opposed to a live one, you can convert the collection to a real array by calling `Array.from`.
+Якщо вам потрібна _суцільна_ колекція вузлів, а не жива, ви можете перетворити колекцію у справжній масив, викликавши `Array.from`.
 
 ```
-let arrayish = {0: "one", 1: "two", length: 2};
+let arrayish = {0: «one», 1: «two», length: 2};
 let array = Array.from(arrayish);
 console.log(array.map(s => s.toUpperCase()));
-// → ["ONE", "TWO"]
+// → [«ONE», «TWO»]
 ```
 
-{{index "createElement method"}}
+{{index «метод createElement»}}
 
-To create ((element)) nodes, you can use the `document.createElement` method. This method takes a tag name and returns a new empty node of the given type.
+Для створення вузлів ((element)) можна скористатися методом `document.createElement`. Цей метод отримує ім'я тегу і повертає новий порожній вузол заданого типу.
 
-{{index "Popper, Karl", [DOM, construction], "elt function"}}
+{{index «Popper, Karl», [DOM, конструкція], «elt function»}}
 
 {{id elt}}
 
-The following example defines a utility `elt`, which creates an element node and treats the rest of its arguments as children to that node. This function is then used to add an attribution to a quote.
+У наступному прикладі визначено утиліту `elt`, яка створює елемент-вузол і розглядає решту її аргументів як дочірні елементи цього вузла. Ця функція потім використовується для додавання атрибуції до цитати.
 
 ```{lang: html}
-<blockquote id="quote">
-  No book can ever be finished. While working on it we learn
-  just enough to find it immature the moment we turn away
-  from it.
-</blockquote>
+<blockquote id=«quote»>
+  Жодна книга не може бути закінчена. Працюючи над нею, ми дізнаємося
+  рівно стільки, щоб виявити її недоробленою в той момент, коли ми відвертаємось
+  від неї.
+</blockquote></blockquote>
 
 <script>
   function elt(type, ...children) {
     let node = document.createElement(type);
     for (let child of children) {
-      if (typeof child != "string") node.appendChild(child);
+      if (typeof child != «string») node.appendChild(child);
       else node.appendChild(document.createTextNode(child));
     }
     return node;
   }
 
-  document.getElementById("quote").appendChild(
-    elt("footer", "—",
-        elt("strong", "Karl Popper"),
-        ", preface to the second edition of ",
-        elt("em", "The Open Society and Its Enemies"),
-        ", 1950"));
+  document.getElementById(«quote»).appendChild(
+    elt(«footer», «-»,
+        elt(«strong», «Карл Поппер»),
+        », передмова до другого видання »,
+        elt(«em», «Відкрите суспільство та його вороги»),
+        », 1950"));
 </script>
 ```
 
 {{if book
 
-This is what the resulting document looks like:
+Ось так виглядає отриманий документ:
 
-{{figure {url: "img/blockquote.png", alt: "Rendered picture of the blockquote with attribution", width: "8cm"}}}
+{{figure {url: «img/blockquote.png», alt: «Відображене зображення блок-цитати з атрибуцією», width: “8cm”}}}}
 
 if}}
 
-## Attributes
+## Атрибути
 
-{{index "href attribute", [DOM, attributes]}}
+{{index «href attribute», [DOM, attributes]}}
 
-Some element ((attribute))s, such as `href` for links, can be accessed through a property of the same name on the element's ((DOM)) object. This is the case for most commonly used standard attributes.
+До деяких елементів ((атрибутів)), таких як `href` для посилань, можна отримати доступ через однойменну властивість на об'єкті елемента ((DOM)). Це стосується більшості стандартних атрибутів, що використовуються найчастіше.
 
-{{index "data attribute", "getAttribute method", "setAttribute method", attribute}}
+{{індекс «атрибут даних», «метод getAttribute», «метод setAttribute», атрибут}}
 
-HTML allows you to set any attribute you want on nodes. This can be useful because it allows you to store extra information in a document. To read or change custom attributes, which aren't available as regular object properties, you have to use the `getAttribute` and `setAttribute` methods.
+HTML дозволяє встановлювати на вузлах будь-які атрибути, які ви хочете. Це може бути корисно, оскільки дозволяє зберігати додаткову інформацію у документі. Щоб прочитати або змінити користувацькі атрибути, які недоступні як звичайні властивості об'єктів, вам слід скористатися методами `getAttribute` та `setAttribute`.
 
 ```{lang: html}
-<p data-classified="secret">The launch code is 00000000.</p>
-<p data-classified="unclassified">I have two feet.</p>
+<p data-classified=«secret»>Код запуску - 00000000.</p>
+<p data-classified=«unclassified»>У мене дві ноги.</p>
 
 <script>
-  let paras = document.body.getElementsByTagName("p");
+  let paras = document.body.getElementsByTagName(«p»);
   for (let para of Array.from(paras)) {
-    if (para.getAttribute("data-classified") == "secret") {
+    if (para.getAttribute(«data-classified») == «secret») {
       para.remove();
     }
   }
 </script>
 ```
 
-It is recommended to prefix the names of such made-up attributes with `data-` to ensure they do not conflict with any other attributes.
+Рекомендується додавати до назв таких вигаданих атрибутів префікс `data-`, щоб вони не конфліктували з іншими атрибутами.
 
-{{index "getAttribute method", "setAttribute method", "className property", "class attribute"}}
+{{index «метод getAttribute», «метод setAttribute», «властивість className», «атрибут класу»}}
 
-There is a commonly used attribute, `class`, which is a ((keyword)) in the JavaScript language. For historical reasons—some old JavaScript implementations could not handle property names that matched keywords—the property used to access this attribute is called `className`. You can also access it under its real name, `"class"`, with the `getAttribute` and `setAttribute` methods.
+Існує загальновживаний атрибут `class`, який є ((ключовим словом)) у мові JavaScript. З історичних причин - деякі старі реалізації JavaScript не могли обробляти назви властивостей, що збігаються з ключовими словами - властивість, яка використовується для доступу до цього атрибута, називається `className`. Ви також можете отримати доступ до нього за його справжньою назвою, `«class»`, за допомогою методів `getAttribute` та `setAttribute`.
 
-## Layout
+## Розмітка
 
-{{index layout, "block element", "inline element", "p (HTML tag)", "h1 (HTML tag)", "a (HTML tag)", "strong (HTML tag)"}}
+{{index layout, «block element», «inline element», «p (HTML tag)», «h1 (HTML tag)», «a (HTML tag)», «strong (HTML tag)»}}
 
-You may have noticed that different types of elements are laid out differently. Some, such as paragraphs (`<p>`) or headings (`<h1>`), take up the whole width of the document and are rendered on separate lines. These are called _block_ elements. Others, such as links (`<a>`) or the `<strong>` element, are rendered on the same line with their surrounding text. Such elements are called _inline_ elements.
+Ви могли помітити, що різні типи елементів розміщуються по-різному. Деякі з них, такі як абзаци (`<p>`) або заголовки (`<h1>`), займають всю ширину документа і виводяться в окремих рядках. Це так звані _блокові_ елементи. Інші, такі як посилання (`<a>`) або елемент `<strong>`, виводяться в одному рядку з навколишнім текстом. Такі елементи називаються _вбудованими_ елементами.
 
-{{index drawing}}
+{{малювання індексів}}
 
-For any given document, browsers are able to compute a layout, which gives each element a size and position based on its type and content. This layout is then used to actually draw the document.
+Для будь-якого документа браузери здатні обчислити макет, який надає кожному елементу розмір і позицію на основі його типу і вмісту. Цей макет потім використовується для фактичного малювання документа.
 
-{{index "border (CSS)", "offsetWidth property", "offsetHeight property", "clientWidth property", "clientHeight property", dimensions}}
+{{index «border (CSS)», «offsetWidth property», «offsetHeight property», «clientWidth property», «clientHeight property», dimensions}}
 
-The size and position of an element can be accessed from JavaScript. The `offsetWidth` and `offsetHeight` properties give you the space the element takes up in _((pixel))s_. A pixel is the basic unit of measurement in the browser. It traditionally corresponds to the smallest dot that the screen can draw, but on modern displays, which can draw _very_ small dots, that may no longer be the case, and a browser pixel may span multiple display dots.
+Розмір та положення елемента можна отримати з JavaScript. Властивості `offsetWidth` та `offsetHeight` дають вам простір, який займає елемент у _((пікселях))s_. Піксель - це основна одиниця вимірювання в браузері. Традиційно він відповідає найменшій точці, яку може намалювати екран, але на сучасних дисплеях, які можуть малювати _дуже_ маленькі точки, це вже не так, і піксель браузера може охоплювати декілька точок дисплея.
 
-Similarly, `clientWidth` and `clientHeight` give you the size of the space _inside_ the element, ignoring border width.
+Аналогічно, `clientWidth` і `clientHeight` дають вам розмір простору _всередині_ елемента, ігноруючи ширину межі.
 
 ```{lang: html}
-<p style="border: 3px solid red">
-  I'm boxed in
+<p style="border: 3px solid red">>></p
+  Я замкнений в рамки
 </p>
 
-<script>
-  let para = document.body.getElementsByTagName("p")[0];
-  console.log("clientHeight:", para.clientHeight);
+<скрипт
+  нехай para = document.body.getElementsByTagName(«p»)[0];
+  console.log(«clientHeight:», para.clientHeight);
   // → 19
-  console.log("offsetHeight:", para.offsetHeight);
+  console.log(«offsetHeight:», para.offsetHeight);
   // → 25
-</script>
+</script> </script> </script> </script> </script> </script> <
 ```
 
 {{if book
 
-Giving a paragraph a border causes a rectangle to be drawn around it.
+Якщо надати абзацу рамку, навколо нього буде намальовано прямокутник.
 
-{{figure {url: "img/boxed-in.png", alt: "Rendered picture of a paragraph with a border", width: "8cm"}}}
+{{figure {url: «img/boxed-in.png», alt: «Зображення абзацу з рамкою», width: “8cm”}}}}
 
 if}}
 
-{{index "getBoundingClientRect method", position, "pageXOffset property", "pageYOffset property"}}
+{{index «getBoundingClientRect method», position, «pageXOffset property», «pageYOffset property»}}
 
 {{id boundingRect}}
 
-The most effective way to find the precise position of an element on the screen is the `getBoundingClientRect` method. It returns an object with `top`, `bottom`, `left`, and `right` properties, indicating the pixel positions of the sides of the element relative to the upper left of the screen. If you want pixel positions relative to the whole document, you must add the current scroll position, which you can find in the `pageXOffset` and `pageYOffset` bindings.
+Найефективнішим способом знайти точну позицію елемента на екрані є метод `getBoundingClientRect`. Він повертає об'єкт з властивостями `top`, `bottom`, `left` і `right`, які вказують на піксельні позиції сторін елемента відносно лівого верхнього кута екрана. Якщо ви хочете отримати позиції пікселів відносно всього документа, вам слід додати поточну позицію прокрутки, яку можна знайти у прив'язках `pageXOffset` та `pageYOffset`.
 
-{{index "offsetHeight property", "getBoundingClientRect method", drawing, laziness, performance, efficiency}}
+{{index «offsetHeight property», «getBoundingClientRect method», drawing, laziness, performance, efficiency}}
 
-Laying out a document can be quite a lot of work. In the interest of speed, browser engines do not immediately re-layout a document every time you change it but wait as long as they can before doing so. When a JavaScript program that changed the document finishes running, the browser will have to compute a new layout to draw the changed document to the screen. When a program _asks_ for the position or size of something by reading properties such as `offsetHeight` or calling `getBoundingClientRect`, providing that information also requires computing a ((layout)).
+Верстка документа може бути досить трудомістким процесом. В інтересах швидкості движки браузерів не перекомпонують документ одразу після внесення змін, а чекають стільки часу, скільки зможуть, перш ніж це зробити. Коли JavaScript-програма, яка змінила документ, завершує роботу, браузеру доводиться обчислювати новий макет, щоб відобразити змінений документ на екрані. Коли програма _запитує_ позицію або розмір чогось, зчитуючи властивості, такі як `offsetHeight` або викликаючи `getBoundingClientRect`, надання цієї інформації також вимагає обчислення ((макет)).
 
-{{index "side effect", optimization, benchmark}}
+{{індекс «побічний ефект», оптимізація, бенчмарк}}
 
-A program that repeatedly alternates between reading DOM layout information and changing the DOM forces a lot of layout computations to happen and will consequently run very slowly. The following code is an example of this. It contains two different programs that build up a line of _X_ characters 2,000 pixels wide and measures the time each one takes.
+Програма, яка постійно чергує читання інформації про макет DOM зі зміною DOM, змушує виконувати багато обчислень макета і, як наслідок, працюватиме дуже повільно. Наступний код є прикладом цього. Він містить дві різні програми, які будують рядок з _X_ символів шириною 2,000 пікселів і вимірюють час, який займає кожна з них.
 
 ```{lang: html, test: nonumbers}
-<p><span id="one"></span></p>
-<p><span id="two"></span></p>
+<p><span id=«one»></span></p></p>
+<p><span id=«two»></span></p></p>
 
 <script>
   function time(name, action) {
-    let start = Date.now(); // Current time in milliseconds
+    let start = Date.now(); // Поточний час в мілісекундах
     action();
-    console.log(name, "took", Date.now() - start, "ms");
+    console.log(name, «took», Date.now() - start, «ms»);
   }
 
-  time("naive", () => {
-    let target = document.getElementById("one");
-    while (target.offsetWidth < 2000) {
-      target.appendChild(document.createTextNode("X"));
+  time(«naive», () => {})
+    let target = document.getElementById(«one»);
+    while (target.offsetWidth < 2000) { { target.appendChild(target.offsetWidth)
+      target.appendChild(document.createTextNode(«X»));
     }
   });
-  // → naive took 32 ms
+  // → naive зайняв 32 мс
 
-  time("clever", function() {
-    let target = document.getElementById("two");
-    target.appendChild(document.createTextNode("XXXXX"));
+  time(«clever», function() {
+    let target = document.getElementById(«two»);
+    target.appendChild(document.createTextNode(«XXXXX»));
     let total = Math.ceil(2000 / (target.offsetWidth / 5));
-    target.firstChild.nodeValue = "X".repeat(total);
+    target.firstChild.nodeValue = «X».repeat(total);
   });
-  // → clever took 1 ms
-</script>
+  // → clever зайняв 1 мс
+</script></script>
 ```
 
-## Styling
+## Стилізація
 
-{{index "block element", "inline element", style, "strong (HTML tag)", "a (HTML tag)", underline}}
+{{index «block element», «inline element», style, «strong (HTML tag)», «a (HTML tag)», underline}}
 
-We have seen that different HTML elements are drawn differently. Some are displayed as blocks, others inline. Some add styling—`<strong>` makes its content ((bold)), and `<a>` makes it blue and underlines it.
+Ми бачили, що різні елементи HTML відображаються по-різному. Деякі з них відображаються як блоки, інші як вбудовані. Деякі додають стиль - `<strong>` робить вміст напівжирним, а `<a>` робить його синім і підкреслює.
 
-{{index "img (HTML tag)", "default behavior", "style attribute"}}
+{{index «img (HTML-тег)», «поведінка за замовчуванням», «атрибут стилю»}}
 
-The way an `<img>` tag shows an image or an `<a>` tag causes a link to be followed when it is clicked is strongly tied to the element type. But we can change the styling associated with an element, such as the text color or underline. Here is an example that uses the `style` property:
+Те, як тег `<img>` показує зображення, або тег `<a>` викликає перехід за посиланням при натисканні на нього, сильно залежить від типу елемента. Але ми можемо змінити стиль, пов'язаний з елементом, наприклад, колір тексту або підкреслення. Ось приклад використання властивості `style`:
 
 ```{lang: html}
-<p><a href=".">Normal link</a></p>
-<p><a href="." style="color: green">Green link</a></p>
+<p><a href=«.»>Звичайне посилання</a></p></p>
+<p><a href=«.» style=«color: green»>Зелене посилання</a></p>
 ```
 
 {{if book
 
-The second link will be green instead of the default link color:
+Друге посилання буде зеленим замість стандартного кольору посилання:
 
-{{figure {url: "img/colored-links.png", alt: "Rendered picture of a normal blue link and a styled green link", width: "2.2cm"}}}
+{{figure {url: «img/colored-links.png», alt: «Зображення звичайного синього посилання та стилізованого зеленого посилання», width: “2.2cm”}}}}
 
 if}}
 
-{{index "border (CSS)", "color (CSS)", CSS, "colon character"}}
+{{index «border (CSS)», «color (CSS)», CSS, «символ двокрапки»}}
 
-A style attribute may contain one or more _((declaration))s_, which are a property (such as `color`) followed by a colon and a value (such as `green`). When there is more than one declaration, they must be separated by ((semicolon))s, as in `"color: red; border: none"`.
+Атрибут стилю може містити одну або більше _((декларацій))s_, які є властивістю (наприклад, `color`), за якою слідує двокрапка і значення (наприклад, `green`). Якщо оголошень більше одного, їх слід розділяти ((крапкою з комою))s, як у `«color: red; border: none»`.
 
-{{index "display (CSS)", layout}}
+{{index «display (CSS)», layout}}
 
-A lot of aspects of the document can be influenced by styling. For example, the `display` property controls whether an element is displayed as a block or an inline element.
+На багато аспектів документа можна впливати за допомогою стилів. Наприклад, властивість `display` визначає, чи буде елемент відображатися як блок або як вбудований елемент.
 
 ```{lang: html}
-This text is displayed <strong>inline</strong>,
-<strong style="display: block">as a block</strong>, and
-<strong style="display: none">not at all</strong>.
+Цей текст відображається <strong>вбудовано</strong>,
+<strong style=«display: block»>як блок</strong>, і
+<strong style=«display: none»>зовсім</strong>.
 ```
 
-{{index "hidden element"}}
+{{index «hidden element»}}
 
-The `block` tag will end up on its own line, since ((block element))s are not displayed inline with the text around them. The last tag is not displayed at all—`display: none` prevents an element from showing up on the screen. This is a way to hide elements. It is often preferable to removing them from the document entirely because it makes it easy to reveal them again later.
+Тег `block` буде виведено у власному рядку, оскільки ((блок-елемент))и не виводяться в лінію з текстом навколо них. Останній тег не відображається взагалі - `display: none` запобігає відображенню елемента на екрані. Це спосіб приховати елементи. Часто він є кращим за повне вилучення елементів з документа, оскільки дозволяє легко показати їх пізніше.
 
 {{if book
 
-{{figure {url: "img/display.png", alt: "Different display styles", width: "4cm"}}}
+{{figure {url: «img/display.png», alt: «Різні стилі відображення», width: “4cm”}}}}
 
 if}}
 
-{{index "color (CSS)", "style attribute"}}
+{{index «color (CSS)», «style attribute»}}
 
-JavaScript code can directly manipulate the style of an element through the element's `style` property. This property holds an object that has properties for all possible style properties. The values of these properties are strings, which we can write to in order to change a particular aspect of the element's style.
+Код JavaScript може безпосередньо маніпулювати стилем елемента через властивість `style` елемента. Ця властивість містить об'єкт, який має властивості для всіх можливих властивостей стилю. Значення цих властивостей є рядками, які ми можемо записати, щоб змінити певний аспект стилю елемента.
 
 ```{lang: html}
-<p id="para" style="color: purple">
-  Nice text
+<p id=«para» style=«color: purple»>
+  Гарний текст
 </p>
 
 <script>
-  let para = document.getElementById("para");
+  let para = document.getElementById(«para»);
   console.log(para.style.color);
-  para.style.color = "magenta";
-</script>
+  para.style.color = «magenta»;
+</script> </script> </script> </script> </script> </script> </script
 ```
 
-{{index "camel case", capitalization, "hyphen character", "font-family (CSS)"}}
+{{index «camel case», capitalization, «hyphen character», «font-family (CSS)»}}
 
-Some style property names contain hyphens, such as `font-family`. Because such property names are awkward to work with in JavaScript (you'd have to say `style["font-family"]`), the property names in the `style` object for such properties have their hyphens removed and the letters after them capitalized (`style.fontFamily`).
+Деякі назви властивостей стилів містять дефіси, наприклад, `font-family`. Оскільки з такими назвами властивостей незручно працювати у JavaScript (вам доведеться сказати `style[«font-family»]`), у назвах властивостей в об'єкті `style` для таких властивостей дефіси видалено, а літери, що стоять після них, взято з великої літери (`style.fontFamily`).
 
-## Cascading styles
+## Каскадні стилі
 
-{{index "rule (CSS)", "style (HTML tag)"}}
+{{index «правило (CSS)», «стиль (HTML-тег)»}}
 
-{{indexsee "Cascading Style Sheets", CSS}}
-{{indexsee "style sheet", CSS}}
+{{indexsee «каскадні таблиці стилів», CSS}}
+{{indexsee «таблиця стилів», CSS}}
 
-The styling system for HTML is called _((CSS))_, for _Cascading Style Sheets_. A _style sheet_ is a set of rules for how to style elements in a document. It can be given inside a `<style>` tag.
+Система стилів для HTML називається _((CSS))_, для _каскадних таблиць стилів_. Таблиця_стилів_ - це набір правил для стилізації елементів у документі. Вона може бути задана всередині тегу `<style>`.
 
 ```{lang: html}
 <style>
-  strong {
+  strong {{lang: html}
     font-style: italic;
     color: gray;
   }
-</style>
-<p>Now <strong>strong text</strong> is italic and gray.</p>
+</style></style>
+<p>Тепер <strong>сильний текст</strong> виділено курсивом і сірим кольором.</p>
 ```
 
-{{index "rule (CSS)", "font-weight (CSS)", overlay}}
+{{index «rule (CSS)», «font-weight (CSS)», overlay}}
 
-The _((cascading))_ in the name refers to the fact that multiple such rules are combined to produce the final style for an element. In the example, the default styling for `<strong>` tags, which gives them `font-weight: bold`, is overlaid by the rule in the `<style>` tag, which adds `font-style` and `color`.
+_((каскадний))_ у назві вказує на те, що декілька таких правил комбінуються для створення остаточного стилю для елемента. У прикладі стиль за замовчуванням для тегів `<strong>`, який надає їм `font-weight: bold`, накладається на правило у тезі `<style>`, яке додає `font-style` і `color`.
 
-{{index "style (HTML tag)", "style attribute"}}
+{{index «style (HTML-тег)», «атрибут стилю»}}
 
-When multiple rules define a value for the same property, the most recently read rule gets a higher ((precedence)) and wins. For example, if the rule in the `<style>` tag included `font-weight: normal`, contradicting the default `font-weight` rule, the text would be normal, _not_ bold. Styles in a `style` attribute applied directly to the node have the highest precedence and always win.
+Коли декілька правил визначають значення для однієї властивості, правило, яке було прочитано останнім, отримує вищий пріоритет і перемагає. Наприклад, якщо правило у тезі `<style>` містить `font-weight: normal`, що суперечить правилу за замовчуванням `font-weight`, текст буде звичайним, _не_ напівжирним. Стилі в атрибуті `style`, застосовані безпосередньо до вузла, мають найвищий пріоритет і завжди перемагають.
 
-{{index uniqueness, "class attribute", "id attribute"}}
+{{індекс унікальності, «атрибут класу», «атрибут id»}}
 
-It is possible to target things other than ((tag)) names in CSS rules. A rule for `.abc` applies to all elements with `"abc"` in their `class` attribute. A rule for `#xyz` applies to the element with an `id` attribute of `"xyz"` (which should be unique within the document).
+У правилах CSS можна націлюватись на речі, відмінні від імен ((тегів)). Правило для `.abc` застосовується до всіх елементів з `.abc` в атрибуті `class`. Правило для `#xyz` застосовується до елементів з атрибутом `id`, що має значення `«xyz»` (який має бути унікальним у документі).
 
-```{lang: "css"}
+```{lang: «css"}
 .subtle {
   color: gray;
   font-size: 80%;
@@ -520,208 +519,208 @@ It is possible to target things other than ((tag)) names in CSS rules. A rule fo
   background: blue;
   color: white;
 }
-/* p elements with id main and with classes a and b */
+/* елементи p з ідентифікатором main та класами a і b */
 p#main.a.b {
   margin-bottom: 20px;
 }
 ```
 
-{{index "rule (CSS)"}}
+{{index «rule (CSS)»}}
 
-The ((precedence)) rule favoring the most recently defined rule applies only when the rules have the same _((specificity))_. A rule's specificity is a measure of how precisely it describes matching elements, determined by the number and kind (tag, class, or ID) of element aspects it requires. For example, a rule that targets `p.a` is more specific than rules that target `p` or just `.a` and would thus take precedence over them.
+Правило ((пріоритету)), яке надає перевагу останньому визначеному правилу, застосовується лише тоді, коли правила мають однакову _((специфічність))_. Специфічність правила - це міра того, наскільки точно воно описує відповідні елементи, що визначається кількістю і типом (тег, клас або ідентифікатор) аспектів елементів, яких воно вимагає. Наприклад, правило, яке визначає `p.a`, є більш специфічним, ніж правила, які визначають `p` або просто `.a`, і, отже, матиме пріоритет над ними.
 
-{{index "direct child node"}}
+{{index «прямий дочірній вузол»}}
 
-The notation `p > a {…}` applies the given styles to all `<a>` tags that are direct children of `<p>` tags. Similarly, `p a {…}` applies to all `<a>` tags inside `<p>` tags, whether they are direct or indirect children.
+Запис `p > a {...}` застосовує задані стилі до всіх тегів `<a>`, які є прямими нащадками тегів `<p>`. Аналогічно, `p a {...}` застосовується до всіх тегів `<a>` всередині тегів `<p>`, незалежно від того, чи є вони прямими або непрямими нащадками.
 
-## Query selectors
+## Селектори запитів
 
-{{index complexity, CSS, "domain-specific language", [DOM, querying]}}
+{{складність індексу, CSS, «мова, специфічна для домену», [DOM, запити]}}
 
-We won't be using style sheets very much in this book. Understanding them is helpful when programming in the browser, but they are complicated enough to warrant a separate book. The main reason I introduced _((selector))_ syntax—the notation used in style sheets to determine which elements a set of styles apply to—is that we can use this same mini-language as an effective way to find DOM elements.
+У цій книзі ми не будемо часто використовувати таблиці стилів. Розуміння їх корисно при програмуванні в браузері, але вони досить складні і заслуговують на окрему книгу. Основна причина, чому я ввів синтаксис _((селектор))_ - позначення, що використовується в таблицях стилів для визначення того, до яких елементів застосовується набір стилів - полягає в тому, що ми можемо використовувати цю ж міні-мову як ефективний спосіб пошуку елементів DOM.
 
-{{index "querySelectorAll method", "NodeList type"}}
+{{index «querySelectorAll method», «NodeList type»}}
 
-The `querySelectorAll` method, which is defined both on the `document` object and on element nodes, takes a selector string and returns a `NodeList` containing all the elements that it matches.
+Метод `querySelectorAll`, який визначено як на об'єкті `document`, так і на вузлах елементів, отримує рядок-селектор і повертає `NodeList`, що містить усі елементи, яким він відповідає.
 
 ```{lang: html}
-<p>And if you go chasing
-  <span class="animal">rabbits</span></p>
-<p>And you know you're going to fall</p>
-<p>Tell 'em a <span class="character">hookah smoking
-  <span class="animal">caterpillar</span></span></p>
-<p>Has given you the call</p>
+<p>А якщо ви підете в погоню за
+  <span class=«animal»>кроликів</span></p></p>
+<p>І знаєш, що впадеш</p>
+<p>Скажи їм, що курить кальян
+  <span class=«animal»>гусінь</span></span></p>
+<p>Дзвонила тобі</p>
 
 <script>
   function count(selector) {
     return document.querySelectorAll(selector).length;
   }
-  console.log(count("p"));           // All <p> elements
+  console.log(count(«p»)); // Усі елементи <p>
   // → 4
-  console.log(count(".animal"));     // Class animal
+  console.log(count(«.animal»)); // Клас animal
   // → 2
-  console.log(count("p .animal"));   // Animal inside of <p>
+  console.log(count(«p .animal»)); // Тварина всередині <p>
   // → 2
-  console.log(count("p > .animal")); // Direct child of <p>
+  console.log(count(«p > .animal»)); // Прямий нащадок <p>
   // → 1
-</script>
+</script> </script> </script> </script> </script> </script> </script
 ```
 
-{{index "live data structure"}}
+{{index «жива структура даних»}}
 
-Unlike methods such as `getElementsByTagName`, the object returned by `querySelectorAll` is _not_ live. It won't change when you change the document. It is still not a real array, though, so you need to call `Array.from` if you want to treat it like one.
+На відміну від таких методів, як `getElementsByTagName`, об'єкт, який повертає `querySelectorAll`, _не_ є живим. Він не зміниться, коли ви зміните документ. Однак це все ще не справжній масив, тому вам потрібно викликати `Array.from`, якщо ви хочете поводитися з ним як з масивом.
 
-{{index "querySelector method"}}
+{{index «метод querySelector»}}
 
-The `querySelector` method (without the `All` part) works in a similar way. This one is useful if you want a specific single element. It will return only the first matching element, or `null` when no element matches.
+Метод `querySelector` (без частини `All`) працює подібним чином. Він корисний, якщо вам потрібен конкретний єдиний елемент. Він поверне лише перший знайдений елемент або `null`, якщо не буде знайдено жодного елемента.
 
 {{id animation}}
 
-## Positioning and animating
+## Позиціонування та анімація
 
-{{index "position (CSS)", "relative positioning", "top (CSS)", "left (CSS)", "absolute positioning"}}
+{{index «position (CSS)», «відносне позиціонування», «top (CSS)», «left (CSS)», «абсолютне позиціонування»}}
 
-The `position` style property influences layout in a powerful way. It has a default value of `static`, meaning the element sits in its normal place in the document. When it is set to `relative`, the element still takes up space in the document, but now the `top` and `left` style properties can be used to move it relative to that normal place. When `position` is set to `absolute`, the element is removed from the normal document flow—that is, it no longer takes up space and may overlap with other elements. Its `top` and `left` properties can be used to absolutely position it relative to the upper-left corner of the nearest enclosing element whose `position` property isn't `static`, or relative to the document if no such enclosing element exists.
+Властивість стилю `position` має потужний вплив на верстку. За замовчуванням вона має значення `static`, що означає, що елемент розташовується на своєму звичайному місці в документі. Коли їй встановлено значення `relative`, елемент все одно займає місце у документі, але тепер властивості стилю `top` і `left` можна використовувати для його переміщення відносно цього звичайного місця. Коли `position` має значення `absolute`, елемент вилучається зі звичайного потоку документа - тобто він більше не займає місця і може перекриватися з іншими елементами. Його властивості `top` і `left` можна використовувати для абсолютного позиціонування відносно лівого верхнього кута найближчого елемента, що охоплює, властивість `position` якого не є `статичною`, або відносно документа, якщо такого елемента, що охоплює, не існує.
 
-{{index [animation, "spinning cat"]}}
+{{index [animation, «spinning cat»]}}
 
-We can use this to create an animation. The following document displays a picture of a cat that moves around in an ((ellipse)):
+Ми можемо використати це для створення анімації. У наступному документі показано зображення кота, який рухається по ((еліпсу)):
 
 ```{lang: html, startCode: true}
-<p style="text-align: center">
-  <img src="img/cat.png" style="position: relative">
+<p style=«text-align: center»>
+  <img src=«img/cat.png» style=«position: relative»>
 </p>
 <script>
-  let cat = document.querySelector("img");
+  let cat = document.querySelector(«img»);
   let angle = Math.PI / 2;
   function animate(time, lastTime) {
     if (lastTime != null) {
       angle += (time - lastTime) * 0.001;
     }
-    cat.style.top = (Math.sin(angle) * 20) + "px";
-    cat.style.left = (Math.cos(angle) * 200) + "px";
+    cat.style.top = (Math.sin(angle) * 20) + «px»;
+    cat.style.left = (Math.cos(angle) * 200) + «px»;
     requestAnimationFrame(newTime => animate(newTime, time));
   }
   requestAnimationFrame(animate);
-</script>
+</script> </span> </span> </span> </span> </p
 ```
 
 {{if book
 
-The gray arrow shows the path along which the image moves.
+Сіра стрілка показує шлях, яким рухається зображення.
 
-{{figure {url: "img/cat-animation.png", alt: "A diagram showing a picture of a cat with a circular arrow indicating its motion", width: "8cm"}}}
+{{figure {url: «img/cat-animation.png», alt: «Діаграма, що показує зображення кота з круговою стрілкою, що вказує його рух», width: “8cm”}}}}
 
 if}}
 
-{{index "top (CSS)", "left (CSS)", centering, "relative positioning"}}
+{{index «top (CSS)», «left (CSS)», centering, «relative positioning»}}
 
-Our picture is centered on the page and given a `position` of `relative`. We'll repeatedly update that picture's `top` and `left` styles to move it.
+Наше зображення вирівняно по центру сторінки і йому присвоєно `позицію` `відносне`. Ми неодноразово оновлюватимемо стилі `top` та `left` цього зображення, щоб перемістити його.
 
-{{index "requestAnimationFrame function", drawing, animation}}
+{{index «requestAnimationFrame function», drawing, animation}}
 
 {{id animationFrame}}
 
-The script uses `requestAnimationFrame` to schedule the `animate` function to run whenever the browser is ready to repaint the screen. The `animate` function itself again calls `requestAnimationFrame` to schedule the next update. When the browser window (or tab) is active, this will cause updates to happen at a rate of about 60 per second, which tends to produce a good-looking animation.
+Скрипт використовує `requestAnimationFrame` для планування запуску функції `animate` щоразу, коли браузер буде готовий перефарбувати екран. Сама функція `animate` знову викликає `requestAnimationFrame` для планування наступного оновлення. Коли вікно (або вкладка) браузера активне, це призведе до оновлення зі швидкістю близько 60 за секунду, що, як правило, створює гарну анімацію.
 
-{{index timeline, blocking}}
+{{Часова шкала індексів, блокування}}
 
-If we just updated the DOM in a loop, the page would freeze, and nothing would show up on the screen. Browsers do not update their display while a JavaScript program is running, nor do they allow any interaction with the page. This is why we need `requestAnimationFrame`—it lets the browser know that we are done for now, and it can go ahead and do the things that browsers do, such as updating the screen and responding to user actions.
+Якби ми просто оновлювали DOM у циклі, сторінка застигла б, і на екрані нічого не відобразилося б. Браузери не оновлюють відображення під час виконання JavaScript-програми, а також не дозволяють ніякої взаємодії зі сторінкою. Ось чому нам потрібен `requestAnimationFrame` - він дає браузеру знати, що ми закінчили, і він може продовжувати робити те, що роблять браузери, наприклад, оновлювати екран і реагувати на дії користувача.
 
-{{index "smooth animation"}}
+{{index «smooth animation»}}
 
-The animation function is passed the current ((time)) as an argument. To ensure that the motion of the cat per millisecond is stable, it bases the speed at which the angle changes on the difference between the current time and the last time the function ran. If it just moved the angle by a fixed amount per step, the motion would stutter when, for example, another heavy task running on the same computer prevented the function from running for a fraction of a second.
+Функції анімації передається поточний ((час)) як аргумент. Щоб забезпечити стабільність руху кота в мілісекунду, вона базує швидкість зміни кута на різниці між поточним часом і останнім запуском функції. Якби вона просто змінювала кут на фіксовану величину за крок, то рух затинався б, коли, наприклад, інша важка задача, запущена на тому ж комп'ютері, заважала функції працювати на долю секунди.
 
-{{index "Math.cos function", "Math.sin function", cosine, sine, trigonometry}}
+{{index «Math.cos function», «Math.sin function», косинус, синус, тригонометрія}}
 
 {{id sin_cos}}
 
-Moving in ((circle))s is done using the trigonometry functions `Math.cos` and `Math.sin`. For those who aren't familiar with these, I'll briefly introduce them, since we will occasionally use them in this book.
+Переміщення по ((колу))s здійснюється за допомогою тригонометричних функцій `Math.cos` та `Math.sin`. Для тих, хто не знайомий з цими функціями, я коротко опишу їх, оскільки ми будемо час від часу використовувати їх у цій книзі.
 
-{{index coordinates, pi}}
+{{індексні координати, pi}}
 
-`Math.cos` and `Math.sin` are useful for finding points that lie on a circle around point (0, 0) with a radius of 1. Both functions interpret their argument as the position on this circle, with 0 denoting the point on the far right of the circle, going clockwise until 2π (about 6.28) has taken us around the whole circle. `Math.cos` tells you the x-coordinate of the point that corresponds to the given position, and `Math.sin` yields the y-coordinate. Positions (or angles) greater than 2π or less than 0 are valid—the rotation repeats so that _a_+2π refers to the same ((angle)) as _a_.
+Функції `Math.cos` і `Math.sin` корисні для пошуку точок, які лежать на колі навколо точки (0, 0) радіусом 1. Обидві функції інтерпретують свій аргумент як положення на цьому колі, де 0 позначає точку на крайньому правому краю кола, і рухаються за годинниковою стрілкою, доки 2π (приблизно 6.28) не обійде все коло. Команда `Math.cos` показує координату x точки, яка відповідає даній позиції, а команда `Math.sin` - координату y. Позиції (або кути), більші за 2π або менші за 0, вважаються дійсними - обертання повторюється так, що _a_+2π відноситься до того самого ((кута)), що й _a_.
 
-{{index "PI constant"}}
+{{індекс «постійна ПІ»}}
 
-This unit for measuring angles is called ((radian))s—a full circle is 2π radians, similar to how it is 360 degrees when measuring in degrees. The constant π is available as `Math.PI` in JavaScript.
+Ця одиниця вимірювання кутів називається ((радіан))s - повне коло дорівнює 2π радіан, подібно до того, як 360 градусів при вимірюванні в градусах. Константа π доступна як `Math.PI` у JavaScript.
 
-{{figure {url: "img/cos_sin.svg", alt: "Diagram showing the use of cosine and sine to compute coordinates. A circle with radius 1 is shown with two points on it. The angle from the right side of the circle to the point, in radians, is used to compute the position of each point by using 'cos(angle)' for the horizontal distance from the center of the circle and sin(angle) for the vertical distance.", width: "6cm"}}}
+{{figure {url: «img/cos_sin.svg», alt: «Діаграма, що показує використання косинуса і синуса для обчислення координат. Показано коло радіусом 1 з двома точками на ньому. Кут від правої сторони кола до точки, в радіанах, використовується для обчислення положення кожної точки, використовуючи 'cos(кут)' для горизонтальної відстані від центру кола і sin(кут) для вертикальної відстані.», width: “6cm”}}}
 
-{{index "counter variable", "Math.sin function", "top (CSS)", "Math.cos function", "left (CSS)", ellipse}}
+{{index «змінна-лічильник», «Math.sin функція», «top (CSS)», «Math.cos функція», «left (CSS)», ellipse}}
 
-The cat animation code keeps a counter, `angle`, for the current angle of the animation and increments it every time the `animate` function is called. It can then use this angle to compute the current position of the image element. The `top` style is computed with `Math.sin` and multiplied by 20, which is the vertical radius of our ellipse. The `left` style is based on `Math.cos` and multiplied by 200 so that the ellipse is much wider than it is high.
+Код анімації кота зберігає лічильник `angle` для поточного кута анімації і збільшує його кожного разу, коли викликається функція `animate`. Потім він може використовувати цей кут для обчислення поточної позиції елемента зображення. Стиль `top` обчислюється за допомогою функції `Math.sin` і множиться на 20, що є вертикальним радіусом нашого еліпса. Стиль `left` базується на `Math.cos` і множиться на 200, щоб еліпс був значно ширшим, ніж високим.
 
-{{index "unit (CSS)"}}
+{{index «unit (CSS)»}}
 
-Note that styles usually need _units_. In this case, we have to append `"px"` to the number to tell the browser that we are counting in ((pixel))s (as opposed to centimeters, "ems", or other units). This is easy to forget. Using numbers without units will result in your style being ignored—unless the number is 0, which always means the same thing, regardless of its unit.
+Зверніть увагу, що стилям зазвичай потрібні _одиниці_. У цьому випадку ми повинні додати `«px»` до числа, щоб сказати браузеру, що ми рахуємо в ((пікселях))s (на відміну від сантиметрів, «емс» або інших одиниць). Це легко забути. Використання чисел без одиниць виміру призведе до того, що ваш стиль буде проігноровано - за винятком числа 0, яке завжди означає одне й те саме, незалежно від одиниці виміру.
 
-## Summary
+## Підсумок
 
-JavaScript programs may inspect and interfere with the document that the browser is displaying through a data structure called the DOM. This data structure represents the browser's model of the document, and a JavaScript program can modify it to change the visible document.
+Програми на JavaScript можуть перевіряти і втручатися в документ, який відображається браузером, через структуру даних, яка називається DOM. Ця структура даних представляє модель документа, що відображається браузером, і JavaScript-програма може модифікувати її, щоб змінити видимий документ.
 
-The DOM is organized like a tree, where elements are arranged hierarchically according to the structure of the document. The objects representing elements have properties such as `parentNode` and `childNodes`, which can be used to navigate through this tree.
+DOM організована як дерево, де елементи розташовані ієрархічно відповідно до структури документа. Об'єкти, що представляють елементи, мають такі властивості, як `parentNode` і `childNode`, які можна використовувати для навігації по цьому дереву.
 
-The way a document is displayed can be influenced by _styling_, both by attaching styles to nodes directly and by defining rules that match certain nodes. There are many different style properties, such as `color` or `display`. JavaScript code can manipulate an element's style directly through its `style` property.
+На спосіб відображення документа можна впливати за допомогою _стилів_, як шляхом додавання стилів безпосередньо до вузлів, так і шляхом визначення правил, які відповідають певним вузлам. Існує багато різних властивостей стилів, таких як `color` або `display`. Код JavaScript може маніпулювати стилем елемента безпосередньо через його властивість `style`.
 
-## Exercises
+## Вправи
 
 {{id exercise_table}}
 
-### Build a table
+### Створити таблицю
 
-{{index "table (HTML tag)"}}
+{{index «table (HTML-тег)»}}
 
-An HTML table is built with the following tag structure:
+HTML-таблиця будується з наступною структурою тегів:
 
 ```{lang: html}
-<table>
-  <tr>
+<table
+  <tr> <tr>
     <th>name</th>
     <th>height</th>
-    <th>place</th>
-  </tr>
+    <th>місце</th>
+  
   <tr>
-    <td>Kilimanjaro</td>
+    <td>Кіліманджаро</td>
     <td>5895</td>
-    <td>Tanzania</td>
-  </tr>
+    <td>Танзанія</td>
+  </tr> </li> </li> <li>Танзанія
 </table>
 ```
 
-{{index "tr (HTML tag)", "th (HTML tag)", "td (HTML tag)"}}
+{{index «tr (HTML-тег)», «th (HTML-тег)», «td (HTML-тег)»}}
 
-For each _((row))_, the `<table>` tag contains a `<tr>` tag. Inside of these `<tr>` tags, we can put cell elements: either heading cells (`<th>`) or regular cells (`<td>`).
+Для кожного _((рядка))_ тег `<table>` містить тег `<tr>`. Всередині цих тегів `<tr>` ми можемо розмістити елементи комірок: або заголовки (`<th>`), або звичайні комірки (`<td>`).
 
-Given a dataset of mountains, an array of objects with `name`, `height`, and `place` properties, generate the DOM structure for a table that enumerates the objects. It has one column per key and one row per object, plus a header row with `<th>` elements at the top, listing the column names.
+За заданим набором даних про гори, масивом об'єктів з властивостями `name`, `height` і `place`, згенеруйте DOM-структуру для таблиці, яка перераховує ці об'єкти. Вона має один стовпець на ключ і один рядок на об'єкт, а також рядок заголовка з елементами `<th>` у верхній частині, де перераховано назви стовпців.
 
-Write this so that the columns are automatically derived from the objects, by taking the property names of the first object in the data.
+Напишіть так, щоб стовпці автоматично отримувалися з об'єктів, беручи назви властивостей першого об'єкта у даних.
 
-Show the resulting table in the document by appending it to the element that has an `id` attribute of `"mountains"`.
+Покажіть отриману таблицю у документі, додавши її до елемента з атрибутом `id`, що має значення `«mountains»`.
 
-{{index "right-aligning", "text-align (CSS)"}}
+{{index «right-aligning», «text-align (CSS)»}}
 
-Once you have this working, right-align cells that contain number values by setting their `style.textAlign` property to `"right"`.
+Після того, як це спрацює, вирівняйте комірки, що містять числові значення, по правому краю, встановивши їхню властивість `style.textAlign` у значення `«right»`.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no, lang: html}
-<h1>Mountains</h1>
+<h1>Гори</h1>
 
-<div id="mountains"></div>
+<div id=«mountains»></div>
 
 <script>
   const MOUNTAINS = [
-    {name: "Kilimanjaro", height: 5895, place: "Tanzania"},
-    {name: "Everest", height: 8848, place: "Nepal"},
-    {name: "Mount Fuji", height: 3776, place: "Japan"},
-    {name: "Vaalserberg", height: 323, place: "Netherlands"},
-    {name: "Denali", height: 6168, place: "United States"},
-    {name: "Popocatepetl", height: 5465, place: "Mexico"},
-    {name: "Mont Blanc", height: 4808, place: "Italy/France"}
+    {name: «Кіліманджаро», height: 5895, place: «Танзанія"},
+    {назва: «Еверест», висота: 8848, місце: «Непал»}, {назва: «Еверест», висота: 8848, місце: «Непал"},
+    {Назва: «Гора Фудзі», висота: 3776, місце: «Японія"},
+    {назва: «Ваалсерберг», висота: 323, місце: «Нідерланди"},
+    {Назва: «Деналі», висота: 6168, місце: «Сполучені Штати"},
+    {name: «Popocatepetl», height: 5465, place: «Мексика"},
+    {назва: «Mont Blanc», висота: 4808, місце: «Італія/Франція"}}
   ];
 
-  // Your code here
+  // Ваш код тут
 </script>
 ```
 
@@ -729,101 +728,101 @@ if}}
 
 {{hint
 
-{{index "createElement method", "table example", "appendChild method"}}
+{{index «метод createElement», «приклад таблиці», «метод appendChild»}}
 
-You can use `document.createElement` to create new element nodes, `document.createTextNode` to create text nodes, and the `appendChild` method to put nodes into other nodes.
+Ви можете використовувати `document.createElement` для створення нових вузлів елементів, `document.createTextNode` для створення текстових вузлів і метод `appendChild` для вставки вузлів в інші вузли.
 
-{{index "Object.keys function"}}
+{{index «Object.keys function»}}
 
-You'll want to loop over the key names once to fill in the top row and then again for each object in the array to construct the data rows. To get an array of key names from the first object, `Object.keys` will be useful.
+Вам потрібно буде виконати цикл над іменами ключів один раз, щоб заповнити верхній рядок, а потім повторити його для кожного об'єкта у масиві, щоб побудувати рядки даних. Щоб отримати масив імен ключів з першого об'єкта, скористайтеся функцією `Object.keys`.
 
-{{index "getElementById method", "querySelector method"}}
+{{index «метод getElementById», «метод querySelector»}}
 
-To add the table to the correct parent node, you can use `document.getElementById` or `document.querySelector` with `"#mountains"` to find the node.
+Щоб додати таблицю до правильного батьківського вузла, ви можете використати `document.getElementById` або `document.querySelector` з `«#mountains»` для пошуку вузла.
 
-hint}}
+підказка}}
 
-### Elements by tag name
+### Елементи за назвою тегу
 
-{{index "getElementsByTagName method", recursion}}
+{{index «getElementsByTagName метод», рекурсія}}
 
-The `document.getElementsByTagName` method returns all child elements with a given tag name. Implement your own version of this as a function that takes a node and a string (the tag name) as arguments and returns an array containing all descendant element nodes with the given tag name. Your function should go through the document itself. It may not use a method like `querySelectorAll` to do the work.
+Метод `document.getElementsByTagName` повертає всі дочірні елементи з заданою назвою тегу. Реалізуйте власну версію цього методу у вигляді функції, яка приймає вузол і рядок (ім'я тегу) як аргументи і повертає масив, що містить усі вузли нащадків елементів із заданим ім'ям тегу. Ваша функція повинна проходити через сам документ. Вона не може використовувати метод типу `querySelectorAll` для виконання роботи.
 
-{{index "nodeName property", capitalization, "toLowerCase method", "toUpperCase method"}}
+{{індекс «властивість nodeName», великі літери, «метод toLowerCase», «метод toUpperCase»}}
 
-To find the tag name of an element, use its `nodeName` property. But note that this will return the tag name in all uppercase. Use the `toLowerCase` or `toUpperCase` string methods to compensate for this.
+Щоб знайти ім'я тегу елемента, використовуйте його властивість `nodeName`. Але зауважте, що вона поверне назву тегу у верхньому регістрі. Використовуйте рядкові методи `toLowerCase` або `toUpperCase`, щоб компенсувати це.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{lang: html, test: no}
-<h1>Heading with a <span>span</span> element.</h1>
-<p>A paragraph with <span>one</span>, <span>two</span>
-  spans.</p>
+<h1>Заголовок з елементом <span>span</span>.</h1>
+<p>Абзац з <span>одним</span>, <span>двома</span>
+  проміжками.</p>
 
-<script>
+<скрипт
   function byTagName(node, tagName) {
-    // Your code here.
+    // Ваш код тут.
   }
 
-  console.log(byTagName(document.body, "h1").length);
+  console.log(byTagName(document.body, «h1»).length);
   // → 1
-  console.log(byTagName(document.body, "span").length);
+  console.log(byTagName(document.body, «span»).length);
   // → 3
-  let para = document.querySelector("p");
-  console.log(byTagName(para, "span").length);
+  нехай para = document.querySelector(«p»);
+  console.log(byTagName(para, «span»).length);
   // → 2
-</script>
+</script> </span> </span> </span> </span> </span
 ```
 if}}
 
 {{hint
 
-{{index "getElementsByTagName method", recursion}}
+{{index «метод getElementsByTagName», рекурсія}}
 
-The solution is most easily expressed with a recursive function, similar to the [`talksAbout` function](dom#talksAbout) defined earlier in this chapter.
+Розв'язок найпростіше виразити за допомогою рекурсивної функції, подібної до функції [`talksAbout`](dom#talksAbout), визначеної раніше у цій главі.
 
-{{index concatenation, "concat method", closure}}
+{{індексна конкатенація, «метод конкатенації», закриття}}
 
-You could call `byTagname` itself recursively, concatenating the resulting arrays to produce the output. Or you could create an inner function that calls itself recursively and that has access to an array binding defined in the outer function, to which it can add the matching elements it finds. Don't forget to call the ((inner function)) once from the outer function to start the process.
+Ви можете викликати саму функцію `byTagname` рекурсивно, конкатенуючи отримані масиви для отримання результату. Або ви можете створити внутрішню функцію, яка викликає себе рекурсивно і має доступ до прив'язки масиву, визначеної у зовнішній функції, до якої вона може додавати знайдені елементи, що збігаються. Не забудьте викликати ((внутрішню функцію)) один раз із зовнішньої функції, щоб запустити процес.
 
-{{index "nodeType property", "ELEMENT_NODE code"}}
+{{index «властивість nodeType», «код ELEMENT_NODE»}}
 
-The recursive function must check the node type. Here we are interested only in node type 1 (`Node.ELEMENT_NODE`). For such nodes, we must loop over their children and, for each child, see whether the child matches the query while also doing a recursive call on it to inspect its own children.
+Рекурсивна функція повинна перевіряти тип вузла. Тут нас цікавить лише вузол типу 1 (`Node.ELEMENT_NODE`). Для таких вузлів ми повинні переглянути їхніх дочірніх елементів і для кожного дочірнього елемента перевірити, чи відповідає він запиту, а також виконати рекурсивний виклик для перевірки його власних дочірніх елементів.
 
-hint}}
+підказка}}
 
-### The cat's hat
+### Котячий капелюх
 
-{{index "cat's hat (exercise)", [animation, "spinning cat"]}}
+{{index «котячий капелюх (вправа)», [animation, «кіт, що крутиться»]}}
 
-Extend the cat animation defined [earlier](dom#animation) so that both the cat and his hat (`<img src="img/hat.png">`) orbit at opposite sides of the ellipse.
+Розширте анімацію кота, визначену [раніше](dom#animation), так, щоб і кіт, і його капелюх (`<img src=«img/hat.png»>`) оберталися на протилежних сторонах еліпса.
 
-Or make the hat circle around the cat. Or alter the animation in some other interesting way.
+Або зробіть так, щоб капелюх обертався навколо кота. Або змініть анімацію якимось іншим цікавим чином.
 
-{{index "absolute positioning", "top (CSS)", "left (CSS)", "position (CSS)"}}
+{{index «абсолютне позиціонування», «top (CSS)», «left (CSS)», «position (CSS)»}}
 
-To make positioning multiple objects easier, you'll probably want to switch to absolute positioning. This means that `top` and `left` are counted relative to the upper left of the document. To avoid using negative coordinates, which would cause the image to move outside of the visible page, you can add a fixed number of pixels to the position values.
+Щоб полегшити позиціонування декількох об'єктів, ви, ймовірно, захочете перейти до абсолютного позиціонування. Це означає, що «верхній» і «лівий» відраховуватимуться відносно лівого верхнього кута документа. Щоб уникнути використання від'ємних координат, які можуть призвести до переміщення зображення за межі видимої сторінки, ви можете додати до значень позицій фіксовану кількість пікселів.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{lang: html, test: no}
-<style>body { min-height: 200px }</style>
-<img src="img/cat.png" id="cat" style="position: absolute">
-<img src="img/hat.png" id="hat" style="position: absolute">
+<style>body { min-height: 200px }</style></style>
+<img src=«img/cat.png» id=«cat» style=«position: absolute»>
+<img src=«img/hat.png» id=«hat» style=«position: absolute»>
 
-<script>
-  let cat = document.querySelector("#cat");
-  let hat = document.querySelector("#hat");
+<скрипт
+  let cat = document.querySelector(«#cat»);
+  let hat = document.querySelector(«#hat»);
 
   let angle = 0;
   let lastTime = null;
   function animate(time) {
     if (lastTime != null) angle += (time - lastTime) * 0.001;
     lastTime = time;
-    cat.style.top = (Math.sin(angle) * 40 + 40) + "px";
-    cat.style.left = (Math.cos(angle) * 200 + 230) + "px";
+    cat.style.top = (Math.sin(angle) * 40 + 40) + «px»;
+    cat.style.left = (Math.cos(angle) * 200 + 230) + «px»;
 
-    // Your extensions here.
+    // Ваші розширення тут.
 
     requestAnimationFrame(animate);
   }
@@ -833,8 +832,8 @@ To make positioning multiple objects easier, you'll probably want to switch to a
 
 if}}
 
-{{hint
+{{підказка
 
-`Math.cos` and `Math.sin` measure angles in radians, where a full circle is 2π. For a given angle, you can get the opposite angle by adding half of this, which is `Math.PI`. This can be useful for putting the hat on the opposite side of the orbit.
+Функції `Math.cos` та `Math.sin` вимірюють кути у радіанах, де повне коло дорівнює 2π. Для заданого кута ви можете отримати протилежний кут, додавши половину цього кута, тобто `Math.PI`. Це може бути корисно для розміщення капелюха на протилежному боці орбіти.
 
-hint}}
+підказка}}

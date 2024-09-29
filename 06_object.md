@@ -1,83 +1,83 @@
-{{meta {load_files: ["code/chapter/06_object.js"], zip: "node/html"}}}
+{{meta {load_files: [«code/chapter/06_object.js»], zip: «node/html"}}}
 
-# The Secret Life of Objects
+# Таємне життя об'єктів
 
-{{quote {author: "Barbara Liskov", title: "Programming with Abstract Data Types", chapter: true}
+{{quote {автор: «Barbara Liskov», title: 
 
-An abstract data type is realized by writing a special kind of program […] which defines the type in terms of the operations which can be performed on it.
+Абстрактний тип даних реалізується шляхом написання спеціального виду програми [...], яка визначає тип в термінах операцій, які можна над ним виконувати.
 
 quote}}
 
-{{index "Liskov, Barbara", "abstract data type"}}
+{{index «Liskov, Barbara», «abstract data type»}}
 
-{{figure {url: "img/chapter_picture_6.jpg", alt: "Illustration of a rabbit next to its prototype, a schematic representation of a rabbit", chapter: framed}}}
+{{figure {url: «img/chapter_picture_6.jpg», alt: «Ілюстрація кролика поруч з його прототипом, схематичним зображенням кролика», chapter: framed}}}
 
-[Chapter ?](data) introduced JavaScript's objects as containers that hold other data. In programming culture, _((object-oriented programming))_ is a set of techniques that use objects as the central principle of program organization. Though no one really agrees on its precise definition, object-oriented programming has shaped the design of many programming languages, including JavaScript. This chapter describes the way these ideas can be applied in JavaScript.
+[Глава ?](дані) представила об'єкти JavaScript як контейнери, що містять інші дані. У культурі програмування _((об'єктно-орієнтоване програмування))_ - це набір методів, які використовують об'єкти як центральний принцип організації програм. Хоча ніхто не має точного визначення, об'єктно-орієнтоване програмування визначило дизайн багатьох мов програмування, включаючи JavaScript. У цій главі описано, як ці ідеї можна застосувати у JavaScript.
 
-## Abstract Data Types
+## Абстрактні типи даних
 
-{{index "abstract data type", type, "mixer example"}}
+{{index «abstract data type», type, «mixer example»}}
 
-The main idea in object-oriented programming is to use objects, or rather _types_ of objects, as the unit of program organization. Setting up a program as a number of strictly separated object types provides a way to think about its structure and thus to enforce some kind of discipline, preventing everything from becoming entangled.
+Основна ідея об'єктно-орієнтованого програмування полягає у використанні об'єктів, а точніше _типів_ об'єктів, як одиниці організації програми. Створення програми як низки строго відокремлених типів об'єктів дає змогу думати про її структуру і, таким чином, забезпечувати певну дисципліну, запобігаючи переплутуванню.
 
-The way to do this is to think of objects somewhat like you'd think of an electric mixer or other consumer ((appliance)). The people who design and assemble a mixer have to do specialized work requiring material science and understanding of electricity. They cover all that up in a smooth plastic shell so that the people who only want to mix pancake batter don't have to worry about all that—they have to understand only the few knobs that the mixer can be operated with.
+Спосіб зробити це - думати про об'єкти приблизно так, як ви думаєте про електричний міксер або інший споживач ((прилад)). Люди, які проектують і збирають змішувач, мають виконувати спеціалізовану роботу, що вимагає матеріалознавства і розуміння електрики. Вони ховають все це в гладку пластикову оболонку, щоб люди, які хочуть лише замісити тісто для млинців, не турбувалися про все це - вони повинні розуміти лише кілька ручок, за допомогою яких можна керувати міксером.
 
-{{index "class"}}
+{{index «class»}}
 
-Similarly, an _abstract data type_, or _object class_, is a subprogram that may contain arbitrarily complicated code but exposes a limited set of methods and properties that people working with it are supposed to use. This allows large programs to be built up out of a number of appliance types, limiting the degree to which these different parts are entangled by requiring them to only interact with each other in specific ways.
+Аналогічно, _абстрактний тип даних_, або _об'єктний клас_, - це підпрограма, яка може містити як завгодно складний код, але розкриває обмежений набір методів і властивостей, які повинні використовувати люди, що працюють з нею. Це дозволяє створювати великі програми з декількох типів пристроїв, обмежуючи ступінь переплетення цих різних частин, вимагаючи, щоб вони взаємодіяли один з одним лише певними способами.
 
-{{index encapsulation, isolation, modularity}}
+{Інкапсуляція, ізоляція, модульність}}
 
-If a problem is found in one such object class, it can often be repaired or even completely rewritten without impacting the rest of the program. Even better, it may be possible to use object classes in multiple different programs, avoiding the need to recreate their functionality from scratch. You can think of JavaScript's built-in data structures, such as arrays and strings, as such reusable abstract data types.
+Якщо проблему виявлено в одному з таких класів об'єктів, його часто можна виправити або навіть повністю переписати, не впливаючи на решту програми. Навіть краще, можна використовувати об'єктні класи в декількох різних програмах, уникаючи необхідності відтворювати їх функціональність з нуля. Ви можете думати про вбудовані структури даних JavaScript, такі як масиви та рядки, як про такі багаторазові абстрактні типи даних.
 
-{{id interface}}
-{{index [interface, object]}}
+{{id інтерфейсу}}
+{{index [інтерфейс, об'єкт]}}
 
-Each abstract data type has an _interface_, the collection of operations that external code can perform on it. Any details beyond that interface are _encapsulated_, treated as internal to the type and of no concern to the rest of the program.
+Кожен абстрактний тип даних має _інтерфейс_- набір операцій, які може виконувати над ним зовнішній код. Будь-які деталі, що виходять за межі цього інтерфейсу,  інкапсулюються, розглядаються як внутрішні дані типу і не мають відношення до решти програми.
 
-Even basic things like numbers can be thought of as an abstract data type whose interface allows us to add them, multiply them, compare them, and so on. In fact, the fixation on single _objects_ as the main unit of organization in classical object-oriented programming is somewhat unfortunate since useful pieces of functionality often involve a group of different object classes working closely together.
+Навіть такі базові речі, як числа, можна розглядати як абстрактний тип даних, інтерфейс якого дозволяє їх додавати, множити, порівнювати тощо. Насправді, зацикленість на окремих _об'єктах_ як основній одиниці організації у класичному об'єктно-орієнтованому програмуванні є дещо невдалою, оскільки корисні частини функціональності часто включають групу різних класів об'єктів, що тісно співпрацюють між собою.
 
 {{id obj_methods}}
 
-## Methods
+## Методи
 
-{{index "rabbit example", method, [property, access]}}
+{{index «rabbit example», method, [property, access]}}
 
-In JavaScript, methods are nothing more than properties that hold function values. This is a simple method:
+У JavaScript методи - це не що інше, як властивості, які зберігають значення функцій. Це простий метод:
 
-```{includeCode: "top_lines:6"}
+```{includeCode: «top_lines:6"}}
 function speak(line) {
-  console.log(`The ${this.type} rabbit says '${line}'`);
+  console.log(`Кролик ${this.type} говорить '${line}'`);
 }
-let whiteRabbit = {type: "white", speak};
-let hungryRabbit = {type: "hungry", speak};
+let whiteRabbit = {type: «white», speak};
+let hungryRabbit = {type: «hungry», speak};
 
-whiteRabbit.speak("Oh my fur and whiskers");
-// → The white rabbit says 'Oh my fur and whiskers'
-hungryRabbit.speak("Got any carrots?");
-// → The hungry rabbit says 'Got any carrots?'
+whiteRabbit.speak(«Oh my fur and whiskers»);
+// → Білий кролик каже «Oh my fur and whiskers
+hungryRabbit.speak(«Got any carrots?»);
+// → Голодний кролик каже: «Є морква?
 ```
 
-{{index "this binding", "method call"}}
+{{index «this binding», «method call»}}
 
-Typically a method needs to do something with the object on which it was called. When a function is called as a method—looked up as a property and immediately called, as in `object.method()`—the binding called `this` in its body automatically points at the object on which it was called.
+Зазвичай метод повинен щось зробити з об'єктом, на якому його було викликано. Коли функція викликається як метод - шукається як властивість і одразу ж викликається, як у `object.method()`, - прив'язка з назвою `this` у її тілі автоматично вказує на об'єкт, на якому її було викликано.
 
 {{id call_method}}
 
-{{index "call method"}}
+{{index «метод_виклику»}}
 
-You can think of `this` as an extra ((parameter)) that is passed to the function in a different way than regular parameters. If you want to provide it explicitly, you can use a function's `call` method, which takes the `this` value as its first argument and treats further arguments as normal parameters.
+Ви можете думати про `this` як про додатковий ((параметр)), який передається у функцію не так, як звичайні параметри. Якщо ви хочете надати його явно, ви можете використати метод `call` функції, який отримує значення `this` як перший аргумент і обробляє подальші аргументи як звичайні параметри.
 
 ```
-speak.call(whiteRabbit, "Hurry");
-// → The white rabbit says 'Hurry'
+speak.call(whiteRabbit, «Поспішай»);
+// → Білий кролик каже «Поспішай
 ```
 
-Since each function has its own `this` binding whose value depends on the way it is called, you cannot refer to the `this` of the wrapping scope in a regular function defined with the `function` keyword.
+Оскільки кожна функція має власне прив'язування `this`, значення якого залежить від способу її виклику, ви не можете звертатися до `this` області видимості обгортки у звичайній функції, визначеній за допомогою ключового слова `function`.
 
-{{index "this binding", "arrow function"}}
+{{index «this binding», «arrow function»}}
 
-Arrow functions are different—they do not bind their own `this` but can see the `this` binding of the scope around them. Thus, you can do something like the following code, which references `this` from inside a local function:
+Функції-стрілки відрізняються - вони не зв'язують власне `this`, але можуть бачити зв'язування `this` області видимості навколо себе. Таким чином, ви можете зробити щось на кшталт наступного коду, який посилається на `this` зсередини локальної функції:
 
 ```
 let finder = {
@@ -90,35 +90,35 @@ console.log(finder.find([4, 5]));
 // → true
 ```
 
-A property like `find(array)` in an object expression is a shorthand way of defining a method. It creates a property called `find` and gives it a function as its value.
+Властивість типу `find(array)` в об'єктному виразі є скороченим способом визначення методу. Вона створює властивість з іменем `find` і передає їй функцію як значення.
 
-If I had written the argument to `some` using the `function` keyword, this code wouldn't work.
+Якби я записав аргумент до `ome` з використанням ключового слова `function`, цей код не працював би.
 
 {{id prototypes}}
 
-## Prototypes
+## Прототипи
 
-One way to create a rabbit object type with a `speak` method would be to create a helper function that has a rabbit type as its parameter and returns an object holding that as its `type` property and our speak function in its `speak` property.
+Одним із способів створити тип об'єкта rabbit з методом `speak` може бути створення допоміжної функції, яка має тип rabbit як параметр і повертає об'єкт, що має цей тип у властивості `type` і нашу функцію speak у властивості `speak`.
 
-All rabbits share that same method. Especially for types with many methods, it would be nice if there were a way to keep a type's methods in a single place, rather than adding them to each object individually.
+Усі кролики використовують один і той самий метод. Особливо для типів з багатьма методами було б добре, якби існував спосіб зберігати методи типу в одному місці, а не додавати їх до кожного об'єкта окремо.
 
-{{index [property, inheritance], [object, property], "Object prototype"}}
+{{індекс [властивість, успадкування], [об'єкт, властивість], «Прототип об'єкта»}}
 
-In JavaScript, _((prototype))s_ are the way to do that. Objects can be linked to other objects, to magically get all the properties that other object has. Plain old objects created with `{}` notation are linked to an object called `Object.prototype`.
+У JavaScript, _((прототип))s_ - це спосіб зробити це. Об'єкти можуть бути пов'язані з іншими об'єктами, щоб чарівним чином отримати всі властивості, які має інший об'єкт. Старі добрі об'єкти, створені за допомогою нотації `{}`, зв'язуються з об'єктом, який називається `Object.prototype`.
 
-{{index "toString method"}}
+{{index «toString method»}}
 
 ```
 let empty = {};
 console.log(empty.toString);
-// → function toString(){…}
+// → функція toString(){...}
 console.log(empty.toString());
-// → [object Object]
+// → [об'єкт Object]
 ```
 
-It looks like we just pulled a property out of an empty object. But in fact, `toString` is a method stored in `Object.prototype`, meaning it is available in most objects.
+Виглядає так, ніби ми просто витягли властивість з порожнього об'єкту. Але насправді, `toString` - це метод, що зберігається в `Object.prototype`, тобто він доступний у більшості об'єктів.
 
-When an object gets a request for a property that it doesn't have, its prototype will be searched for the property. If that doesn't have it, the _prototype's_ prototype is searched, and so on until an object without prototype is reached (`Object.prototype` is such an object).
+Коли об'єкт отримує запит на властивість, якої у нього немає, він шукає цю властивість у своєму прототипі. Якщо його немає, шукається прототип _прототипу_, і так далі, доки не буде знайдено об'єкт без прототипу (`Object.prototype` є таким об'єктом).
 
 ```
 console.log(Object.getPrototypeOf({}) == Object.prototype);
@@ -127,13 +127,13 @@ console.log(Object.getPrototypeOf(Object.prototype));
 // → null
 ```
 
-{{index "getPrototypeOf function"}}
+{{index «getPrototypeOf функції»}}
 
-As you'd guess, `Object.getPrototypeOf` returns the prototype of an object.
+Як ви можете здогадатися, `Object.getPrototypeOf` повертає прототип об'єкту.
 
-{{index inheritance, "Function prototype", "Array prototype", "Object prototype"}}
+{{спадкування індексу, «прототип функції», «прототип масиву», «прототип об'єкта»}}
 
-Many objects don't directly have `Object.prototype` as their ((prototype)) but instead have another object that provides a different set of default properties. Functions derive from `Function.prototype` and arrays derive from `Array.prototype`.
+Багато об'єктів не мають безпосередньо `Object.prototype` як свого ((прототипу)), а натомість мають інший об'єкт, який надає інший набір властивостей за замовчуванням. Функції походять від `Function.prototype`, а масиви - від `Array.prototype`.
 
 ```
 console.log(Object.getPrototypeOf(Math.max) ==
@@ -143,45 +143,45 @@ console.log(Object.getPrototypeOf([]) == Array.prototype);
 // → true
 ```
 
-{{index "Object prototype"}}
+{{index «Object prototype»}}
 
-Such a prototype object will itself have a prototype, often `Object.prototype`, so that it still indirectly provides methods like `toString`.
+Такий об'єкт-прототип сам матиме прототип, найчастіше `Object.prototype`, так що він все одно опосередковано надає методи на кшталт `toString`.
 
-{{index "rabbit example", "Object.create function"}}
+{{index «rabbit example», «Object.create function»}}
 
-You can use `Object.create` to create an object with a specific ((prototype)).
+Ви можете використовувати `Object.create` для створення об'єкта за певним ((прототипом)).
 
-```{includeCode: "top_lines: 7"}
+```{includeCode: «top_lines: 7"}
 let protoRabbit = {
   speak(line) {
-    console.log(`The ${this.type} rabbit says '${line}'`);
+    console.log(`Кролик ${this.type} говорить '${line}'`);
   }
 };
-let blackRabbit = Object.create(protoRabbit);
-blackRabbit.type = "black";
-blackRabbit.speak("I am fear and darkness");
-// → The black rabbit says 'I am fear and darkness'
+нехай blackRabbit = Object.create(protoRabbit);
+blackRabbit.type = «black»;
+blackRabbit.speak(«Я - страх і темрява»);
+// → Чорний кролик говорить «Я є страх і темрява
 ```
 
-{{index "shared property"}}
+{{index «shared property»}}
 
-The "proto" rabbit acts as a container for the properties shared by all rabbits. An individual rabbit object, like the black rabbit, contains properties that apply only to itself—in this case its type—and derives shared properties from its prototype.
+«Прото» кролик діє як контейнер для властивостей, спільних для всіх кроликів. Окремий об'єкт-кролик, наприклад, чорний кролик, містить властивості, які застосовуються лише до нього самого - у цьому випадку до його типу - і отримує спільні властивості від свого прототипу.
 
 {{id classes}}
 
-## Classes
+## Класи
 
-{{index "object-oriented programming", "abstract data type"}}
+{{index «об'єктно-орієнтоване програмування», «абстрактний тип даних»}}
 
-JavaScript's ((prototype)) system can be interpreted as a somewhat free-form take on abstract data types or ((class))es. A _class_ defines the shape of a type of object—what methods and properties it has. Such an object is called an _((instance))_ of the class.
+Систему ((прототип)) JavaScript можна інтерпретувати як дещо вільний погляд на абстрактні типи даних або ((класи)). Клас визначає форму типу об'єкта - які методи та властивості він має. Такий об'єкт називається _((екземпляром))_ класу.
 
-{{index [property, inheritance]}}
+{{індекс [властивість, успадкування]}}
 
-Prototypes are useful for defining properties for which all instances of a class share the same value. Properties that differ per instance, such as our rabbits' `type` property, need to be stored directly in the objects themselves.
+Прототипи корисні для визначення властивостей, які мають однакове значення для всіх екземплярів класу. Властивості, які відрізняються для кожного екземпляра, такі як властивість `type` наших кроликів, потрібно зберігати безпосередньо у самих об'єктах.
 
-{{id constructors}}
+{{id конструктори}}
 
-To create an instance of a given class, you have to make an object that derives from the proper prototype, but you _also_ have to make sure it itself has the properties that instances of this class are supposed to have. This is what a _((constructor))_ function does.
+Щоб створити екземпляр певного класу, вам потрібно створити об'єкт, який є похідним від відповідного прототипу, але ви _також_ повинні переконатися, що він сам має властивості, які повинні мати екземпляри цього класу. Саме цим займається функція _((конструктор))_.
 
 ```
 function makeRabbit(type) {
@@ -191,9 +191,9 @@ function makeRabbit(type) {
 }
 ```
 
-JavaScript's ((class)) notation makes it easier to define this type of function, along with a ((prototype)) object.
+Нотація ((клас)) у JavaScript полегшує визначення цього типу функцій разом з об'єктом ((прототип)).
 
-{{index "rabbit example", constructor}}
+{{index «rabbit example», constructor}}
 
 ```{includeCode: true}
 class Rabbit {
@@ -201,57 +201,57 @@ class Rabbit {
     this.type = type;
   }
   speak(line) {
-    console.log(`The ${this.type} rabbit says '${line}'`);
+    console.log(`Кролик ${this.type} говорить '${line}'`);
   }
 }
 ```
 
-{{index "prototype property", [braces, class]}}
+{{index «властивість прототипу», [дужки, клас]}}
 
-The `class` keyword starts a ((class declaration)), which allows us to define a constructor and a set of methods together. Any number of methods may be written inside the declaration's braces. This code has the effect of defining a binding called `Rabbit`, which holds a function that runs the code in `constructor` and has a `prototype` property that holds the `speak` method.
+Ключове слово `class` починає ((оголошення класу)), що дозволяє нам визначити конструктор і набір методів разом. У фігурних дужках оголошення може бути записана будь-яка кількість методів. Цей код визначає зв'язування під назвою `Rabbit`, яке містить функцію, що запускає код у `constructor` і має властивість `prototype`, яка містить метод `peak`.
 
-{{index "new operator", "this binding", [object, creation]}}
+{{index «new operator», «this binding», [object, creation]}}
 
-This function cannot be called like a normal function. Constructors, in JavaScript, are called by putting the keyword `new` in front of them. Doing so creates a fresh instance object whose prototype is the object from the function's `prototype` property, then runs the function with `this` bound to the new object, and finally returns the object.
+Цю функцію не можна викликати як звичайну функцію. Конструктори в JavaScript викликаються за допомогою ключового слова `new` перед ними. При цьому створюється новий об'єкт, прототипом якого є об'єкт з властивості `prototype` функції, потім запускається функція з `this`, прив'язаним до нового об'єкта, і нарешті повертається об'єкт.
 
 ```{includeCode: true}
-let killerRabbit = new Rabbit("killer");
+let killerRabbit = new Rabbit(«killer»);
 ```
 
-In fact, `class` was only introduced in the 2015 edition of JavaScript. Any function can be used as a constructor, and before 2015, the way to define a class was to write a regular function and then manipulate its `prototype` property.
+Насправді, `class` було введено лише у версії JavaScript 2015 року. Будь-яка функція може бути використана як конструктор, і до 2015 року спосіб визначити клас полягав у тому, щоб написати звичайну функцію, а потім маніпулювати її властивістю `prototype`.
 
 ```
 function ArchaicRabbit(type) {
   this.type = type;
 }
-ArchaicRabbit.prototype.speak = function(line) {
-  console.log(`The ${this.type} rabbit says '${line}'`);
+ArchaicRabbit.prototype.speak = function(line) { this.type = type; }
+  console.log(`Кролик ${this.type} говорить '${line}'`);
 };
-let oldSchoolRabbit = new ArchaicRabbit("old school");
+let oldSchoolRabbit = new ArchaicRabbit(«стара школа»);
 ```
 
-For this reason, all non-arrow functions start with a `prototype` property holding an empty object.
+З цієї причини всі функції, що не є стрілками, починаються з властивості `prototype`, яка містить порожній об'єкт.
 
-{{index capitalization}}
+{{капіталізація індексу}}
 
-By convention, the names of constructors are capitalized so that they can easily be distinguished from other functions.
+За домовленістю, імена конструкторів пишуться з великої літери, щоб їх можна було легко відрізнити від інших функцій.
 
-{{index "prototype property", "getPrototypeOf function"}}
+{{індекс «властивість прототипу», «getPrototypeOf function»}}
 
-It is important to understand the distinction between the way a prototype is associated with a constructor (through its `prototype` property) and the way objects _have_ a prototype (which can be found with `Object.getPrototypeOf`). The actual prototype of a constructor is `Function.prototype` since constructors are functions. The constructor function's `prototype` _property_ holds the prototype used for instances created through it.
+Важливо розуміти різницю між тим, як прототип асоціюється з конструктором (через його властивість `prototype`) і тим, як об'єкти _мають_ прототип (який можна знайти за допомогою `Object.getPrototypeOf`). Фактичним прототипом конструктора є `Function.prototype`, оскільки конструктори є функціями. Властивість `prototype` функції-конструктора містить прототип, який використовується для екземплярів, створених за її допомогою.
 
 ```
 console.log(Object.getPrototypeOf(Rabbit) ==
             Function.prototype);
 // → true
 console.log(Object.getPrototypeOf(killerRabbit) ==
-            Rabbit.prototype);
+            Кролик.прототип);
 // → true
 ```
 
-{{index constructor}}
+{{Конструктор індексу}}
 
-Constructors will typically add some per-instance properties to `this`. It is also possible to declare properties directly in the ((class declaration)). Unlike methods, such properties are added to ((instance)) objects and not the prototype.
+Конструктори зазвичай додають до `this` деякі властивості для кожного екземпляра. Також можна оголошувати властивості безпосередньо в розділі ((оголошення класу)). На відміну від методів, такі властивості додаються до об'єктів ((екземпляра)), а не до прототипу.
 
 ```
 class Particle {
@@ -262,44 +262,44 @@ class Particle {
 }
 ```
 
-Like `function`, `class` can be used both in statements and in expressions. When used as an expression, it doesn't define a binding but just produces the constructor as a value. You are allowed to omit the class name in a class expression.
+Як і `function`, `class` можна використовувати як в операторах, так і у виразах. Коли він використовується як вираз, він не визначає прив'язку, а просто створює конструктор як значення. Ви можете опустити ім'я класу у виразі класу.
 
 ```
-let object = new class { getWord() { return "hello"; } };
+let object = new class { getWord() { return «hello»; } };
 console.log(object.getWord());
 // → hello
 ```
 
 
-## Private Properties
+## Приватні властивості
 
-{{index [property, private], [property, public], "class declaration"}}
+{{index [властивість, private], [властивість, public], «оголошення класу»}}
 
-It is common for classes to define some properties and ((method))s for internal use that are not part of their ((interface)). These are called _private_ properties, as opposed to _public_ ones, which are part of the object's external interface.
+У класах зазвичай визначають деякі властивості та ((методи)) для внутрішнього використання, які не є частиною їхнього ((інтерфейсу)). Такі властивості називаються _приватними_, на відміну від _загальних_, які є частиною зовнішнього інтерфейсу об'єкта.
 
-{{index [method, private]}}
+{{index [метод, private]}}
 
-To declare a private method, put a `#` sign in front of its name. Such methods can be called only from inside the `class` declaration that defines them.
+Щоб оголосити приватний метод, поставте перед його іменем знак `#`. Такі методи можна викликати тільки з оголошення класу, який їх визначає.
 
 ```
 class SecretiveObject {
   #getSecret() {
-    return "I ate all the plums";
+    return «Я з'їв усі сливи»;
   }
   interrogate() {
     let shallISayIt = this.#getSecret();
-    return "never";
+    return «never»;
   }
 }
 ```
 
-When a class does not declare a constructor, it will automatically get an empty one.
+Коли клас не оголошує конструктор, він автоматично отримує порожній.
 
-If you try to call `#getSecret` from outside the class, you get an error. Its existence is entirely hidden inside the class declaration.
+Якщо ви спробуєте викликати `#getSecret` ззовні класу, то отримаєте помилку. Його існування повністю приховано всередині оголошення класу.
 
-To use private instance properties, you must declare them. Regular properties can be created by just assigning to them, but private properties _must_ be declared in the class declaration to be available at all.
+Щоб використовувати приватні властивості екземпляра, ви повинні їх оголосити. Звичайні властивості можна створювати простим присвоюванням, але приватні властивості _обов'язково_ мають бути оголошені в оголошенні класу, щоб бути доступними взагалі.
 
-This class implements an appliance for getting a random whole number below a given maximum number. It has only one ((public)) property: `getNumber`.
+Цей клас реалізує пристрій для отримання випадкового цілого числа, меншого за задане максимальне число. Він має лише одну ((загальнодоступну)) властивість: `getNumber`.
 
 ```
 class RandomSource {
@@ -313,173 +313,173 @@ class RandomSource {
 }
 ```
 
-## Overriding derived properties
+## Перевизначення похідних властивостей
 
-{{index "shared property", overriding, [property, inheritance]}}
+{{індекс «спільна властивість», перевизначення, [властивість, успадкування]}}
 
-When you add a property to an object, whether it is present in the prototype or not, the property is added to the object _itself_. If there was already a property with the same name in the prototype, this property will no longer affect the object, as it is now hidden behind the object's own property.
+Коли ви додаєте властивість до об'єкта, незалежно від того, присутня вона у прототипі чи ні, властивість додається до об'єкта _самостійно_. Якщо у прототипі вже була властивість з такою ж назвою, ця властивість більше не впливатиме на об'єкт, оскільки тепер вона прихована за власною властивістю об'єкта.
 
 ```
-Rabbit.prototype.teeth = "small";
+Rabbit.prototype.teeth = «small»;
 console.log(killerRabbit.teeth);
 // → small
-killerRabbit.teeth = "long, sharp, and bloody";
+killerRabbit.teeth = «довгі, гострі та криваві»;
 console.log(killerRabbit.teeth);
-// → long, sharp, and bloody
-console.log((new Rabbit("basic")).teeth);
-// → small
+// → довгі, гострі та криваві
+console.log((new Rabbit(«basic»)).teeth);
+// → маленькі
 console.log(Rabbit.prototype.teeth);
-// → small
+// → маленькі
 ```
 
-{{index [prototype, diagram]}}
+{{index [прототип, діаграма]}}
 
-The following diagram sketches the situation after this code has run. The `Rabbit` and `Object` ((prototype))s lie behind `killerRabbit` as a kind of backdrop, where properties that are not found in the object itself can be looked up.
+На наступній діаграмі показано ситуацію після виконання цього коду. Кролик та об'єкти `Rabbit` та `Object` ((прототип)) знаходяться позаду `killerRabbit` як своєрідне тло, на якому можна побачити властивості, яких немає в самому об'єкті.
 
-{{figure {url: "img/rabbits.svg", alt: "A diagram showing the object structure of rabbits and their prototypes. There is a box for the 'killerRabbit' instance (holding instance properties like 'type'), with its two prototypes, 'Rabbit.prototype' (holding the 'speak' method) and 'Object.prototype' (holding methods like 'toString') stacked behind it.",width: "8cm"}}}
+{{figure {url: «img/rabbits.svg», alt: «Діаграма, що показує об'єктну структуру кроликів та їх прототипів. Тут зображено блок для екземпляра «killerRabbit» (містить властивості екземпляра, такі як «type»), а за ним - два його прототипи, «Rabbit.prototype» (містить метод «speak») та «Object.prototype» (містить методи, такі як «toString»).»,width: “8cm”}}}}
 
-{{index "shared property"}}
+{{index «shared property»}}
 
-Overriding properties that exist in a prototype can be a useful thing to do. As the rabbit teeth example shows, overriding can be used to express exceptional properties in instances of a more generic class of objects while letting the nonexceptional objects take a standard value from their prototype.
+Перевизначення властивостей, що існують у прототипі, може бути корисним. Як показує приклад з кролячими зубами, перевизначення можна використовувати для вираження виняткових властивостей в екземплярах більш загального класу об'єктів, дозволяючи невинятковим об'єктам приймати стандартне значення з їхнього прототипу.
 
-{{index "toString method", "Array prototype", "Function prototype"}}
+{{index «метод toString», «прототип масиву», «прототип функції»}}
 
-Overriding is also used to give the standard function and array prototypes a different `toString` method than the basic object prototype.
+Перевизначення також використовується для того, щоб надати стандартним прототипам функцій та масивів інший метод `toString`, ніж прототип базового об'єкта.
 
 ```
-console.log(Array.prototype.toString ==
-            Object.prototype.toString);
+console.log(Array.prototype.toString == Array.prototype.toString
+            Об'єкт.прототип.toString);
 // → false
 console.log([1, 2].toString());
 // → 1,2
 ```
 
-{{index "toString method", "join method", "call method"}}
+{{індекс «метод toString», «метод приєднання», «метод виклику»}}
 
-Calling `toString` on an array gives a result similar to calling `.join(",")` on it—it puts commas between the values in the array. Directly calling `Object.prototype.toString` with an array produces a different string. That function doesn't know about arrays, so it simply puts the word _object_ and the name of the type between square brackets.
+Виклик `toString` для масиву дає результат, подібний до виклику `.join(«,»)` - він розставляє коми між значеннями в масиві. Прямий виклик `Object.prototype.toString` з масивом створює інший рядок. Ця функція не знає про масиви, тому вона просто бере слово _об'єкт_ і назву типу у квадратні дужки.
 
 ```
 console.log(Object.prototype.toString.call([1, 2]));
-// → [object Array]
+// → [масив об'єктів]
 ```
 
-## Maps
+## Мапи
 
-{{index "map method"}}
+{{index «map method»}}
 
-We saw the word _map_ used in the [previous chapter](higher_order#map) for an operation that transforms a data structure by applying a function to its elements. Confusing as it is, in programming the same word is used for a related but rather different thing.
+У [попередньому розділі] ми бачили, що слово _map_ використовується для позначення операції, яка перетворює структуру даних, застосовуючи функцію до її елементів. Як це не дивно, але у програмуванні те саме слово використовується для споріднених, але досить різних речей.
 
-{{index "map (data structure)", "ages example", ["data structure", map]}}
+{{index «map (data structure)», «ages example», [«data structure», map]}}
 
-A _map_ (noun) is a data structure that associates values (the keys) with other values. For example, you might want to map names to ages. It is possible to use objects for this.
+Карта_ (іменник) - це структура даних, яка пов'язує значення (ключі) з іншими значеннями. Наприклад, вам може знадобитися зіставити імена з віком. Для цього можна використовувати об'єкти.
 
 ```
 let ages = {
-  Boris: 39,
-  Liang: 22,
-  Júlia: 62
+  Борис: 39,
+  Лян: 22,
+  Юля: 62
 };
 
-console.log(`Júlia is ${ages["Júlia"]}`);
-// → Júlia is 62
-console.log("Is Jack's age known?", "Jack" in ages);
-// → Is Jack's age known? false
-console.log("Is toString's age known?", "toString" in ages);
-// → Is toString's age known? true
+console.log(`Júlia is ${ages[«Júlia»]}`);
+// → Юлії 62 роки
+console.log(«Is Jack's age known?», «Jack» in ages);
+// → Чи відомий вік Джека? false
+console.log(«Чи відомий вік toString?», «toString» в роках);
+// → Чи відомий вік toString? true
 ```
 
-{{index "Object.prototype", "toString method"}}
+{{index «Object.prototype», «toString method»}}
 
-Here, the object's property names are the people's names and the property values are their ages. But we certainly didn't list anybody named toString in our map. Yet because plain objects derive from `Object.prototype`, it looks like the property is there.
+Тут іменами властивостей об'єкта є імена людей, а значеннями властивостей - їхній вік. Але ми, звичайно, не додали до нашої мапи нікого з іменем toString. Проте, оскільки звичайні об'єкти походять від `Object.prototype`, схоже, що ця властивість там є.
 
-{{index "Object.create function", prototype}}
+{{index «Object.create function», prototype}}
 
-For this reason, using plain objects as maps is dangerous. There are several possible ways to avoid this problem. First, you can create objects with _no_ prototype. If you pass `null` to `Object.create`, the resulting object will not derive from `Object.prototype` and can be safely used as a map.
+З цієї причини використання простих об'єктів як мап є небезпечним. Існує декілька можливих способів уникнути цієї проблеми. По-перше, ви можете створювати об'єкти  без прототипу. Якщо ви передасте `null` функції `Object.create`, отриманий об'єкт не буде похідним від `Object.prototype` і його можна буде безпечно використовувати як мапу.
 
 ```
-console.log("toString" in Object.create(null));
+console.log(«toString» в Object.create(null));
 // → false
 ```
 
-{{index [property, naming]}}
+{{index [властивість, назва]}}
 
-Object property names must be strings. If you need a map whose keys can't easily be converted to strings—such as objects—you cannot use an object as your map.
+Імена властивостей об'єктів повинні бути рядками. Якщо вам потрібна мапа, ключі якої не можуть бути легко перетворені у рядки (наприклад, об'єкти), ви не можете використовувати об'єкт як мапу.
 
-{{index "Map class"}}
+{{index «Клас мапи»}}
 
-Fortunately, JavaScript comes with a class called `Map` that is written for this exact purpose. It stores a mapping and allows any type of keys.
+На щастя, JavaScript постачається з класом `Map`, який написано саме для цієї мети. Він зберігає відображення і дозволяє використовувати будь-які типи ключів.
 
 ```
 let ages = new Map();
-ages.set("Boris", 39);
-ages.set("Liang", 22);
-ages.set("Júlia", 62);
+ages.set(«Boris», 39);
+ages.set(«Liang», 22);
+ages.set(«Júlia», 62);
 
-console.log(`Júlia is ${ages.get("Júlia")}`);
-// → Júlia is 62
-console.log("Is Jack's age known?", ages.has("Jack"));
-// → Is Jack's age known? false
-console.log(ages.has("toString"));
+console.log(`Júlia is ${ages.get(«Júlia»)}`);
+// → Юлії 62 роки
+console.log(«Чи відомий вік Джека?», ages.has(«Jack»));
+// → Чи відомий вік Джека? false
+console.log(ages.has(«toString»));
 // → false
 ```
 
-{{index [interface, object], "set method", "get method", "has method", encapsulation}}
+{{index [інтерфейс, об'єкт], «метод set», «метод get», «метод has», інкапсуляція}}
 
-The methods `set`, `get`, and `has` are part of the interface of the `Map` object. Writing a data structure that can quickly update and search a large set of values isn't easy, but we don't have to worry about that. Someone else did it for us, and we can go through this simple interface to use their work.
+Методи `set`, `get` та `has` є частиною інтерфейсу об'єкту `Map`. Написати структуру даних, яка може швидко оновлювати і шукати великий набір значень, нелегко, але нам не потрібно про це турбуватися. Хтось інший зробив це за нас, і ми можемо скористатися цим простим інтерфейсом для використання їхньої роботи.
 
-{{index "hasOwn function", "in operator"}}
+{{index «hasOwn function», «in operator»}}
 
-If you do have a plain object that you need to treat as a map for some reason, it is useful to know that `Object.keys` returns only an object's _own_ keys, not those in the prototype. As an alternative to the `in` operator, you can use the `Object.hasOwn` function, which ignores the object's prototype.
+Якщо у вас є звичайний об'єкт, який з якихось причин потрібно обробляти як мапу, корисно знати, що `Object.keys` повертає лише  власні ключі об'єкта, а не ті, що є у прототипі. Як альтернативу оператору `in` можна використовувати функцію `Object.hasOwn`, яка ігнорує прототип об'єкта.
 
 ```
-console.log(Object.hasOwn({x: 1}, "x"));
+console.log(Object.hasOwn({x: 1}, «x»));
 // → true
-console.log(Object.hasOwn({x: 1}, "toString"));
+console.log(Object.hasOwn({x: 1}, «toString»));
 // → false
 ```
 
-## Polymorphism
+## Поліморфізм
 
-{{index "toString method", "String function", polymorphism, overriding, "object-oriented programming"}}
+{{індекс «метод toString», «функція String», поліморфізм, перевизначення, «об'єктно-орієнтоване програмування»}}
 
-When you call the `String` function (which converts a value to a string) on an object, it will call the `toString` method on that object to try to create a meaningful string from it. I mentioned that some of the standard prototypes define their own version of `toString` so they can create a string that contains more useful information than `"[object Object]"`. You can also do that yourself.
+Коли ви викликаєте функцію `String` (яка перетворює значення у рядок) на об'єкті, вона викликає метод `toString` на цьому об'єкті, щоб спробувати створити з нього осмислений рядок. Я вже згадував, що деякі стандартні прототипи визначають власну версію методу `toString`, щоб можна було створити рядок, який містить більше корисної інформації, ніж `«[об'єкт Object]»`. Ви також можете зробити це самостійно.
 
-```{includeCode: "top_lines: 3"}
+```{includeCode: «top_lines: 3"}
 Rabbit.prototype.toString = function() {
-  return `a ${this.type} rabbit`;
+  повернути `кролика ${this.type};
 };
 
 console.log(String(killerRabbit));
-// → a killer rabbit
+// → кролик-вбивця
 ```
 
-{{index "object-oriented programming", [interface, object]}}
+{{index «об'єктно-орієнтоване програмування», [interface, object]}}
 
-This is a simple instance of a powerful idea. When a piece of code is written to work with objects that have a certain interface—in this case, a `toString` method—any kind of object that happens to support this interface can be plugged into the code and will be able to work with it.
+Це простий приклад потужної ідеї. Коли написаний фрагмент коду для роботи з об'єктами, які мають певний інтерфейс - у цьому випадку метод `toString` - будь-який тип об'єкта, який підтримує цей інтерфейс, може бути підключений до коду і зможе з ним працювати.
 
-This technique is called _polymorphism_. Polymorphic code can work with values of different shapes, as long as they support the interface it expects.
+Цей прийом називається _поліморфізм_. Поліморфний код може працювати зі значеннями різної форми, якщо вони підтримують інтерфейс, який він очікує.
 
-{{index "forEach method"}}
+{{index «forEach method»}}
 
-An example of a widely used interface is that of ((array-like object))s that have a `length` property holding a number and numbered properties for each of their elements. Both arrays and strings support this interface, as do various other objects, some of which we'll see later in the chapters about the browser. Our implementation of `forEach` from [Chapter ?](higher_order) works on anything that provides this interface. In fact, so does `Array.prototype.forEach`.
+Прикладом широко використовуваного інтерфейсу є інтерфейс ((об'єктів типу масив)), які мають властивість `length`, що містить число та нумеровані властивості для кожного з їхніх елементів. Цей інтерфейс підтримують як масиви, так і рядки, а також різні інші об'єкти, деякі з яких ми розглянемо пізніше у розділах про браузер. Наша реалізація `forEach` з [Глава ?](вищий_порядок) працює з усім, що підтримує цей інтерфейс. Насправді, так само як і `Array.prototype.forEach`.
 
 ```
 Array.prototype.forEach.call({
-  length: 2,
-  0: "A",
-  1: "B"
+  довжина: 2,
+  0: «A»,
+  1: «B»
 }, elt => console.log(elt));
 // → A
 // → B
 ```
 
-## Getters, setters, and statics
+## Геттери, сеттери та статика
 
-{{index [interface, object], [property, definition], "Map class"}}
+{{index [інтерфейс, об'єкт], [властивість, визначення], «Map class»}}
 
-Interfaces often contain plain properties, not just methods. For example, `Map` objects have a `size` property that tells you how many keys are stored in them.
+Інтерфейси часто містять звичайні властивості, а не лише методи. Наприклад, об'єкти `Map` мають властивість `size`, яка показує, скільки ключів у них зберігається.
 
-It is not necessary for such an object to compute and store such a property directly in the instance. Even properties that are accessed directly may hide a method call. Such methods are called _((getter))s_ and are defined by writing `get` in front of the method name in an object expression or class declaration.
+Для такого об'єкта не обов'язково обчислювати і зберігати таку властивість безпосередньо в екземплярі. Навіть властивості, доступ до яких здійснюється безпосередньо, можуть приховувати виклик методу. Такі методи називаються _((getter))s_ і визначаються написанням `get` перед іменем методу у виразі об'єкта або оголошенні класу.
 
 ```{test: no}
 let varyingSize = {
@@ -494,11 +494,11 @@ console.log(varyingSize.size);
 // → 49
 ```
 
-{{index "temperature example"}}
+{{index «temperature example»}}
 
-Whenever someone reads from this object's `size` property, the associated method is called. You can do a similar thing when a property is written to, using a _((setter))_.
+Кожного разу, коли хтось читає з властивості ``size`` цього об'єкта, викликається пов'язаний з нею метод. Ви можете зробити те саме, коли властивість записується, використовуючи _((сеттер))_.
 
-```{startCode: true, includeCode: "top_lines: 16"}
+```{startCode: true, includeCode: «top_lines: 16"}
 class Temperature {
   constructor(celsius) {
     this.celsius = celsius;
@@ -506,12 +506,12 @@ class Temperature {
   get fahrenheit() {
     return this.celsius * 1.8 + 32;
   }
-  set fahrenheit(value) {
+  set fahrenheit(значення) {
     this.celsius = (value - 32) / 1.8;
   }
 
   static fromFahrenheit(value) {
-    return new Temperature((value - 32) / 1.8);
+    return new Temperature((значення - 32) / 1.8);
   }
 }
 
@@ -523,49 +523,49 @@ console.log(temp.celsius);
 // → 30
 ```
 
-The `Temperature` class allows you to read and write the temperature in either degrees ((Celsius)) or degrees ((Fahrenheit)), but internally it stores only Celsius and automatically converts to and from Celsius in the `fahrenheit` getter and setter.
+Клас `Temperature` дозволяє читати і записувати температуру в градусах ((Celsius)) або градусах ((Fahrenheit)), але внутрішньо він зберігає тільки градуси Цельсія і автоматично конвертує в градуси Цельсія і з градусів Цельсія в гетері і сетері `fahrenheit`.
 
-{{index "static method", "static property"}}
+{{index «статичний метод», «статична властивість»}}
 
-Sometimes you want to attach some properties directly to your constructor function rather than to the prototype. Such methods won't have access to a class instance but can, for example, be used to provide additional ways to create instances.
+Іноді ви хочете прикріпити деякі властивості безпосередньо до функції-конструктора, а не до прототипу. Такі методи не матимуть доступу до екземпляру класу, але можуть, наприклад, використовуватися для надання додаткових способів створення екземплярів.
 
-Inside a class declaration, methods or properties that have `static` written before their name are stored on the constructor. For example, the `Temperature` class allows you to write `Temperature.fromFahrenheit(100)` to create a temperature using degrees Fahrenheit.
+Усередині оголошення класу методи або властивості, що мають перед своїм іменем `static`, зберігаються у конструкторі. Наприклад, клас `Temperature` дозволяє вам написати `Temperature.fromFahrenheit(100)` для створення температури у градусах Фаренгейта.
 
 ```
-let boil = Temperature.fromFahrenheit(212);
+нехай boil = Temperature.fromFahrenheit(212);
 console.log(boil.celsius);
 // → 100
 ```
 
-## Symbols
+## Символи
 
-{{index "for/of loop", "iterator interface"}}
+{{індекс «for/of циклу», «інтерфейс ітератора»}}
 
-I mentioned in [Chapter ?](data#for_of_loop) that a `for`/`of` loop can loop over several kinds of data structures. This is another case of polymorphism—such loops expect the data structure to expose a specific interface, which arrays and strings do. And we can also add this interface to our own objects! But before we can do that, we need to briefly take a look at the symbol type.
+У [Глава ?](data#for_of_loop) я згадував, що цикл `for`/`of` може перебирати декілька типів структур даних. Це ще один випадок поліморфізму - такі цикли очікують, що структура даних надасть певний інтерфейс, як це роблять масиви та рядки. І ми також можемо додати цей інтерфейс до наших власних об'єктів! Але перш ніж ми це зробимо, нам потрібно коротко розглянути тип символу.
 
-It is possible for multiple interfaces to use the same property name for different things. For example, on array-like objects, `length` refers to the number of elements in the collection. But an object interface describing a hiking route could use `length` to provide the length of the route in meters. It would not be possible for an object to conform to both these interfaces.
+Існує можливість для декількох інтерфейсів використовувати одне й те саме ім'я властивості для різних речей. Наприклад, на об'єктах, подібних до масивів, `length` означає кількість елементів у колекції. Але інтерфейс об'єкта, що описує пішохідний маршрут, може використовувати `length` для визначення довжини маршруту у метрах. Неможливо, щоб об'єкт відповідав обом цим інтерфейсам.
 
-An object trying to be a route and array-like (maybe to enumerate its waypoints) is somewhat far-fetched, and this kind of problem isn't that common in practice. For things like the iteration protocol, though, the language designers needed a type of property that _really_ doesn't conflict with any others. So in 2015, _((symbol))s_ were added to the language.
+Об'єкт, який намагається бути одночасно і маршрутом, і масивом (можливо, щоб перерахувати точки маршруту), є дещо надуманим, і на практиці такі проблеми зустрічаються не так часто. Однак для таких речей, як ітераційний протокол, розробникам мови потрібен був тип властивості, який _справді_ не конфліктує з іншими. Тож у 2015 році до мови було додано _((символ))s_.
 
-{{index "Symbol function", [property, naming]}}
+{{index «Symbol function», [property, naming]}}
 
-Most properties, including all those we have seen so far, are named with strings. But it is also possible to use symbols as property names. Symbols are values created with the `Symbol` function. Unlike strings, newly created symbols are unique—you cannot create the same symbol twice.
+Більшість властивостей, включаючи всі ті, які ми бачили досі, називаються рядками. Але також можна використовувати символи як назви властивостей. Символи - це значення, створені за допомогою функції `Symbol`. На відміну від рядків, новостворені символи є унікальними - ви не можете створити той самий символ двічі.
 
 ```
-let sym = Symbol("name");
-console.log(sym == Symbol("name"));
+let sym = Symbol(«name»);
+console.log(sym == Symbol(«name»));
 // → false
 Rabbit.prototype[sym] = 55;
 console.log(killerRabbit[sym]);
 // → 55
 ```
 
-The string you pass to `Symbol` is included when you convert it to a string and can make it easier to recognize a symbol when, for example, showing it in the console. But it has no meaning beyond that—multiple symbols may have the same name.
+Рядок, який ви передаєте до `Symbol`, включається при перетворенні його у рядок і може полегшити розпізнавання символу, наприклад, при показі його у консолі. Але це не має жодного іншого значення - декілька символів можуть мати однакову назву.
 
-Being both unique and usable as property names makes symbols suitable for defining interfaces that can peacefully live alongside other properties, no matter what their names are.
+Унікальність та можливість використання символів як імен властивостей робить їх придатними для визначення інтерфейсів, які можуть мирно співіснувати з іншими властивостями, незалежно від того, як вони називаються.
 
-```{includeCode: "top_lines: 1"}
-const length = Symbol("length");
+```{includeCode: «top_lines: 1"}
+const length = Symbol(«length»);
 Array.prototype[length] = 0;
 
 console.log([1, 2].length);
@@ -574,53 +574,53 @@ console.log([1, 2][length]);
 // → 0
 ```
 
-{{index [property, naming]}}
+{{index [властивість, іменування]}}
 
-It is possible to include symbol properties in object expressions and classes by using ((square bracket))s around the property name. That causes the expression between the brackets to be evaluated to produce the property name, analogous to the square bracket property access notation.
+Властивості символів можна включати у вирази об'єктів і класів, використовуючи ((квадратні дужки)) навколо імені властивості. Це призводить до обчислення виразу між дужками для отримання імені властивості, аналогічно до позначення доступу до властивостей у квадратних дужках.
 
 ```
-let myTrip = {
+нехай myTrip = {{}.
   length: 2,
-  0: "Lankwitz",
-  1: "Babelsberg",
+  0: «Lankwitz»,
+  1: «Babelsberg»,
   [length]: 21500
 };
 console.log(myTrip[length], myTrip.length);
 // → 21500 2
 ```
 
-## The iterator interface
+## Інтерфейс ітератора
 
-{{index "iterable interface", "Symbol.iterator symbol", "for/of loop"}}
+{{index «iterable interface», «Symbol.iterator symbol», «for/of loop»}}
 
-The object given to a `for`/`of` loop is expected to be _iterable_. This means it has a method named with the `Symbol.iterator` symbol (a symbol value defined by the language, stored as a property of the `Symbol` function).
+Очікується, що об'єкт, який передається у цикл `for`/`of`, є _ітерабельним_. Це означає, що він має метод з іменем `Symbol.iterator` (символьне значення, визначене мовою, що зберігається як властивість функції `Symbol`).
 
-{{index "iterator interface", "next method"}}
+{{index «iterator interface», «next method»}}
 
-When called, that method should return an object that provides a second interface, _iterator_. This is the actual thing that iterates. It has a `next` method that returns the next result. That result should be an object with a `value` property that provides the next value, if there is one, and a `done` property, which should be true when there are no more results and false otherwise.
+При виклику цей метод має повернути об'єкт, який надає другий інтерфейс, _ітератор_. Це власне те, що виконує ітерації. Він має метод `next`, який повертає наступний результат. Цей результат має бути об'єктом з властивістю `value`, яка надає наступне значення, якщо воно є, і властивістю `done`, яка має бути істинною, коли більше немає результатів, і хибною в іншому випадку.
 
-Note that the `next`, `value`, and `done` property names are plain strings, not symbols. Only `Symbol.iterator`, which is likely to be added to a _lot_ of different objects, is an actual symbol.
+Зверніть увагу, що імена властивостей `next`, `value` і `done` є звичайними рядками, а не символами. Тільки `Symbol.iterator`, який, ймовірно, буде додано до _багато_ різних об'єктів, є справжнім символом.
 
-We can directly use this interface ourselves.
+Ми можемо безпосередньо використовувати цей інтерфейс самі.
 
 ```
-let okIterator = "OK"[Symbol.iterator]();
+let okIterator = «OK»[Symbol.iterator]();
 console.log(okIterator.next());
-// → {value: "O", done: false}
+// → {значення: «O», done: false}}
 console.log(okIterator.next());
-// → {value: "K", done: false}
+// → {значення: «K», done: false}}
 console.log(okIterator.next());
 // → {value: undefined, done: true}
 ```
 
-{{index ["data structure", list], "linked list", collection}}
+{{index [«структура даних», list], «зв'язаний список», collection}}
 
-Let's implement an iterable data structure similar to the linked list from the exercise in [Chapter ?](data). We'll write the list as a class this time.
+Реалізуємо ітеровану структуру даних, подібну до зв'язаного списку з вправи у [Розділ ?](дані). Цього разу ми запишемо список як клас.
 
 ```{includeCode: true}
 class List {
   constructor(value, rest) {
-    this.value = value;
+    this.value = value
     this.rest = rest;
   }
 
@@ -638,11 +638,11 @@ class List {
 }
 ```
 
-Note that `this`, in a static method, points at the constructor of the class, not an instance—there is no instance around when a static method is called.
+Зверніть увагу, що `this` у статичному методі вказує на конструктор класу, а не на його екземпляр - під час виклику статичного методу екземпляра класу не існує.
 
-Iterating over a list should return all the list's elements from start to end. We'll write a separate class for the iterator.
+Ітерація над списком повинна повертати всі елементи списку від початку до кінця. Напишемо окремий клас для ітератора.
 
-{{index "ListIterator class"}}
+{{index «ListIterator class»}}
 
 ```{includeCode: true}
 class ListIterator {
@@ -661,9 +661,9 @@ class ListIterator {
 }
 ```
 
-The class tracks the progress of iterating through the list by updating its `list` property to move to the next list object whenever a value is returned and reports that it is done when that list is empty (null).
+Клас відстежує хід ітерації по списку, оновлюючи свою властивість `list` для переходу до наступного об'єкту списку щоразу, коли повертається значення, і повідомляє про завершення, коли список стає порожнім (нульовим).
 
-Let's set up the `List` class to be iterable. Throughout this book, I'll occasionally use after-the-fact prototype manipulation to add methods to classes so that the individual pieces of code remain small and self contained. In a regular program, where there is no need to split the code into small pieces, you'd declare these methods directly in the class instead.
+Давайте налаштуємо клас `List`, щоб він був ітерованим. У цій книзі я буду час від часу використовувати маніпуляції з прототипами для додавання методів до класів, щоб окремі фрагменти коду залишалися невеликими і самодостатніми. У звичайній програмі, де немає необхідності розбивати код на маленькі шматочки, ви б оголосили ці методи безпосередньо в класі.
 
 ```{includeCode: true}
 List.prototype[Symbol.iterator] = function() {
@@ -671,9 +671,9 @@ List.prototype[Symbol.iterator] = function() {
 };
 ```
 
-{{index "for/of loop"}}
+{{index «for/of loop»}}
 
-We can now loop over a list with `for`/`of`.
+Тепер ми можемо обходити список з допомогою `for`/`of`.
 
 ```
 let list = List.fromArray([1, 2, 3]);
@@ -685,28 +685,28 @@ for (let element of list) {
 // → 3
 ```
 
-{{index spread}}
+{{розкид індексів}}
 
-The `...` syntax in array notation and function calls similarly works with any iterable object. For example, you can use `[...value]` to create an array containing the elements in an arbitrary iterable object.
+Синтаксис `...` у нотації масивів і викликах функцій аналогічно працює з будь-яким ітерованим об'єктом. Наприклад, ви можете використовувати `[...value]` для створення масиву, що містить елементи довільного ітерованого об'єкта.
 
 ```
-console.log([..."PCI"]);
-// → ["P", "C", "I"]
+console.log([... «PCI»]);
+// → [«P», «C», «I»]
 ```
 
-## Inheritance
+## Успадкування
 
-{{index inheritance, "linked list", "object-oriented programming", "LengthList class"}}
+{{індексна спадковість, «зв'язаний список», «об'єктно-орієнтоване програмування», «клас LengthList»}}
 
-Imagine we need a list type much like the `List` class we saw before, but because we will be asking for its length all the time, we don't want it to have to scan through its `rest` every time. Instead, we want to store the length in every instance for efficient access.
+Уявіть, що нам потрібен тип списку, подібний до класу `List`, який ми розглядали раніше, але оскільки ми будемо постійно запитувати його довжину, ми не хочемо, щоб він щоразу сканував його `решту`. Замість цього ми хочемо зберігати довжину у кожному екземплярі для ефективного доступу.
 
-{{index overriding, prototype}}
+{{перевизначення індексу, прототип}}
 
-JavaScript's prototype system makes it possible to create a _new_ class, much like the old class, but with new definitions for some of its properties. The prototype for the new class derives from the old prototype but adds a new definition for, say, the `length` getter.
+Система прототипів JavaScript дозволяє створити _новий_ клас, подібний до старого, але з новими визначеннями деяких його властивостей. Прототип нового класу походить від старого прототипу, але додає нове визначення, скажімо, для геттера `length`.
 
-In object-oriented programming terms, this is called _((inheritance))_. The new class inherits properties and behavior from the old class.
+В термінах об'єктно-орієнтованого програмування це називається _((успадкування))_. Новий клас успадковує властивості та поведінку старого класу.
 
-```{includeCode: "top_lines: 12"}
+```{includeCode: «top_lines: 12"}
 class LengthList extends List {
   #length;
 
@@ -716,7 +716,7 @@ class LengthList extends List {
   }
 
   get length() {
-    return this.#length;
+    повернути this.#length;
   }
 }
 
@@ -724,23 +724,23 @@ console.log(LengthList.fromArray([1, 2, 3]).length);
 // → 3
 ```
 
-The use of the word `extends` indicates that this class shouldn't be directly based on the default `Object` prototype but on some other class. This is called the _((superclass))_. The derived class is the _((subclass))_.
+Використання слова `extends` вказує на те, що цей клас не повинен безпосередньо базуватися на прототипі за замовчуванням `Object`, а на якомусь іншому класі. Такий  клас називається _((суперклас))_. Похідним класом є _((підклас))_.
 
-To initialize a `LengthList` instance, the constructor calls the constructor of its superclass through the `super` keyword. This is necessary because if this new object is to behave (roughly) like a `List`, it is going to need the instance properties that lists have.
+Щоб ініціалізувати екземпляр `LengthList`, конструктор викликає конструктор його суперкласу через ключове слово super. Це необхідно, оскільки якщо новий об'єкт має поводитися (приблизно) як `List`, йому знадобляться властивості екземпляра, які мають списки.
 
-The constructor then stores the list's length in a private property. If we had written `this.length` there, the class's own getter would have been called, which doesn't work yet since `#length` hasn't been filled in yet. We can use `super.something` to call methods and getters on the superclass's prototype, which is often useful.
+Конструктор зберігає довжину списку у приватній властивості. Якби ми написали там `this.length`, був би викликаний власний геттер класу, що поки що не працює, оскільки `#length` ще не заповнено. Ми можемо використовувати `super.something` для виклику методів і гетерів у прототипі суперкласу, що часто буває корисно.
 
-Inheritance allows us to build slightly different data types from existing data types with relatively little work. It is a fundamental part of the object-oriented tradition, alongside encapsulation and polymorphism. But while the latter two are now generally regarded as wonderful ideas, inheritance is more controversial.
+Спадкування дозволяє нам створювати типи даних, що дещо відрізняються від існуючих, з відносно невеликими зусиллями. Це фундаментальна частина об'єктно-орієнтованої традиції, поряд з інкапсуляцією та поліморфізмом. Але якщо останні дві ідеї зараз загалом вважаються чудовими, то успадкування є більш суперечливим.
 
-{{index complexity, reuse, "class hierarchy"}}
+{Складність індексів, повторне використання, «ієрархія класів»}}
 
-Whereas ((encapsulation)) and polymorphism can be used to _separate_ pieces of code from one another, reducing the tangledness of the overall program, ((inheritance)) fundamentally ties classes together, creating _more_ tangle. When inheriting from a class, you usually have to know more about how it works than when simply using it. Inheritance can be a useful tool to make some types of programs more succinct, but it shouldn't be the first tool you reach for, and you probably shouldn't actively go looking for opportunities to construct class hierarchies (family trees of classes).
+В той час як ((інкапсуляція)) та поліморфізм можна використовувати для _відокремлення_ частин коду одна від одної, зменшуючи заплутаність програми в цілому, ((успадкування)) фундаментально пов'язує класи разом, створюючи _більший_ клубок. При успадкуванні від класу зазвичай потрібно знати більше про те, як він працює, ніж при простому його використанні. Спадкування може бути корисним інструментом для того, щоб зробити деякі типи програм більш лаконічними, але воно не повинно бути першим інструментом, до якого ви потягнетесь, і ви, ймовірно, не повинні активно шукати можливості для побудови ієрархій класів (родинних дерев класів).
 
-## The instanceof operator
+## Оператор instanceof
 
-{{index type, "instanceof operator", constructor, object}}
+{{тип індексу, «оператор instanceof», конструктор, об'єкт}}
 
-It is occasionally useful to know whether an object was derived from a specific class. For this, JavaScript provides a binary operator called `instanceof`.
+Іноді буває корисно дізнатися, чи був об'єкт похідним від певного класу. Для цього у JavaScript передбачено бінарний оператор, який називається `instanceof`.
 
 ```
 console.log(
@@ -754,50 +754,50 @@ console.log([1] instanceof Array);
 // → true
 ```
 
-{{index inheritance}}
+{{Успадкування індексів}}
 
-The operator will see through inherited types, so a `LengthList` is an instance of `List`. The operator can also be applied to standard constructors like `Array`. Almost every object is an instance of `Object`.
+Оператор бачить успадковані типи наскрізь, тому `LengthList` є екземпляром `List`. Оператор також можна застосовувати до стандартних конструкторів, таких як `Array`. Майже кожен об'єкт є екземпляром `Object`.
 
-## Summary
+## Підсумок
 
-Objects do more than just hold their own properties. They have prototypes, which are other objects. They'll act as if they have properties they don't have as long as their prototype has that property. Simple objects have `Object.prototype` as their prototype.
+Об'єкти роблять більше, ніж просто володіють власними властивостями. Вони мають прототипи, якими є інші об'єкти. Вони поводитимуться так, ніби мають властивості, яких не мають, доки їхній прототип має цю властивість. Прості об'єкти мають `Object.prototype` як свій прототип.
 
-Constructors, which are functions whose names usually start with a capital letter, can be used with the `new` operator to create new objects. The new object's prototype will be the object found in the `prototype` property of the constructor. You can make good use of this by putting the properties that all values of a given type share into their prototype. There's a `class` notation that provides a clear way to define a constructor and its prototype.
+Конструктори, тобто функції, назви яких зазвичай починаються з великої літери, можна використовувати з оператором `new` для створення нових об'єктів. Прототипом нового об'єкта буде об'єкт, знайдений у властивості `prototype` конструктора. Ви можете добре використати цю властивість, помістивши у прототип властивості, які є спільними для всіх значень даного типу. Існує нотація `class`, яка забезпечує чіткий спосіб визначення конструктора та його прототипу.
 
-You can define getters and setters to secretly call methods every time an object's property is accessed. Static methods are methods stored in a class's constructor rather than its prototype.
+Ви можете визначити гетери та сетери для таємного виклику методів кожного разу, коли відбувається доступ до властивості об'єкта. Статичні методи - це методи, що зберігаються у конструкторі класу, а не у його прототипі.
 
-The `instanceof` operator can, given an object and a constructor, tell you whether that object is an instance of that constructor.
+Оператор `instanceof` може, маючи об'єкт і конструктор, сказати вам, чи є цей об'єкт екземпляром цього конструктора.
 
-One useful thing to do with objects is to specify an interface for them and tell everybody that they are supposed to talk to your object only through that interface. The rest of the details that make up your object are now _encapsulated_, hidden behind the interface. You can use private properties to hide a part of your object from the outside world.
+Одна з корисних речей, яку можна зробити з об'єктами - це визначити для них інтерфейс і сказати всім, що вони повинні звертатися до вашого об'єкту тільки через цей інтерфейс. Решта деталей, з яких складається ваш об'єкт, тепер «інкапсульовані», тобто сховані за інтерфейсом. Ви можете використовувати приватні властивості, щоб приховати частину вашого об'єкту від зовнішнього світу.
 
-More than one type may implement the same interface. Code written to use an interface automatically knows how to work with any number of different objects that provide the interface. This is called _polymorphism_.
+Більш ніж один тип може реалізовувати один і той самий інтерфейс. Код, написаний для використання інтерфейсу, автоматично знає, як працювати з будь-якою кількістю різних об'єктів, що надають інтерфейс. Це називається _поліморфізм_.
 
-When implementing multiple classes that differ in only some details, it can be helpful to write the new classes as _subclasses_ of an existing class, _inheriting_ part of its behavior.
+При реалізації декількох класів, які відрізняються лише деякими деталями, може бути корисним написання нових класів як _підкласів_ існуючого класу, що  успадковують частину його поведінки.
 
-## Exercises
+## Вправи
 
 {{id exercise_vector}}
 
-### A vector type
+### Тип вектора
 
-{{index dimensions, "Vec class", coordinates, "vector (exercise)"}}
+{{index dimensions, «Vec class», coordinates, «vector (exercise)»}}
 
-Write a ((class)) `Vec` that represents a vector in two-dimensional space. It takes `x` and `y` parameters (numbers), that it saves to properties of the same name.
+Напишіть ((клас)) `Vec`, який представляє вектор у двовимірному просторі. Він отримує параметри `x` та `y` (числа), які зберігає в однойменних властивостях.
 
-{{index addition, subtraction}}
+{{додавання, віднімання індексів}}
 
-Give the `Vec` prototype two methods, `plus` and `minus`, that take another vector as a parameter and return a new vector that has the sum or difference of the two vectors' (`this` and the parameter) _x_ and _y_ values.
+Додайте до прототипу `Vec` два методи, `plus` та `minus`, які приймають інший вектор як параметр і повертають новий вектор, що є сумою або різницею значень двох векторів (цього та параметра) _x_ та _y_.
 
-Add a ((getter)) property `length` to the prototype that computes the length of the vector—that is, the distance of the point (_x_, _y_) from the origin (0, 0).
+Додайте до прототипу властивість ((getter)) `length`, яка обчислює довжину вектора - тобто відстань точки (_x_, _y_) від початку координат (0, 0).
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
-console.log(new Vec(1, 2).plus(new Vec(2, 3)));
+console.log(new Vec(1, 2).plus(new Vec(2, 3));
 // → Vec{x: 3, y: 5}
-console.log(new Vec(1, 2).minus(new Vec(2, 3)));
+console.log(new Vec(1, 2).minus(new Vec(2, 3));
 // → Vec{x: -1, y: -1}
 console.log(new Vec(3, 4).length);
 // → 5
@@ -806,41 +806,41 @@ if}}
 
 {{hint
 
-{{index "vector (exercise)"}}
+{{index «вектор (вправа)»}}
 
-Look back to the `Rabbit` class example if you're unsure how `class` declarations look.
+Зверніться до прикладу класу `Rabbit`, якщо ви не впевнені, як виглядають оголошення `class`.
 
-{{index Pythagoras, "defineProperty function", "square root", "Math.sqrt function"}}
+{{index «Pythagoras», «defineProperty function», «square root», «Math.sqrt function»}}
 
-Adding a getter property to the constructor can be done by putting the word `get` before the method name. To compute the distance from (0, 0) to (x, y), you can use the Pythagorean theorem, which says that the square of the distance we are looking for is equal to the square of the x-coordinate plus the square of the y-coordinate. Thus, [√(x^2^ + y^2^)]{if html}[[$\sqrt{x^2 + y^2}$]{latex}]{if tex} is the number you want. `Math.sqrt` is the way you compute a square root in JavaScript and `x ** 2` can be used to square a number.
+Додати властивість-геттер до конструктора можна, поставивши слово `get` перед іменем методу. Для обчислення відстані від (0, 0) до (x, y) можна скористатися теоремою Піфагора, яка говорить, що квадрат відстані, яку ми шукаємо, дорівнює квадрату координати x плюс квадрат координати y. Таким чином, [√(x^2^ + y^2^)]{if html}[[$\sqrt{x^2 + y^2}$]{latex}]{if tex} - шукане число. `Math.sqrt` - це спосіб обчислення квадратного кореня в JavaScript, а `x ** 2` можна використовувати для піднесення числа до квадрату.
 
-hint}}
+підказка}}
 
-### Groups
+### Групи
 
-{{index "groups (exercise)", "Set class", "Group class", "set (data structure)"}}
+{{index «groups (вправа)», «клас множини», «клас групи», «множина (структура даних)»}}
 
 {{id groups}}
 
-The standard JavaScript environment provides another data structure called `Set`. Like an instance of `Map`, a set holds a collection of values. Unlike `Map`, it does not associate other values with those—it just tracks which values are part of the set. A value can be part of a set only once—adding it again doesn't have any effect.
+Стандартне середовище JavaScript надає ще одну структуру даних, яка називається `Set`. Як і екземпляр `Map`, множина містить набір значень. На відміну від `Map`, він не пов'язує інші значення з цими - він просто відстежує, які значення є частиною набору. Значення може бути частиною множини лише один раз - повторне додавання не має жодного ефекту.
 
-{{index "add method", "delete method", "has method"}}
+{{index «add method», «delete method», «has method»}}
 
-Write a class called `Group` (since `Set` is already taken). Like `Set`, it has `add`, `delete`, and `has` methods. Its constructor creates an empty group, `add` adds a value to the group (but only if it isn't already a member), `delete` removes its argument from the group (if it was a member), and `has` returns a Boolean value indicating whether its argument is a member of the group.
+Напишіть клас з назвою `Group` (оскільки `Set` вже зайнято). Як і `Set`, він має методи `add`, `delete` та `has`. Його конструктор створює порожню групу, `add` додає значення до групи (але тільки якщо він ще не є її членом), `delete` видаляє його аргумент з групи (якщо він був її членом), а `has` повертає булеве значення, яке вказує, чи є його аргумент членом групи.
 
-{{index "=== operator", "indexOf method"}}
+{{індекс «=== оператор», «індекс методу»}}
 
-Use the `===` operator, or something equivalent such as `indexOf`, to determine whether two values are the same.
+Використовуйте оператор `===` або його еквівалент, наприклад `indexOf`, щоб визначити, чи є два значення однаковими.
 
-{{index "static method"}}
+{{index «статичний метод»}}
 
-Give the class a static `from` method that takes an iterable object as its argument and creates a group that contains all the values produced by iterating over it.
+Додайте класу статичний метод `from`, який отримує об'єкт, що ітерується, як аргумент і створює групу, яка містить усі значення, отримані в результаті ітерації над ним.
 
-{{if interactive
+{{якщо інтерактивний
 
-```{test: no}
+```{test: no}}
 class Group {
-  // Your code here.
+  // Ваш код тут.
 }
 
 let group = Group.from([10, 20]);
@@ -858,42 +858,42 @@ if}}
 
 {{hint
 
-{{index "groups (exercise)", "Group class", "indexOf method", "includes method"}}
+{{index «groups (exercise)», «Group class», «indexOf method», «includes method»}}
 
-The easiest way to do this is to store an array of group members in an instance property. The `includes` or `indexOf` methods can be used to check whether a given value is in the array.
+Найпростіший спосіб зробити це - зберігати масив членів групи у властивості екземпляра. Методи `includes` або `indexOf` можна використовувати для перевірки наявності заданого значення у масиві.
 
-{{index "push method"}}
+{{index «метод push»}}
 
-Your class's ((constructor)) can set the member collection to an empty array. When `add` is called, it must check whether the given value is in the array or add it otherwise, possibly using `push`.
+Конструктор вашого класу може встановити колекцію членів у порожній масив. Коли викликається `add`, він повинен перевірити, чи є задане значення у масиві, або додати його інакше, можливо, використовуючи `push`.
 
-{{index "filter method"}}
+{{index «метод фільтрації»}}
 
-Deleting an element from an array, in `delete`, is less straightforward, but you can use `filter` to create a new array without the value. Don't forget to overwrite the property holding the members with the newly filtered version of the array.
+Видалення елемента з масиву методом `delete` є менш простим, але ви можете використовувати `filter` для створення нового масиву без цього значення. Не забудьте перезаписати властивість, що містить члени масиву, новою відфільтрованою версією масиву.
 
-{{index "for/of loop", "iterable interface"}}
+{{index «for/of loop», «iterable interface»}}
 
-The `from` method can use a `for`/`of` loop to get the values out of the iterable object and call `add` to put them into a newly created group.
+Метод `from` може використовувати цикл `for`/`of` для отримання значень з ітерованого об'єкта і викликати `add` для додавання їх до новоствореної групи.
 
-hint}}
+підказка}}
 
-### Iterable groups
+### Змінні групи
 
-{{index "groups (exercise)", [interface, object], "iterator interface", "Group class"}}
+{{index «groups (exercise)», [interface, object], «iterator interface», «Group class»}}
 
 {{id group_iterator}}
 
-Make the `Group` class from the previous exercise iterable. Refer  to the section about the iterator interface earlier in the chapter if you aren't clear on the exact form of the interface anymore.
+Зробіть клас `Group` з попередньої вправи ітерованим. Зверніться до розділу про інтерфейс ітератора на початку розділу, якщо вам не зрозуміла точна форма інтерфейсу.
 
-If you used an array to represent the group's members, don't just return the iterator created by calling the `Symbol.iterator` method on the array. That would work, but it defeats the purpose of this exercise.
+Якщо ви використовували масив для представлення членів групи, не повертайте просто ітератор, створений викликом методу `Symbol.iterator` на масиві. Це може спрацювати, але це суперечить меті цієї вправи.
 
-It is okay if your iterator behaves strangely when the group is modified during iteration.
+Нічого страшного, якщо ваш ітератор поводитиметься дивно, коли групу буде змінено під час ітерації.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
-// Your code here (and the code from the previous exercise)
+// Ваш код тут (і код з попередньої вправи)
 
-for (let value of Group.from(["a", "b", "c"])) {
+for (let value of Group.from([«a», «b», «c»])) {
   console.log(value);
 }
 // → a
@@ -905,10 +905,10 @@ if}}
 
 {{hint
 
-{{index "groups (exercise)", "Group class", "next method"}}
+{{індекс «групи (вправа)», «клас групи», «наступний метод»}}
 
-It is probably worthwhile to define a new class `GroupIterator`. Iterator instances should have a property that tracks the current position in the group. Every time `next` is called, it checks whether it is done and, if not, moves past the current value and returns it.
+Можливо, варто визначити новий клас `GroupIterator`. Екземпляри ітератора повинні мати властивість, яка відстежує поточну позицію в групі. Кожного разу, коли викликається `next`, вона перевіряє, чи це зроблено, і якщо ні, пересувається далі поточного значення і повертає його.
 
-The `Group` class itself gets a method named by `Symbol.iterator` that, when called, returns a new instance of the iterator class for that group.
+Сам клас `Group` отримує метод з іменем `Symbol.iterator`, який при виклику повертає новий екземпляр класу ітератора для цієї групи.
 
-hint}}
+підказка}}

@@ -1,286 +1,285 @@
-# Handling Events
+# Обробка подій
 
-{{quote {author: "Marcus Aurelius", title: Meditations, chapter: true}
+{{quote {автор: «Марк Аврелій», title: Meditations, chapter: true}}
 
-You have power over your mind—not outside events. Realize this, and you will find strength.
+Ви маєте владу над своїм розумом, а не над зовнішніми подіями. Усвідомте це, і ви знайдете силу.
 
 quote}}
 
-{{index stoicism, "Marcus Aurelius", input, timeline}}
+{{index_stoicism, «Marcus Aurelius», input, timeline}}
+{{figure {url: «img/chapter_picture_15.jpg», alt: «Ілюстрація із зображенням машини Руба Ґолдберґа, що складається з кульки, пилки, ножиць і молотка, які впливають одне на одного в ланцюговій реакції, що вмикає лампочку.», “chapter”, “image”, “alt”: »Ілюстрація із зображенням машини Руба Ґолдберґа: «Обрамлення"}}}.
 
-{{figure {url: "img/chapter_picture_15.jpg", alt: "Illustration showing a Rube Goldberg machine involving a ball, a see-saw, a pair of scissors, and a hammer, which affect each other in a chain reaction that turns on a lightbulb.", chapter: "framed"}}}
+Деякі програми працюють з прямим введенням даних користувачем, наприклад, за допомогою миші та клавіатури. Таке введення не можна передбачити заздалегідь, як добре організовану структуру даних - воно надходить по частинах, у реальному часі, і програма повинна реагувати на нього у міру надходження.
 
-Some programs work with direct user input, such as mouse and keyboard actions. That kind of input isn't available ahead of time, as a well-organized data structure—it comes in piece by piece, in real time, and the program must respond to it as it happens.
+## Обробники подій
 
-## Event handlers
+{{index polling, button, «real-time»}}
 
-{{index polling, button, "real-time"}}
+Уявіть собі інтерфейс, у якому єдиний спосіб дізнатися, чи натиснуто клавішу на ((клавіатурі)) - це прочитати поточний стан цієї клавіші. Щоб мати можливість реагувати на натискання клавіш, вам доведеться постійно зчитувати стан клавіші, щоб встигнути зловити натискання до того, як її знову буде відпущено. Було б небезпечно виконувати інші трудомісткі обчислення, оскільки ви могли б пропустити натискання клавіш.
 
-Imagine an interface where the only way to find out whether a key on the ((keyboard)) is being pressed is to read the current state of that key. To be able to react to keypresses, you would have to constantly read the key's state to catch it before it is released again. It would be dangerous to perform other time-intensive computations, since you might miss a keypress.
+Деякі примітивні машини обробляють ввід саме так. Наступним кроком є те, що апаратне забезпечення або операційна система помічають натискання клавіш і ставлять їх у чергу. Програма може періодично перевіряти чергу на наявність нових подій і реагувати на те, що вона там знаходить.
 
-Some primitive machines handle input like this. A step up from this is for the hardware or operating system to notice the keypress and put it in a queue. A program can then periodically check the queue for new events and react to what it finds there.
+{{індекс чуйності, «користувацький досвід»}}
 
-{{index responsiveness, "user experience"}}
+Звісно, програма повинна пам'ятати про перегляд черги, і робити це часто, оскільки будь-який час між натисканням клавіші та помічанням події програмою призведе до того, що програма не реагуватиме на неї. Такий підхід називається _((опитування))_. Більшість програмістів вважають за краще його уникати.
 
-Of course, the program has to remember to look at the queue, and to do it often because any time between the key being pressed and the program noticing the event will cause the software to feel unresponsive. This approach is called _((polling))_. Most programmers prefer to avoid it.
+{{index «функція зворотного виклику», «обробка подій»}}
 
-{{index "callback function", "event handling"}}
-
-A better mechanism is for the system to actively notify the code when an event occurs. Browsers do this by allowing us to register functions as _handlers_ for specific events.
+Кращим механізмом є активне сповіщення системою коду про виникнення події. Браузери роблять це, дозволяючи нам реєструвати функції як _обробники_ певних подій.
 
 ```{lang: html}
-<p>Click this document to activate the handler.</p>
+<p>Клікніть цей документ, щоб активувати обробник.</p>
 <script>
-  window.addEventListener("click", () => {
-    console.log("You knocked?");
+  window.addEventListener(«click», () => {
+    console.log(«Ви стукали?»);
   });
 </script>
 ```
 
-{{index "click event", "addEventListener method", "window object", [browser, window]}}
+{{індекс «подія кліку», «метод addEventListener», «об'єкт вікна», [браузер, вікно]}}
 
-The `window` binding refers to a built-in object provided by the browser. It represents the browser window that contains the document. Calling its `addEventListener` method registers the second argument to be called whenever the event described by its first argument occurs.
+Зв'язка `window` посилається на вбудований об'єкт, наданий браузером. Він представляє вікно браузера, яке містить документ. Виклик його методу `addEventListener` реєструє другий аргумент, який буде викликано щоразу, коли відбудеться подія, описана його першим аргументом.
 
-## Events and DOM nodes
+## Події та DOM-вузли
 
-{{index "addEventListener method", "event handling", "window object", browser, [DOM, events]}}
+{{index «addEventListener method», «event handling», «window object», browser, [DOM, events]}}
 
-Each browser event handler is registered in a context. In the previous example, we called `addEventListener` on the `window` object to register a handler for the whole window. Such a method can also be found on DOM elements and some other types of objects. Event listeners are called only when the event happens in the context of the object on which they are registered.
+Кожен обробник подій браузера реєструється в контексті. У попередньому прикладі ми викликали `addEventListener` на об'єкті `window`, щоб зареєструвати обробник для всього вікна. Такий метод також можна знайти на DOM-елементах та деяких інших типах об'єктів. Слухачі подій викликаються тільки тоді, коли подія відбувається в контексті об'єкта, на якому вони зареєстровані.
 
 ```{lang: html}
-<button>Click me</button>
-<p>No handler here.</p>
-<script>
-  let button = document.querySelector("button");
-  button.addEventListener("click", () => {
-    console.log("Button clicked.");
+<button>Клікни мене</button>
+<p>Тут немає обробника.</p>
+<скрипт
+  let button = document.querySelector(«button»);
+  button.addEventListener(«click», () => {})
+    console.log(«Кнопка натиснута.»);
   });
 </script>
 ```
 
-{{index "click event", "button (HTML tag)"}}
+{{index «click event», «button (HTML-тег)»}}
 
-That example attaches a handler to the button node. Clicks on the button cause that handler to run, but clicks on the rest of the document do not.
+Цей приклад приєднує обробник до вузла button. Клацання на кнопці викликає запуск цього обробника, але клацання на решті частини документа не викликає.
 
-{{index "onclick attribute", encapsulation}}
+{{index «onclick attribute», інкапсуляція}}
 
-Giving a node an `onclick` attribute has a similar effect. This works for most types of events—you can attach a handler through the attribute whose name is the event name with `on` in front of it.
+Надання вузлу атрибуту `onclick` має подібний ефект. Це працює для більшості типів подій - ви можете приєднати обробник через атрибут, ім'я якого є назвою події з `on` перед ним.
 
-But a node can have only one `onclick` attribute, so you can register only one handler per node that way. The `addEventListener` method allows you to add any number of handlers meaning it's safe to add handlers even if there is already another handler on the element.
+Але вузол може мати лише один атрибут `onclick`, тому ви можете зареєструвати лише один обробник на вузол у такий спосіб. Метод `addEventListener` дозволяє додавати будь-яку кількість обробників, тобто безпечно додавати обробники, навіть якщо на елементі вже є інший обробник.
 
-{{index "removeEventListener method"}}
+{{index «removeEventListener method»}}
 
-The `removeEventListener` method, called with arguments similar to `addEventListener`, removes a handler.
+Метод `removeEventListener`, викликаний з аргументами, подібними до `addEventListener`, видаляє обробник.
 
 ```{lang: html}
-<button>Act-once button</button>
-<script>
-  let button = document.querySelector("button");
+<button>Кнопка однократної дії</button>
+<скрипт
+  let button = document.querySelector(«button»);
   function once() {
-    console.log("Done.");
-    button.removeEventListener("click", once);
+    console.log(«Виконано.»);
+    button.removeEventListener(«click», once);
   }
-  button.addEventListener("click", once);
+  button.addEventListener(«click», once);
 </script>
 ```
 
-{{index [function, "as value"]}}
+{{index [function, «as value»]}}
 
-The function given to `removeEventListener` has to be the same function value given to `addEventListener`. When you need to unregister a handler, you'll want to give the handler function a name (`once`, in the example) to be able to pass the same function value to both methods.
+Функція, що передається в `removeEventListener`, має бути тим самим значенням функції, що передається в `addEventListener`. Якщо вам потрібно скасувати реєстрацію обробника, вам слід надати функції-обробнику ім'я (у прикладі `once`), щоб мати змогу передати те саме значення функції до обох методів.
 
-## Event objects
+## Об'єкти подій
 
-{{index "button property", "event handling"}}
+{{index «властивість кнопки», «обробка подій»}}
 
-Though we have ignored it so far, event handler functions are passed an argument: the _((event object))_. This object holds additional information about the event. For example, if we want to know _which_ ((mouse button)) was pressed, we can look at the event object's `button` property.
+Хоча ми досі ігнорували це, функціям обробників подій передається аргумент:  об'єкт _((об'єкт події))_. Цей об'єкт містить додаткову інформацію про подію. Наприклад, якщо ми хочемо дізнатися, _яка_ ((кнопка миші)) була натиснута, ми можемо подивитися на властивість `button` об'єкта події.
 
 ```{lang: html}
-<button>Click me any way you want</button>
+<button>Клікніть мене як завгодно</button>
 <script>
-  let button = document.querySelector("button");
-  button.addEventListener("mousedown", event => {
+  let button = document.querySelector(«button»);
+  button.addEventListener(«mousedown», event => {})
     if (event.button == 0) {
-      console.log("Left button");
+      console.log(«Ліва кнопка»);
     } else if (event.button == 1) {
-      console.log("Middle button");
+      console.log(«Середня кнопка»);
     } else if (event.button == 2) {
-      console.log("Right button");
+      console.log(«Права кнопка»);
     }
   });
 </script>
 ```
 
-{{index "event type", "type property"}}
+{{індекс «тип події», «властивість типу»}}
 
-The information stored in an event object differs per type of event. (We'll discuss different types later in the chapter.) The object's `type` property always holds a string identifying the event (such as `"click"` or `"mousedown"`).
+Інформація, що зберігається в об'єкті події, відрізняється залежно від типу події. (Ми обговоримо різні типи пізніше у цій главі.) Властивість `type` об'єкта завжди містить рядок, що ідентифікує подію (наприклад, `«click»` або `«mousedown»`).
 
-## Propagation
+## Поширення
 
-{{index "event propagation", "parent node"}}
+{{index «event propagation», «parent node»}}
 
-{{indexsee bubbling, "event propagation"}}
+{{indexsee bubbling, «event propagation»}}
 
-{{indexsee propagation, "event propagation"}}
+{{indexsee propagation, «event propagation»}}
 
-For most event types, handlers registered on nodes with children will also receive events that happen in the children. If a button inside a paragraph is clicked, event handlers on the paragraph will also see the click event.
+Для більшості типів подій обробники, зареєстровані на дочірніх вузлах, також отримуватимуть події, що відбуваються у дочірніх вузлах. Якщо натиснуто кнопку всередині абзацу, обробники подій у цьому абзаці також побачать подію натискання.
 
-{{index "event handling"}}
+{{index «обробка подій»}}
 
-But if both the paragraph and the button have a handler, the more specific handler—the one on the button—gets to go first. The event is said to _propagate_ outward from the node where it happened to that node's parent node and on to the root of the document. Finally, after all handlers registered on a specific node have had their turn, handlers registered on the whole ((window)) get a chance to respond to the event.
+Але якщо і абзац, і кнопка мають обробник, то більш специфічний обробник - той, що на кнопці, - буде оброблений першим. Кажуть, що подія _поширюється_ назовні від вузла, де вона сталася, до батьківського вузла цього вузла і далі до кореня документа. Нарешті, після того, як всі обробники, зареєстровані на певному вузлі, дочекалися своєї черги, обробники, зареєстровані на всьому документі ((вікні)), отримують можливість відреагувати на подію.
 
-{{index "stopPropagation method", "click event"}}
+{{index «stopPropagation method», «click event»}}
 
-At any point, an event handler can call the `stopPropagation` method on the event object to prevent handlers further up from receiving the event. This can be useful when, for example, you have a button inside another clickable element and you don't want clicks on the button to activate the outer element's click behavior.
+У будь-який момент обробник події може викликати метод `stopPropagation` на об'єкті події, щоб запобігти отриманню події обробниками, зареєстрованими вище. Це може бути корисно, коли, наприклад, у вас є кнопка всередині іншого елемента, на який можна натиснути, і ви не хочете, щоб натискання на кнопку активувало поведінку натискання на зовнішньому елементі.
 
-{{index "mousedown event", "pointer event"}}
+{{index «mousedown event», «pointer event»}}
 
-The following example registers `"mousedown"` handlers on both a button and the paragraph around it. When clicked with the right mouse button, the handler for the button calls `stopPropagation`, which will prevent the handler on the paragraph from running. When the button is clicked with another ((mouse button)), both handlers will run.
+У наступному прикладі реєструються обробники події «наведення миші» як для кнопки, так і для абзацу навколо неї. При натисканні правою кнопкою миші обробник для кнопки викликає `stopPropagation`, який зупиняє виконання обробника для абзацу. При натисканні кнопки іншою кнопкою миші (кнопка миші) будуть запущені обидва обробники.
 
 ```{lang: html}
-<p>A paragraph with a <button>button</button>.</p>
+<p>Абзац з кнопкою <button>button</button>.</p>
 <script>
-  let para = document.querySelector("p");
-  let button = document.querySelector("button");
-  para.addEventListener("mousedown", () => {
-    console.log("Handler for paragraph.");
+  let para = document.querySelector(«p»);
+  let button = document.querySelector(«button»);
+  para.addEventListener(«mousedown», () => {})
+    console.log(«Обробник для пункту.»);
   });
-  button.addEventListener("mousedown", event => {
-    console.log("Handler for button.");
+  button.addEventListener(«mousedown», event => {}); button.addEventListener(«mousedown», event => {})
+    console.log(«Обробник для кнопки.»);
     if (event.button == 2) event.stopPropagation();
   });
 </script>
 ```
 
-{{index "event propagation", "target property"}}
+{{index «propagation», «target property»}}
 
-Most event objects have a `target` property that refers to the node where they originated. You can use this property to ensure that you're not accidentally handling something that propagated up from a node you do not want to handle.
+Більшість об'єктів подій мають властивість `target`, яка посилається на вузол, де вони виникли. Ви можете використовувати цю властивість, щоб переконатися, що ви випадково не обробляєте щось, що поширилося з вузла, який ви не хочете обробляти.
 
-It is also possible to use the `target` property to cast a wide net for a specific type of event. For example, if you have a node containing a long list of buttons, it may be more convenient to register a single click handler on the outer node and have it use the `target` property to figure out whether a button was clicked, rather than registering individual handlers on all of the buttons.
+Також можна використовувати властивість `target`, щоб закинути широку мережу для певного типу подій. Наприклад, якщо у вас є вузол, що містить довгий список кнопок, може бути зручніше зареєструвати обробник одного кліку на зовнішньому вузлі і змусити його використовувати властивість `target` для визначення того, чи була натиснута кнопка, ніж реєструвати окремі обробники для всіх кнопок.
 
 ```{lang: html}
 <button>A</button>
 <button>B</button>
 <button>C</button>
 <script>
-  document.body.addEventListener("click", event => {
-    if (event.target.nodeName == "BUTTON") {
-      console.log("Clicked", event.target.textContent);
+  document.body.addEventListener(«click», event => {
+    if (event.target.nodeName == «BUTTON») {
+      console.log(«Clicked», event.target.textContent);
     }
   });
 </script>
 ```
 
-## Default actions
+## Дії за замовчуванням
 
-{{index scrolling, "default behavior", "event handling"}}
+{{прокрутка індексу, «поведінка за замовчуванням», «обробка подій»}}
 
-Many events have a default action. If you click a ((link)), you will be taken to the link's target. If you press the down arrow, the browser will scroll the page down. If you right-click, you'll get a context menu. And so on.
+Багато подій мають дію за замовчуванням. Якщо ви натиснете кнопку ((посилання)), вас буде перенаправлено на цільове посилання. Якщо ви натиснете стрілку вниз, браузер прокрутить сторінку вниз. Якщо ви натиснете правою кнопкою миші, ви отримаєте контекстне меню. І так далі.
 
-{{index "preventDefault method"}}
+{{index «preventDefault method»}}
 
-For most types of events, the JavaScript event handlers are called _before_ the default behavior takes place. If the handler doesn't want this normal behavior to happen, typically because it has already taken care of handling the event, it can call the `preventDefault` method on the event object.
+Для більшості типів подій обробники подій JavaScript викликаються _до_ того, як відбудеться поведінка за замовчуванням. Якщо обробник не хоче, щоб відбувалася ця нормальна поведінка, зазвичай тому, що він вже подбав про обробку події, він може викликати метод `preventDefault` на об'єкті події.
 
-{{index expectation}}
+{{Очікування індексу}}
 
-This can be used to implement your own ((keyboard)) shortcuts or ((context menu)). It can also be used to obnoxiously interfere with the behavior that users expect. For example, here is a link that cannot be followed:
+Це може бути використано для реалізації ваших власних ((клавіатурних)) комбінацій клавіш або ((контекстного меню)). Він також може бути використаний для неприємного втручання у поведінку, яку очікують користувачі. Наприклад, ось посилання, за яким неможливо перейти:
 
 ```{lang: html}
-<a href="https://developer.mozilla.org/">MDN</a>
-<script>
-  let link = document.querySelector("a");
-  link.addEventListener("click", event => {
-    console.log("Nope.");
+<a href=«https://developer.mozilla.org/»>MDN</a>
+<скрипт
+  let link = document.querySelector(«a»);
+  link.addEventListener(«click», event => {})
+    console.log(«Nope.»);
     event.preventDefault();
   });
 </script>
 ```
 
-{{index usability}}
+{{індекс юзабіліті}}
 
-Try not to do such things without a really good reason. It'll be unpleasant for people who use your page when expected behavior is broken.
+Намагайтеся не робити такі речі без дійсно вагомої причини. Людям, які користуються вашою сторінкою, буде неприємно, коли очікувана поведінка буде порушена.
 
-Depending on the browser, some events can't be intercepted at all. On Chrome, for example, the ((keyboard)) shortcut to close the current tab ([ctrl]{keyname}-W or [command]{keyname}-W) cannot be handled by JavaScript.
+Залежно від браузера, деякі події взагалі неможливо перехопити. У Chrome, наприклад, комбінація клавіш ((клавіатура)) для закриття поточної вкладки ([ctrl]{ім'я}-W або [command]{ім'я}-W) не може бути оброблена JavaScript.
 
-## Key events
+## Ключові події
 
-{{index keyboard, "keydown event", "keyup event", "event handling"}}
+{{індекс клавіатури, «подія натискання клавіші», «подія натискання клавіші», «обробка подій»}}
 
-When a key on the keyboard is pressed, your browser fires a `"keydown"` event. When it is released, you get a `"keyup"` event.
+Коли натискається клавіша на клавіатурі, ваш браузер генерує подію «натискання клавіші». Коли клавішу відпускається, відбувається подія ``keyup``.
 
 ```{lang: html, focus: true}
-<p>This page turns violet when you hold the V key.</p>
+<p>Ця сторінка стає фіолетовою, коли ви утримуєте клавішу V.</p>
 <script>
-  window.addEventListener("keydown", event => {
-    if (event.key == "v") {
-      document.body.style.background = "violet";
+  window.addEventListener(«keydown», event => {
+    if (event.key == «v») {
+      document.body.style.background = «violet»;
     }
   });
-  window.addEventListener("keyup", event => {
-    if (event.key == "v") {
-      document.body.style.background = "";
+  window.addEventListener(«keyup», event => {
+    if (event.key == «v») {
+      document.body.style.background = «»;
     }
   });
 </script>
 ```
 
-{{index "repeating key"}}
+{{index «repeating key»}}
 
-Despite its name, `"keydown"` fires not only when the key is physically pushed down. When a key is pressed and held, the event fires again every time the key _repeats_. Sometimes you have to be careful about this. For example, if you add a button to the DOM when a key is pressed and remove it again when the key is released, you might accidentally add hundreds of buttons when the key is held down longer.
+Незважаючи на свою назву, `«натискання клавіші»` спрацьовує не лише тоді, коли клавішу фізично натиснуто. Коли клавішу натиснуто і утримується, подія спрацьовує знову щоразу, коли клавіша _повторюється_. Іноді з цим потрібно бути обережним. Наприклад, якщо ви додаєте кнопку до DOM, коли натиснуто клавішу, і видаляєте її, коли клавішу відпускається, ви можете випадково додати сотні кнопок, якщо утримувати клавішу натиснутою довше.
 
-{{index "key property"}}
+{{index «key property»}}
 
-The previous example looks at the `key` property of the event object to see which key the event is about. This property holds a string that, for most keys, corresponds to the thing that pressing that key would type. For special keys such as [enter]{keyname}, it holds a string that names the key (`"Enter"`, in this case). If you hold [shift]{keyname} while pressing a key, that might also influence the name of the key—`"v"` becomes `"V"`, and `"1"` may become `"!"`, if that is what pressing [shift]{keyname}-1 produces on your keyboard.
+У попередньому прикладі ми розглядали властивість `key` об'єкта події, щоб дізнатися, про яку клавішу йдеться у події. Ця властивість містить рядок, який для більшості клавіш відповідає тому, що буде введено при натисканні цієї клавіші. Для спеціальних клавіш, таких як [enter]{назва клавіші}, ця властивість містить рядок з назвою клавіші (у цьому випадку `«Enter»`). Якщо під час натискання клавіші утримувати [shift]{назва клавіші}, це також може вплинути на назву клавіші - `«v»` стане `«V»`, а `«1»` може стати `«!»`, якщо натискання [shift]{назва клавіші}-1 призведе до такого результату на вашій клавіатурі.
 
-{{index "modifier key", "shift key", "control key", "alt key", "meta key", "command key", "ctrlKey property", "shiftKey property", "altKey property", "metaKey property"}}
+{{index «клавіша-модифікатор», «клавіша shift», «клавіша керування», «клавіша alt», «метаклавіша», «командна клавіша», «властивість ctrlKey», «властивість shiftKey», «властивість altKey», «властивість metaKey»}}
 
-Modifier keys such as [shift]{keyname}, [ctrl]{keyname}, [alt]{keyname}, and [meta]{keyname} ([command]{keyname} on Mac) generate key events just like normal keys. When looking for key combinations, you can also find out whether these keys are held down by looking at the `shiftKey`, `ctrlKey`, `altKey`, and `metaKey` properties of keyboard and mouse events.
+Клавіші-модифікатори, такі як [shift]{назва клавіші}, [ctrl]{назва клавіші}, [alt]{назва клавіші} та [meta]{назва клавіші} ([command]{назва клавіші} на Mac) генерують події клавіш так само, як і звичайні клавіші. Під час пошуку комбінацій клавіш ви також можете дізнатися, чи утримуються ці клавіші натиснутими, переглянувши властивості `shiftKey`, `ctrlKey`, `altKey` та `metaKey` подій клавіатури та миші.
 
 ```{lang: html, focus: true}
-<p>Press Control-Space to continue.</p>
+<p>Для продовження натисніть клавішу Control-Space.
 <script>
-  window.addEventListener("keydown", event => {
-    if (event.key == " " && event.ctrlKey) {
-      console.log("Continuing!");
+  window.addEventListener(«keydown», event => {
+    if (event.key == « » && event.ctrlKey) {
+      console.log(«Продовжуємо!»);
     }
   });
 </script>
 ```
 
-{{index "button (HTML tag)", "tabindex attribute", [DOM, events]}}
+{{index «button (HTML-тег)», «атрибут tabindex», [DOM, events]}}
 
-The DOM node where a key event originates depends on the element that has ((focus)) when the key is pressed. Most nodes cannot have focus unless you give them a `tabindex` attribute, but things like ((link))s, buttons, and form fields can. We'll come back to form ((field))s in [Chapter ?](http#forms). When nothing in particular has focus, `document.body` acts as the target node of key events.
+Вузол DOM, в якому відбувається подія натискання клавіші, залежить від елемента, який має ((focus)) при натисканні клавіші. Більшість вузлів не можуть мати фокус, якщо ви не надасте їм атрибут `tabindex`, але такі елементи, як ((link)), кнопки та поля форм можуть. Ми повернемося до форми ((поле))s у [Главі ?] (http#forms). Коли ні на чому конкретному не сфокусовано увагу, `document.body` діє як цільовий вузол ключових подій.
 
-When the user is typing text, using key events to figure out what is being typed is problematic. Some platforms, most notably the ((virtual keyboard)) on ((Android)) ((phone))s, don't fire key events. But even when you have an old-fashioned keyboard, some types of text input don't match keypresses in a straightforward way, such as _input method editor_ (_((IME))_) software used by people whose scripts don't fit on a keyboard, where multiple keystrokes are combined to create characters.
+Коли користувач вводить текст, використання ключових подій для визначення того, що саме вводиться, є проблематичним. Деякі платформи, зокрема віртуальна клавіатура на ((Android)) ((телефоні)), не генерують ключові події. Але навіть якщо у вас старомодна клавіатура, деякі типи введення тексту не відповідають натисканням клавіш у прямому сенсі, наприклад, _редактор методів введення_ (_((IME))_) програмне забезпечення, яке використовують люди, чиї сценарії не вміщуються на клавіатурі, де для створення символів комбінується кілька натискань клавіш.
 
-To notice when something was typed, elements that you can type into, such as the `<input>` and `<textarea>` tags, fire `"input"` events whenever the user changes their content. To get the actual content that was typed, it is best to directly read it from the focused field, which we discuss in [Chapter ?](http#forms).
+Щоб помітити, коли щось було введено, елементи, у які можна вводити дані, такі як теги `<input>` та `<textarea>`, викликають подію `«input»` щоразу, коли користувач змінює їхній вміст. Щоб отримати фактичний вміст, який було введено, найкраще безпосередньо прочитати його з сфокусованого поля, що ми обговорюємо у [Розділ ?](http#forms).
 
-## Pointer events
+## Події з вказівниками
 
-There are currently two widely used ways to point at things on a screen: mice (including devices that act like mice, such as touchpads and trackballs) and touchscreens. These produce different kinds of events.
+Наразі існує два широко використовувані способи вказівки на об'єкти на екрані: миша (включно з пристроями, що діють як миші, наприклад, тачпади та трекболи) та сенсорні екрани. Вони спричиняють різні типи подій.
 
-### Mouse clicks
+### Клацання мишею
 
-{{index "mousedown event", "mouseup event", "mouse cursor"}}
+{{індекс «подія при натисканні кнопки миші», «подія при наведенні курсору миші», «курсор миші»}}
 
-Pressing a ((mouse button)) causes a number of events to fire. The `"mousedown"` and `"mouseup"` events are similar to `"keydown"` and `"keyup"` and fire when the button is pressed and released. These happen on the DOM nodes that are immediately below the mouse pointer when the event occurs.
+Натискання ((кнопки миші)) спричиняє низку подій. Події «mousedown»` і «mouseup»` подібні до подій «keydown»` і «keyup»` і спрацьовують, коли кнопку натиснуто і відпущено. Вони відбуваються у вузлах DOM, які знаходяться безпосередньо під вказівником миші, коли відбувається подія.
 
-{{index "click event"}}
+{{index «click event»}}
 
-After the `"mouseup"` event, a `"click"` event fires on the most specific node that contained both the press and the release of the button. For example, if I press down the mouse button on one paragraph and then move the pointer to another paragraph and release the button, the `"click"` event will happen on the element that contains both those paragraphs.
+Після події `«mouseup»` відбувається подія `«click»` на конкретному вузлі, на якому відбулося і натискання, і відпускання кнопки. Наприклад, якщо я натисну кнопку миші на одному абзаці, а потім переміщу вказівник на інший абзац і відпущу кнопку, подія `«click»` відбудеться на елементі, який містить обидва ці абзаци.
 
-{{index "dblclick event", "double click"}}
+{{index «dblclick event», «подвійне клацання»}}
 
-If two clicks happen close together, a `"dblclick"` (double-click) event also fires, after the second click event.
+Якщо два кліки відбуваються близько один до одного, то після другого кліку також відбувається подія `«dblclick»` (подвійний клік).
 
-{{index pixel, "clientX property", "clientY property", "pageX property", "pageY property", "event object"}}
+{{index pixel, «clientX property», «clientY property», «pageX property», «pageY property», «event object»}}
 
-To get precise information about the place where a mouse event happened, you can look at its `clientX` and `clientY` properties, which contain the event's ((coordinates)) (in pixels) relative to the upper-left corner of the window, or `pageX` and `pageY`, which are relative to the upper-left corner of the whole document (which may be different when the window has been scrolled).
+Для отримання точної інформації про місце, де відбулася подія миші, можна подивитися на її властивості `clientX` та `clientY`, які містять координати події (у пікселях) відносно лівого верхнього кута вікна, або `pageX` та `pageY`, які відносяться до лівого верхнього кута всього документа (які можуть відрізнятися при прокручуванні вікна).
 
-{{index "border-radius (CSS)", "absolute positioning", "drawing program example"}}
+{{index «border-radius (CSS)», «абсолютне позиціонування», «приклад програми малювання»}}
 
 {{id mouse_drawing}}
 
-The following program implements a primitive drawing application. Every time you click the document, it adds a dot under your mouse pointer.
+Наступна програма реалізує примітивну програму малювання. Кожного разу, коли ви клацаєте на документі, вона додає крапку під вказівником миші.
 
 ```{lang: html}
 <style>
@@ -290,137 +289,137 @@ The following program implements a primitive drawing application. Every time you
   }
   .dot {
     height: 8px; width: 8px;
-    border-radius: 4px; /* rounds corners */
+    border-radius: 4px; /* закруглює кути */
     background: teal;
     position: absolute;
   }
-</style>
+</style> </style
 <script>
-  window.addEventListener("click", event => {
-    let dot = document.createElement("div");
-    dot.className = "dot";
-    dot.style.left = (event.pageX - 4) + "px";
-    dot.style.top = (event.pageY - 4) + "px";
+  window.addEventListener(«click», event => {})
+    нехай dot = document.createElement(«div»);
+    dot.className = «dot»;
+    dot.style.left = (event.pageX - 4) + «px»;
+    dot.style.top = (event.pageY - 4) + «px»;
     document.body.appendChild(dot);
   });
 </script>
 ```
 
-We'll create a less primitive drawing application in [Chapter ?](paint).
+Ми створимо менш примітивний додаток для малювання у [Глава ?](paint).
 
-### Mouse motion
+### Рух миші
 
-{{index "mousemove event"}}
+{{index «mousemove event»}}
 
-Every time the mouse pointer moves, a `"mousemove"` event fires. This event can be used to track the position of the mouse. A common situation in which this is useful is when implementing some form of mouse-((dragging)) functionality.
+Кожного разу, коли вказівник миші рухається, відбувається подія ``mousemove``. Цю подію можна використовувати для відстеження положення миші. Типовою ситуацією, у якій це може бути корисно, є реалізація певної форми функціональності миші-((перетягування)).
 
-{{index "draggable bar example"}}
+{{index «draggable bar example»}}
 
-As an example, the following program displays a bar and sets up event handlers so that dragging to the left or right on this bar makes it narrower or wider:
+Як приклад, у наступній програмі показано смужку і налаштовано обробники подій таким чином, що перетягування ліворуч або праворуч на цій смужці робить її вужчою або ширшою:
 
 ```{lang: html, startCode: true}
-<p>Drag the bar to change its width:</p>
-<div style="background: orange; width: 60px; height: 20px">
-</div>
+<p>Перетягніть смугу, щоб змінити її ширину:</p> <p>Перетягніть смугу, щоб змінити її ширину
+<div style=«background: orange; width: 60px; height: 20px»>
+</div> </div> </div> </div> </div> </div
 <script>
-  let lastX; // Tracks the last observed mouse X position
-  let bar = document.querySelector("div");
-  bar.addEventListener("mousedown", event => {
+  let lastX; // Відстежує останню зафіксовану позицію мишки по X
+  let bar = document.querySelector(«div»);
+  bar.addEventListener(«mousedown», event => {})
     if (event.button == 0) {
       lastX = event.clientX;
-      window.addEventListener("mousemove", moved);
-      event.preventDefault(); // Prevent selection
+      window.addEventListener(«mousemove», moved);
+      event.preventDefault(); // Заборонити вибір
     }
   });
 
   function moved(event) {
     if (event.buttons == 0) {
-      window.removeEventListener("mousemove", moved);
+      window.removeEventListener(«mousemove», moved);
     } else {
       let dist = event.clientX - lastX;
       let newWidth = Math.max(10, bar.offsetWidth + dist);
-      bar.style.width = newWidth + "px";
+      bar.style.width = newWidth + «px»;
       lastX = event.clientX;
     }
   }
-</script>
+</script> </span> </span> </span> </span> </span>.
 ```
 
 {{if book
 
-The resulting page looks like this:
+Результуюча сторінка виглядає наступним чином:
 
-{{figure {url: "img/drag-bar.png", alt: "Picture of a draggable bar", width: "5.3cm"}}}
+{{figure {url: «img/drag-bar.png», alt: «Зображення панелі, що перетягується», width: “5.3cm”}}}}
 
 if}}
 
-{{index "mouseup event", "mousemove event"}}
+{{index «mouseup event», «mousemove event»}}
 
-Note that the `"mousemove"` handler is registered on the whole ((window)). Even if the mouse goes outside of the bar during resizing, as long as the button is held, we still want to update its size.
+Зверніть увагу, що обробник `«mousemove»` реєструється на все вікно ((вікно)). Навіть якщо під час зміни розміру миша вийде за межі панелі, ми все одно хочемо оновити розмір кнопки, доки вона утримується натиснутою.
 
-{{index "buttons property", "button property", "bitfield"}}
+{{index «buttons property», «button property», «bitfield»}}
 
-We must stop resizing the bar when the mouse button is released. For that, we can use the `buttons` property (note the plural), which tells us about the buttons that are currently held down. When it is 0, no buttons are down. When buttons are held, the value of the `buttons` property is the sum of the codes for those buttons—the left button has code 1, the right button 2, and the middle one 4. With the left and right buttons held, for example, the value of `buttons` will be 3.
+Ми повинні зупинити зміну розміру смуги, коли кнопку миші буде відпущено. Для цього ми можемо використати властивість `buttons` (зверніть увагу на множину), яка повідомляє нам про кнопки, які наразі утримуються натиснутими. Коли вона дорівнює 0, жодної кнопки не натиснуто. Коли кнопки натиснуто, значення властивості `buttons` дорівнює сумі кодів цих кнопок - ліва кнопка має код 1, права - 2, а середня - 4. Наприклад, якщо утримувати ліву та праву кнопки, значення властивості `buttons` буде 3.
 
-Note that the order of these codes is different from the one used by `button`, where the middle button came before the right one. As mentioned, consistency isn't a strong point of the browser's programming interface.
+Зверніть увагу, що порядок цих кодів відрізняється від того, який використовувався для `button`, де середня кнопка йшла перед правою. Як вже було сказано, послідовність не є сильною стороною інтерфейсу програмування браузера.
 
-### Touch events
+### Події дотику
 
-{{index touch, "mousedown event", "mouseup event", "click event"}}
+{{індекс дотику, «подія наведення миші», «подія наведення миші», «подія клацання»}}
 
-The style of graphical browser that we use was designed with mouse interfaces in mind, at a time where touchscreens were rare. To make the web "work" on early touchscreen phones, browsers for those devices pretended, to a certain extent, that touch events were mouse events. If you tap your screen, you'll get `"mousedown"`, `"mouseup"`, and `"click"` events.
+Стиль графічного браузера, який ми використовуємо, був розроблений з урахуванням інтерфейсів миші, в той час, коли сенсорні екрани були рідкістю. Щоб змусити Інтернет «працювати» на ранніх телефонах з сенсорним екраном, браузери для цих пристроїв певною мірою вдавали, що події дотику є подіями миші. Якщо ви торкнетеся екрана, то отримаєте події «наведення миші», «наведення миші» і «клацання».
 
-But this illusion isn't very robust. A touchscreen doesn't work like a mouse: it doesn't have multiple buttons, you can't track the finger when it isn't on the screen (to simulate `"mousemove"`), and it allows multiple fingers to be on the screen at the same time.
+Але ця ілюзія не дуже надійна. Сенсорний екран працює не так, як миша: він не має декількох кнопок, ви не можете відстежувати палець, коли його немає на екрані (щоб імітувати «рух миші»), і він дозволяє декільком пальцям перебувати на екрані одночасно.
 
-Mouse events cover touch interaction only in straightforward cases—if you add a `"click"` handler to a button, touch users will still be able to use it. But something like the resizeable bar in the previous example does not work on a touchscreen.
+Події миші покривають сенсорну взаємодію лише у простих випадках - якщо ви додасте обробник «клацання» до кнопки, користувачі сенсорного вводу все одно зможуть нею користуватися. Але щось на кшталт смуги зі змінним розміром у попередньому прикладі не працює на сенсорному екрані.
 
-{{index "touchstart event", "touchmove event", "touchend event"}}
+{{index «touchstart event», «touchmove event», «touchend event»}}
 
-There are specific event types fired by touch interaction. When a finger starts touching the screen, you get a `"touchstart"` event. When it is moved while touching, `"touchmove"` events fire.  Finally, when it stops touching the screen, you'll see a `"touchend"` event.
+Існують певні типи подій, які запускаються при взаємодії з дотиком. Коли палець починає торкатися екрана, виникає подія «початок торкання». Якщо палець рухається під час торкання, відбувається подія «дотик-переміщення».  Нарешті, коли палець припиняє торкатися екрана, ви побачите подію ``touchnd``.
 
-{{index "touches property", "clientX property", "clientY property", "pageX property", "pageY property"}}
+{{index «touches property», «clientX property», «clientY property», «pageX property», «pageY property»}}
 
-Because many touchscreens can detect multiple fingers at the same time, these events don't have a single set of coordinates associated with them. Rather, their ((event object))s have a `touches` property, which holds an ((array-like object)) of points, each of which has its own `clientX`, `clientY`, `pageX`, and `pageY` properties.
+Оскільки багато сенсорних екранів можуть розпізнавати кілька пальців одночасно, ці події не мають єдиного набору координат, пов'язаних з ними. Натомість, їхні ((об'єкт події)) мають властивість `touch`, яка містить ((масивний об'єкт)) точок, кожна з яких має власні властивості `clientX`, `clientY`, `pageX` та `pageY`.
 
-You could do something like this to show red circles around every touching finger:
+Ви можете зробити щось на кшталт цього, щоб показати червоні кола навколо кожного дотику пальця:
 
 ```{lang: html}
 <style>
   dot { position: absolute; display: block;
         border: 2px solid red; border-radius: 50px;
         height: 100px; width: 100px; }
-</style>
-<p>Touch this page</p>
-<script>
+</style> </style> </style> </style> </style> </style> </style
+<p>Доторкніться до цієї сторінки</p>
+<скрипт
   function update(event) {
-    for (let dot; dot = document.querySelector("dot");) {
+    for (let dot; dot = document.querySelector(«dot»);) {
       dot.remove();
     }
     for (let i = 0; i < event.touches.length; i++) {
       let {pageX, pageY} = event.touches[i];
-      let dot = document.createElement("dot");
-      dot.style.left = (pageX - 50) + "px";
-      dot.style.top = (pageY - 50) + "px";
+      let dot = document.createElement(«dot»);
+      dot.style.left = (pageX - 50) + «px»;
+      dot.style.top = (pageY - 50) + «px»;
       document.body.appendChild(dot);
     }
   }
-  window.addEventListener("touchstart", update);
-  window.addEventListener("touchmove", update);
-  window.addEventListener("touchend", update);
-</script>
+  window.addEventListener(«touchstart», update);
+  window.addEventListener(«touchmove», update);
+  window.addEventListener(«touchend», update);
+</script> </script> </script> </script> </script> </script> <
 ```
 
-{{index "preventDefault method"}}
+{{index «preventDefault method»}}
 
-You'll often want to call `preventDefault` in touch event handlers to override the browser's default behavior (which may include scrolling the page on swiping) and to prevent the mouse events from being fired, for which you may _also_ have a handler.
+Вам часто буде потрібно викликати `preventDefault` в обробниках подій дотику, щоб перевизначити поведінку браузера за замовчуванням (яка може включати прокрутку сторінки при свайпі) і запобігти спрацьовуванню подій миші, для яких  також може бути передбачено обробник.
 
-## Scroll events
+## Події прокрутки
 
-{{index scrolling, "scroll event", "event handling"}}
+{{index scrolling, «scroll event», «event handling»}}
 
-Whenever an element is scrolled, a `"scroll"` event is fired on it. This has various uses, such as knowing what the user is currently looking at (for disabling off-screen ((animation))s or sending ((spy)) reports to your evil headquarters) or showing some indication of progress (by highlighting part of a table of contents or showing a page number).
+Щоразу, коли елемент прокручується, для нього викликається подія ``прокрутки``. Це має різні застосування, наприклад, щоб знати, на що користувач наразі дивиться (для вимкнення позаекранної ((анімації)) або надсилання ((шпигунських)) звітів до вашого злого штабу), або для відображення певних ознак прогресу (виділяючи частину змісту або показуючи номер сторінки).
 
-The following example draws a ((progress bar)) above the document and updates it to fill up as you scroll down:
+У наступному прикладі над документом намальовано ((індикатор виконання)), який оновлюється, заповнюючись при прокручуванні вниз:
 
 ```{lang: html}
 <style>
@@ -430,62 +429,62 @@ The following example draws a ((progress bar)) above the document and updates it
     position: fixed;
     top: 0; left: 0;
   }
-</style>
-<div id="progress"></div>
+</style> </style
+<div id=«progress»></div></div>
 <script>
-  // Create some content
+  // Створюємо деякий вміст
   document.body.appendChild(document.createTextNode(
-    "supercalifragilisticexpialidocious ".repeat(1000)));
+    «supercalifragilisticexpialidocious «.repeat(1000)));
 
-  let bar = document.querySelector("#progress");
-  window.addEventListener("scroll", () => {
+  let bar = document.querySelector(«#progress»);
+  window.addEventListener(«scroll», () => {} window.addEventListener(«scroll», () => {})
     let max = document.body.scrollHeight - innerHeight;
     bar.style.width = `${(pageYOffset / max) * 100}%`;
   });
 </script>
 ```
 
-{{index "unit (CSS)", scrolling, "position (CSS)", "fixed positioning", "absolute positioning", percentage, "repeat method"}}
+{{index «unit (CSS)», scrolling, «position (CSS)», «fixed positioning», «absolute positioning», percentage, «repeat method»}}
 
-Giving an element a `position` of `fixed` acts much like an `absolute` position but also prevents it from scrolling along with the rest of the document. The effect is to make our progress bar stay at the top. Its width is changed to indicate the current progress. We use `%`, rather than `px`, as a unit when setting the width so that the element is sized relative to the page width.
+Надання елементу `позиції` `фіксованої` діє подібно до `абсолютної` позиції, але також запобігає його прокручуванню разом з рештою документа. Внаслідок цього наша смужка прогресу залишиться зверху. Його ширина змінюється для відображення поточного прогресу. Ми використовуємо `%`, а не `px`, як одиницю при встановленні ширини, щоб розмір елемента залежав від ширини сторінки.
 
-{{index "innerHeight property", "innerWidth property", "pageYOffset property"}}
+{{index «властивість innerHeight», «властивість innerWidth», «властивість pageYOffset»}}
 
-The global `innerHeight` binding gives us the height of the window, which we must subtract from the total scrollable height—you can't keep scrolling when you hit the bottom of the document. There's also an `innerWidth` for the window width. By dividing `pageYOffset`, the current scroll position, by the maximum scroll position and multiplying by 100, we get the percentage for the progress bar.
+Глобальна прив'язка `innerHeight` дає нам висоту вікна, яку ми повинні відняти від загальної висоти прокрутки - ви не можете продовжувати прокрутку, коли досягаєте нижньої частини документа. Існує також прив'язка `innerWidth` для ширини вікна. Поділивши `pageYOffset`, поточну позицію прокрутки, на максимальну позицію прокрутки і помноживши на 100, ми отримаємо відсоток для смужки прогресу.
 
-{{index "preventDefault method"}}
+{{index «preventDefault method»}}
 
-Calling `preventDefault` on a scroll event does not prevent the scrolling from happening. In fact, the event handler is called only _after_ the scrolling takes place.
+Виклик методу `preventDefault` на подію прокрутки не зупиняє прокрутку. Насправді, обробник події викликається лише _після_ прокрутки.
 
-## Focus events
+## Події фокусування
 
-{{index "event handling", "focus event", "blur event"}}
+{{index «event handling», «focus event», «blur event»}}
 
-When an element gains ((focus)), the browser fires a `"focus"` event on it. When it loses focus, the element gets a `"blur"` event.
+Коли елемент отримує фокус ((focus)), браузер генерує подію `«focus»` для нього. Коли елемент втрачає фокус, він отримує подію «розмиття».
 
-{{index "event propagation"}}
+{{index «event propagation»}}
 
-Unlike the events discussed earlier, these two events do not propagate. A handler on a parent element is not notified when a child element gains or loses focus.
+На відміну від подій, розглянутих раніше, ці дві події не поширюються. Обробник батьківського елемента не отримує повідомлення, коли дочірній елемент отримує або втрачає фокус.
 
-{{index "input (HTML tag)", "help text example"}}
+{{index «input (HTML-тег)», «help text example»}}
 
-The following example displays help text for the ((text field)) that currently has focus:
+У наступному прикладі показано текст довідки для ((текстового поля)), на якому наразі встановлено фокус:
 
 ```{lang: html}
-<p>Name: <input type="text" data-help="Your full name"></p>
-<p>Age: <input type="text" data-help="Your age in years"></p>
-<p id="help"></p>
+<p>Назва: <input type=«text» data-help=«Ваше повне ім'я»></p></p> <input type=«text» data-help=«Ваше повне ім'я»></p>
+<p>Вік: <input type=«text» data-help=«Ваш вік у роках»></p> </p>
+<p id=«help»></p> <p id=«help»></p>
 
-<script>
-  let help = document.querySelector("#help");
-  let fields = document.querySelectorAll("input");
+<скрипт
+  let help = document.querySelector(«#help»);
+  let fields = document.querySelectorAll(«input»);
   for (let field of Array.from(fields)) {
-    field.addEventListener("focus", event => {
-      let text = event.target.getAttribute("data-help");
+    field.addEventListener(«focus», event => {
+      let text = event.target.getAttribute(«data-help»);
       help.textContent = text;
     });
-    field.addEventListener("blur", event => {
-      help.textContent = "";
+    field.addEventListener(«blur», event => {
+      help.textContent = «»;
     });
   }
 </script>
@@ -493,145 +492,145 @@ The following example displays help text for the ((text field)) that currently h
 
 {{if book
 
-This screenshot shows the help text for the age field:
+На цьому знімку екрана показано текст довідки для поля віку:
 
-{{figure {url: "img/help-field.png", alt: "Screenshot of the help text below the age field", width: "4.4cm"}}}
+{{figure {url: «img/help-field.png», alt: «Скріншот довідкового тексту під полем віку», width: “4.4cm”}}}}
 
 if}}
 
-{{index "focus event", "blur event"}}
+{{index «focus event», «blur event»}}
 
-The ((window)) object will receive `"focus"` and `"blur"` events when the user moves from or to the browser tab or window in which the document is shown.
+Об'єкт ((window)) отримуватиме події «фокус» та «розмиття», коли користувач переходить з або до вкладки або вікна браузера, у якому показано документ.
 
-## Load event
+## Подія завантаження
 
-{{index "script (HTML tag)", "load event"}}
+{{index «script (HTML-тег)», «load event»}}
 
-When a page finishes loading, the `"load"` event fires on the window and the document body objects. This is often used to schedule ((initialization)) actions that require the whole ((document)) to have been built. Remember that the content of `<script>` tags is run immediately when the tag is encountered. This may be too soon, for example when the script needs to do something with parts of the document that appear after the `<script>` tag.
+Коли сторінка завершує завантаження, у вікні та об'єктах тіла документа спрацьовує подія `«load»`. Це часто використовується для планування ((ініціалізації)) дій, які вимагають побудови всього ((документа)). Пам'ятайте, що вміст тегів `<script>` виконується одразу після зустрічі з тегом. Це може бути занадто рано, наприклад, коли скрипту потрібно зробити щось з частинами документа, які з'являються після тегу `<script>`.
 
-{{index "event propagation", "img (HTML tag)"}}
+{{index «event propagation», «img (HTML-тег)»}}
 
-Elements such as ((image))s and script tags that load an external file also have a `"load"` event that indicates the files they reference were loaded. Like the focus-related events, loading events do not propagate.
+Такі елементи, як ((image))s та теги скриптів, які завантажують зовнішній файл, також мають подію `«load»`, яка вказує на те, що файли, на які вони посилаються, було завантажено. Як і події, пов'язані з фокусом, події завантаження не поширюються.
 
-{{index "beforeunload event", "page reload", "preventDefault method"}}
+{{index «beforeunload event», «page reload», «preventDefault method»}}
 
-When you close page or navigate away from it (for example, by following a link), a `"beforeunload"` event fires. The main use of this event is to prevent the user from accidentally losing work by closing a document. If you prevent the default behavior on this event _and_ set the `returnValue` property on the event object to a string, the browser will show the user a dialog asking if they really want to leave the page. That dialog might include your string, but because some malicious sites try to use these dialogs to confuse people into staying on their page to look at dodgy weight-loss ads, most browsers no longer display them.
+Коли ви закриваєте сторінку або переходите з неї (наприклад, за посиланням), відбувається подія `«beforeunload»`. Основне призначення цієї події - запобігти випадковій втраті роботи користувача при закритті документа. Якщо ви відвернете поведінку за замовчуванням для цієї події _і_ встановите властивість `returnValue` об'єкта події у значення рядок, браузер покаже користувачеві діалогове вікно із запитом про те, чи дійсно він хоче залишити сторінку. Це діалогове вікно може містити ваш рядок, але оскільки деякі шкідливі сайти намагаються використовувати ці діалогові вікна, щоб заплутати користувачів і змусити їх залишитися на сторінці, щоб переглянути нечесну рекламу про схуднення, більшість браузерів більше не показують їх.
 
 {{id timeline}}
 
-## Events and the event loop
+## Події та цикл обробки подій
 
-{{index "requestAnimationFrame function", "event handling", timeline, "script (HTML tag)"}}
+{{index «requestAnimationFrame function», «event handling», timeline, «script (HTML tag)»}}
 
-In the context of the event loop, as discussed in [Chapter ?](async), browser event handlers behave like other asynchronous notifications. They are scheduled when the event occurs but must wait for other scripts that are running to finish before they get a chance to run.
+У контексті циклу обробки подій, як описано у [Розділ ?](async), обробники подій браузера поводяться подібно до інших асинхронних сповіщень. Вони запускаються за розкладом, коли відбувається подія, але повинні дочекатися завершення інших запущених скриптів, перш ніж вони отримають шанс на запуск.
 
-The fact that events can be processed only when nothing else is running means that if the event loop is tied up with other work, any interaction with the page (which happens through events) will be delayed until there's time to process it. So if you schedule too much work, either with long-running event handlers or with lots of short-running ones, the page will become slow and cumbersome to use.
+Той факт, що події можуть бути оброблені тільки тоді, коли більше нічого не виконується, означає, що якщо цикл обробки подій пов'язаний з іншою роботою, будь-яка взаємодія зі сторінкою (яка відбувається через події) буде відкладена до тих пір, поки не з'явиться час на її обробку. Отже, якщо ви заплануєте занадто багато роботи, або з довготривалими обробниками подій, або з великою кількістю короткотривалих, сторінка стане повільною і громіздкою у використанні.
 
-For cases where you _really_ do want to do some time-consuming thing in the background without freezing the page, browsers provide something called _((web worker))s_. A worker is a JavaScript process that runs alongside the main script, on its own timeline.
+Для випадків, коли ви _дуже_ хочете виконати якусь трудомістку роботу у фоновому режимі, не заморожуючи сторінку, браузери надають дещо, що називається _((web worker))s_. Робочий процес - це JavaScript-процес, який виконується паралельно з основним сценарієм, на власній часовій шкалі.
 
-Imagine that squaring a number is a heavy, long-running computation that we want to perform in a separate ((thread)). We could write a file called `code/squareworker.js` that responds to messages by computing a square and sending a message back.
+Уявіть, що піднесення числа до квадрату - це важке, довготривале обчислення, яке ми хочемо виконати в окремому ((потоці)). Ми можемо написати файл під назвою `code/squareworker.js`, який відповідатиме на повідомлення, обчислюючи квадрат і надсилаючи повідомлення назад.
 
 ```
-addEventListener("message", event => {
+addEventListener(«message», event => {
   postMessage(event.data * event.data);
 });
 ```
 
-To avoid the problems of having multiple ((thread))s touching the same data, workers do not share their ((global scope)) or any other data with the main script's environment. Instead, you have to communicate with them by sending messages back and forth.
+Щоб уникнути проблем, пов'язаних з тим, що декілька ((потоків)) звертаються до одних і тих самих даних, робітники не надають спільного доступу до своїх ((глобальної області видимості)) або будь-яких інших даних оточенню основного скрипта. Натомість, вам доводиться спілкуватися з ними, надсилаючи повідомлення туди і назад.
 
-This code spawns a worker running that script, sends it a few messages, and outputs the responses.
+Цей код породжує робітника, який запускає цей скрипт, надсилає йому кілька повідомлень і виводить відповіді.
 
 ```{test: no}
-let squareWorker = new Worker("code/squareworker.js");
-squareWorker.addEventListener("message", event => {
-  console.log("The worker responded:", event.data);
+let squareWorker = new Worker(«code/squareworker.js»);
+squareWorker.addEventListener(«message», event => {})
+  console.log(«Працівник відповів:», event.data);
 });
 squareWorker.postMessage(10);
 squareWorker.postMessage(24);
 ```
 
-{{index "postMessage method", "message event"}}
+{{index «postMessage method», «message event»}}
 
-The `postMessage` function sends a message, which will cause a `"message"` event to fire in the receiver. The script that created the worker sends and receives messages through the `Worker` object, whereas the worker talks to the script that created it by sending and listening directly on its ((global scope)). Only values that can be represented as JSON can be sent as messages—the other side will receive a _copy_ of them, rather than the value itself.
+Функція `postMessage` надсилає повідомлення, яке викликає подію `«message»` у приймачі. Скрипт, який створив працівника, надсилає та отримує повідомлення через об'єкт `Worker`, тоді як працівник спілкується зі скриптом, який його створив, надсилаючи та слухаючи безпосередньо у його ((глобальній області видимості)). Як повідомлення можна надсилати лише значення, які можна представити у форматі JSON - інша сторона отримає їхню _копію_, а не саме значення.
 
-## Timers
+## Таймери
 
-{{index timeout, "setTimeout function", "clearTimeout function"}}
+{{index timeout, «функція setTimeout», «функція clearTimeout»}}
 
-The `setTimeout` function we saw in [Chapter ?](async) schedules another function to be called later, after a given number of milliseconds. Sometimes you need to cancel a function you have scheduled. You can do this by storing the value returned by `setTimeout` and calling `clearTimeout` on it.
+Функція `setTimeout`, яку ми розглядали у [Розділі ?](async), планує виклик іншої функції пізніше, через задану кількість мілісекунд. Іноді вам потрібно скасувати заплановану функцію. Ви можете зробити це, зберігши значення, повернуте `setTimeout`, і викликавши для нього `clearTimeout`.
 
 ```
-let bombTimer = setTimeout(() => {
-  console.log("BOOM!");
+let bombTimer = setTimeout(() => {}}.
+  console.log(«BOOM!»);
 }, 500);
 
-if (Math.random() < 0.5) { // 50% chance
-  console.log("Defused.");
+if (Math.random() < 0.5) { // ймовірність 50%
+  console.log(«Знешкоджено.»);
   clearTimeout(bombTimer);
 }
 ```
 
-{{index "cancelAnimationFrame function", "requestAnimationFrame function"}}
+{{index «cancelAnimationFrame function», «requestAnimationFrame function»}}
 
-The `cancelAnimationFrame` function works in the same way as `clearTimeout`. Calling it on a value returned by `requestAnimationFrame` will cancel that frame (assuming it hasn't already been called).
+Функція `cancelAnimationFrame` працює так само, як і `clearTimeout`. Її виклик для значення, повернутого функцією `requestAnimationFrame`, скасує цей кадр (за умови, що його ще не було викликано).
 
-{{index "setInterval function", "clearInterval function", repetition}}
+{{index «setInterval function», «clearInterval function», repetition}}
 
-A similar set of functions, `setInterval` and `clearInterval`, are used to set timers that should repeat every _X_ milliseconds.
+Подібний набір функцій `setInterval` та `clearInterval` використовується для встановлення таймерів, які мають повторюватися кожні _X_ мілісекунд.
 
 ```
 let ticks = 0;
-let clock = setInterval(() => {
-  console.log("tick", ticks++);
+let clock = setInterval(() => {}}
+  console.log(«tick», ticks++);
   if (ticks == 10) {
     clearInterval(clock);
-    console.log("stop.");
+    console.log(«stop.»);
   }
 }, 200);
 ```
 
-## Debouncing
+## Дебаунсинг
 
-{{index optimization, "mousemove event", "scroll event", blocking}}
+{{оптимізація індексу, «подія переміщення миші», «подія прокрутки», блокування}}
 
-Some types of events have the potential to fire rapidly many times in a row, such as the `"mousemove"` and `"scroll"` events. When handling such events, you must be careful not to do anything too time-consuming or your handler will take up so much time that interaction with the document starts to feel slow.
+Деякі типи подій можуть швидко спрацьовувати багато разів поспіль, наприклад, події ``mousemove`` та ``scroll``. При обробці таких подій ви повинні бути обережними і не робити нічого надто довготривалого, інакше ваш обробник забиратиме так багато часу, що взаємодія з документом почне здаватися повільною.
 
-{{index "setTimeout function"}}
+{{index «функція setTimeout»}}
 
-If you do need to do something nontrivial in such a handler, you can use `setTimeout` to make sure you are not doing it too often. This is usually called _((debouncing))_ the event. There are several slightly different approaches to this.
+Якщо вам потрібно зробити щось нетривіальне у такому обробнику, ви можете використати `setTimeout`, щоб переконатися, що ви не робите це занадто часто. Зазвичай це називається _((дебаунсинг))_ події. Існує декілька дещо різних підходів до цього.
 
-{{index "textarea (HTML tag)", "clearTimeout function", "keydown event"}}
+{{index «textarea (HTML-тег)», «функція clearTimeout», «подія натискання клавіші»}}
 
-For example, suppose we want to react when the user has typed something, but we don't want to do it immediately for every input event. When they are ((typing)) quickly, we just want to wait until a pause occurs. Instead of immediately performing an action in the event handler, we set a timeout. We also clear the previous timeout (if any) so that when events occur close together (closer than our timeout delay), the timeout from the previous event will be canceled.
+Наприклад, припустимо, що ми хочемо реагувати, коли користувач щось ввів, але не хочемо робити це негайно на кожну подію введення. Коли користувач вводить щось швидко, ми просто хочемо дочекатися паузи. Замість того, щоб негайно виконувати дію в обробнику події, ми встановлюємо таймаут. Ми також очистимо попередній таймаут (якщо такий є), щоб коли події відбудуться близько одна до одної (ближче, ніж наша затримка таймауту), таймаут від попередньої події буде скасовано.
 
 ```{lang: html}
-<textarea>Type something here...</textarea>
+<textarea>Наберіть щось тут...</textarea>
 <script>
-  let textarea = document.querySelector("textarea");
+  let textarea = document.querySelector(«textarea»);
   let timeout;
-  textarea.addEventListener("input", () => {
+  textarea.addEventListener(«input», () => {})
     clearTimeout(timeout);
-    timeout = setTimeout(() => console.log("Typed!"), 500);
+    timeout = setTimeout(() => console.log(«Введено!»), 500);
   });
 </script>
 ```
 
-{{index "sloppy programming"}}
+{{index «неохайне програмування»}}
 
-Giving an undefined value to `clearTimeout` or calling it on a timeout that has already fired has no effect. Thus, we don't have to be careful about when to call it, and we simply do so for every event.
+Надання невизначеного значення функції `clearTimeout` або її виклик під час таймауту, який вже закінчився, не має жодного ефекту. Таким чином, нам не потрібно дбати про те, коли викликати цю функцію, і ми просто робимо це для кожної події.
 
-{{index "mousemove event"}}
+{{index «mousemove event»}}
 
-We can use a slightly different pattern if we want to space responses so that they're separated by at least a certain length of ((time)) but want to fire them _during_ a series of events, not just afterward. For example, we might want to respond to `"mousemove"` events by showing the current coordinates of the mouse, but only every 250 milliseconds.
+Ми можемо використовувати дещо інший шаблон, якщо ми хочемо розмістити відповіді так, щоб вони були розділені принаймні певним інтервалом ((часу)), але хочемо запускати їх _під час_ серії подій, а не одразу після них. Наприклад, ми можемо захотіти реагувати на події ``mousemove`` показом поточних координат миші, але лише кожні 250 мілісекунд.
 
 ```{lang: html}
 <script>
-  let scheduled = null;
-  window.addEventListener("mousemove", event => {
+  нехай scheduled = null;
+  window.addEventListener(«mousemove», event => {
     if (!scheduled) {
       setTimeout(() => {
         document.body.textContent =
-          `Mouse at ${scheduled.pageX}, ${scheduled.pageY}`;
+          `Наведення миші на ${scheduled.pageX}, ${scheduled.pageY}`;
         scheduled = null;
       }, 250);
     }
@@ -640,41 +639,41 @@ We can use a slightly different pattern if we want to space responses so that th
 </script>
 ```
 
-## Summary
+## Підсумок
 
-Event handlers make it possible to detect and react to events happening in our web page. The `addEventListener` method is used to register such a handler.
+Обробники подій дозволяють виявляти події, що відбуваються на нашій веб-сторінці, та реагувати на них. Для реєстрації такого обробника використовується метод `addEventListener`.
 
-Each event has a type (`"keydown"`, `"focus"`, and so on) that identifies it. Most events are called on a specific DOM element and then propagate to that element's ancestors, allowing handlers associated with those elements to handle them.
+Кожна подія має тип («натискання клавіші»`, «фокус»` і так далі), який її ідентифікує. Більшість подій викликаються на конкретному елементі DOM, а потім поширюються на предків цього елемента, дозволяючи обробникам, пов'язаним з цими елементами, обробляти їх.
 
-When an event handler is called, it's passed an event object with additional information about the event. This object also has methods that allow us to stop further propagation (`stopPropagation`) and prevent the browser's default handling of the event (`preventDefault`).
+Коли викликається обробник події, йому передається об'єкт події з додатковою інформацією про подію. Цей об'єкт також має методи, які дозволяють зупинити подальше поширення (`stopPropagation`) і запобігти обробці події браузером за замовчуванням (`preventDefault`).
 
-Pressing a key fires `"keydown"` and `"keyup"` events. Pressing a mouse button fires `"mousedown"`, `"mouseup"`, and `"click"` events. Moving the mouse fires `"mousemove"` events. Touchscreen interaction will result in `"touchstart"`, `"touchmove"`, and `"touchend"` events.
+Натискання клавіші викликає події `keydown` та `keyup`. Натискання кнопки миші спричиняє події `mousedown`, `mousedup` та `click`. Переміщення миші спричиняє події «mousemove»`. Взаємодія з сенсорним екраном призводить до подій «touchstart», «touchmove» і «touchend».
 
-Scrolling can be detected with the `"scroll"` event, and focus changes can be detected with the `"focus"` and `"blur"` events. When the document finishes loading, a `"load"` event fires on the window.
+Прокручування можна виявити за допомогою події «scroll», а зміну фокусу - за допомогою подій «focus» і «blur». Коли документ завершує завантаження, у вікні з'являється подія ``load``.
 
-## Exercises
+## Вправи
 
-### Balloon
+### Повітряна кулька
 
-{{index "balloon (exercise)", "arrow key"}}
+{{index «balloon (вправа)», «стрілка»}}
 
-Write a page that displays a ((balloon)) (using the balloon ((emoji)), 🎈). When you press the up arrow, it should inflate (grow) 10 percent. When you press the down arrow, it should deflate (shrink) 10 percent.
+Напишіть сторінку, яка відображає ((повітряну кульку)) (використовуючи повітряну кульку ((емодзі)), 🎈). Коли ви натискаєте стрілку вгору, вона має надутися (вирости) на 10 відсотків. Коли ви натискаєте стрілку вниз, вона повинна здутися (зменшитися) на 10 відсотків.
 
-{{index "font-size (CSS)"}}
+{{index «font-size (CSS)»}}
 
-You can control the size of text (emoji are text) by setting the `font-size` CSS property (`style.fontSize`) on its parent element. Remember to include a unit in the value—for example, pixels (`10px`).
+Ви можете керувати розміром тексту (емодзі - це текст), встановивши властивість CSS `font-size` (`style.fontSize`) для його батьківського елемента. Не забудьте вказати одиницю виміру, наприклад, пікселі (`10px`).
 
-The key names of the arrow keys are `"ArrowUp"` and `"ArrowDown"`. Make sure the keys change only the balloon, without scrolling the page.
+Назви клавіш зі стрілками - `«ArrowUp»` та `«ArrowDown»`. Переконайтеся, що клавіші змінюють лише кульку, не прокручуючи сторінку.
 
-Once you have that working, add a feature where if you blow up the balloon past a certain size, it “explodes”. In this case, exploding means that it is replaced with an 💥 emoji, and the event handler is removed (so that you can't inflate or deflate the explosion).
+Після того, як ви переконаєтеся, що все працює, додайте функцію, за якою, якщо ви надуєте кульку більше певного розміру, вона «вибухне». У цьому випадку вибух означає, що вона замінюється на емодзі 💥, а обробник події видаляється (щоб ви не могли надути або здути вибух).
 
-{{if interactive
+{{якщо інтерактивний
 
-```{test: no, lang: html, focus: yes}
+```{test: no, lang: html, focus: yes}}
 <p>🎈</p>
 
 <script>
-  // Your code here
+  // Ваш код тут
 </script>
 ```
 
@@ -682,49 +681,49 @@ if}}
 
 {{hint
 
-{{index "keydown event", "key property", "balloon (exercise)"}}
+{{index «keydown event», «key property», «balloon (exercise)»}}
 
-You'll want to register a handler for the `"keydown"` event and look at `event.key` to figure out whether the up or down arrow key was pressed.
+Вам слід зареєструвати обробник події `«натискання клавіші»` і переглядати `event.key`, щоб визначити, яку клавішу зі стрілкою вгору або вниз було натиснуто.
 
-The current size can be kept in a binding so that you can base the new size on it. It'll be helpful to define a function that updates the size—both the binding and the style of the balloon in the DOM—so that you can call it from your event handler, and possibly also once when starting, to set the initial size.
+Поточний розмір можна зберегти у прив'язці, щоб ви могли на його основі визначити новий розмір. Буде корисно визначити функцію, яка оновлює розмір - як прив'язку, так і стиль кульки у DOM, - щоб ви могли викликати її з обробника події, а також, можливо, один раз під час запуску, щоб встановити початковий розмір.
 
-{{index "replaceChild method", "textContent property"}}
+{{index «replaceChild метод», «textContent властивість»}}
 
-You can change the balloon to an explosion by replacing the text node with another one (using `replaceChild`) or by setting the `textContent` property of its parent node to a new string.
+Ви можете змінити кульку на вибух, замінивши текстову вершину на іншу (за допомогою методу `replaceChild`) або встановивши властивість `textContent` її батьківської вершини на новий рядок.
 
-hint}}
+підказка}}
 
-### Mouse trail
+### Слід миші
 
-{{index animation, "mouse trail (exercise)"}}
+{{index animation, «слід миші (вправа)»}}
 
-In JavaScript's early days, which was the high time of ((gaudy home pages)) with lots of animated images, people came up with some truly inspiring ways to use the language. One of these was the _mouse trail_—a series of elements that would follow the mouse pointer as you moved it across the page.
+На початку розвитку JavaScript, а це був час яскравих домашніх сторінок з великою кількістю анімованих зображень, люди придумали кілька дійсно надихаючих способів використання мови. Одним з них був _слід миші_- серія елементів, які слідували за вказівником миші, коли ви переміщували його по сторінці.
 
-{{index "absolute positioning", "background (CSS)"}}
+{{index «absolute positioning», «background (CSS)»}}
 
-In this exercise, I want you to implement a mouse trail. Use absolutely positioned `<div>` elements with a fixed size and background color (refer to the [code](event#mouse_drawing) in the "Mouse Clicks" section for an example). Create a bunch of these elements and, when the mouse moves, display them in the wake of the mouse pointer.
+У цій вправі я хочу, щоб ви реалізували слід миші. Використовуйте абсолютно позиціоновані елементи `<div>` з фіксованим розміром і кольором фону (див. приклад [code](event#mouse_drawing) у розділі «Клацання мишею»). Створіть групу таких елементів і, коли миша рухається, відображайте їх слідом за вказівником миші.
 
-{{index "mousemove event"}}
+{{index «mousemove event»}}
 
-There are various possible approaches here. You can make your trail as simple or as complex as you want. A simple solution to start with is to keep a fixed number of trail elements and cycle through them, moving the next one to the mouse's current position every time a `"mousemove"` event occurs.
+Тут можливі різні підходи. Ви можете зробити свій слід настільки простим або складним, наскільки хочете. Простим рішенням для початку є збереження фіксованої кількості елементів сліду і циклічне проходження через них, переміщуючи наступний елемент у поточну позицію миші щоразу, коли відбувається подія ``mousemove``.
 
-{{if interactive
+{{if інтерактивний
 
 ```{lang: html, test: no}
 <style>
-  .trail { /* className for the trail elements */
+  .trail { /* назва класу для елементів сліду */
     position: absolute;
     height: 6px; width: 6px;
     border-radius: 3px;
     background: teal;
   }
-  body {
+  body { { height: 0; width: 0
     height: 300px;
   }
-</style>
+</style> </style> </style> </style> </style> </style> </style
 
 <script>
-  // Your code here.
+  // Ваш код тут.
 </script>
 ```
 
@@ -732,45 +731,45 @@ if}}
 
 {{hint
 
-{{index "mouse trail (exercise)"}}
+{{index «слід миші (вправа)»}}
 
-Creating the elements is best done with a loop. Append them to the document to make them show up. To be able to access them later to change their position, you'll want to store the elements in an array.
+Створювати елементи найкраще за допомогою циклу. Додайте їх до документа, щоб вони з'явилися. Щоб мати доступ до них пізніше і змінювати їхнє положення, вам слід зберігати елементи у масиві.
 
-{{index "mousemove event", [array, indexing], "remainder operator", "% operator"}}
+{{index «подія переміщення миші», [масив, індексація], «оператор залишку», «оператор %»}}
 
-Cycling through them can be done by keeping a ((counter variable)) and adding 1 to it every time the `"mousemove"` event fires. The remainder operator (`% elements.length`) can then be used to get a valid array index to pick the element you want to position during a given event.
+Циклічно переглядати їх можна, зберігаючи змінну-лічильник ((змінна-лічильник)) і додаючи до неї 1 щоразу, коли спрацьовує подія `«mousemove»`. Оператор залишку (`% elements.length`) можна використати для отримання дійсного індексу масиву, щоб вибрати елемент, який ви хочете позиціонувати під час даної події.
 
-{{index simulation, "requestAnimationFrame function"}}
+{{index simulation, «requestAnimationFrame function»}}
 
-Another interesting effect can be achieved by modeling a simple ((physics)) system. Use the `"mousemove"` event only to update a pair of bindings that track the mouse position. Then use `requestAnimationFrame` to simulate the trailing elements being attracted to the position of the mouse pointer. At every animation step, update their position based on their position relative to the pointer (and, optionally, a speed that is stored for each element). Figuring out a good way to do this is up to you.
+Іншого цікавого ефекту можна досягти, моделюючи просту ((фізичну)) систему. Використовуйте подію `«mousemove»` лише для оновлення пари прив'язок, які відстежують положення миші. Потім використовуйте `requestAnimationFrame` для імітації притягування елементів, що відслідковують положення вказівника миші. На кожному кроці анімації оновлюйте їхню позицію на основі їхнього положення відносно вказівника (і, за бажанням, швидкості, яка зберігається для кожного елемента). Вирішення питання про те, як це зробити, залежить від вас.
 
-hint}}
+підказка}}
 
-### Tabs
+### Вкладки
 
-{{index "tabbed interface (exercise)"}}
+{{index «інтерфейс з вкладками (вправа)»}}
 
-Tabbed panels are common in user interfaces. They allow you to select an interface panel by choosing from a number of tabs "sticking out" above an element.
+Панелі з вкладками є поширеним явищем у користувацьких інтерфейсах. Вони дають змогу вибрати панель інтерфейсу, обравши одну з декількох вкладок, що «стирчать» над елементом.
 
-{{index "button (HTML tag)", "display (CSS)", "hidden element", "data attribute"}}
+{{index «кнопка (тег HTML)», «відображення (CSS)», «прихований елемент», «атрибут даних»}}
 
-Implement a simple tabbed interface. Write a function, `asTabs`, that takes a DOM node and creates a tabbed interface showing the child elements of that node. It should insert a list of `<button>` elements at the top of the node, one for each child element, containing text retrieved from the `data-tabname` attribute of the child. All but one of the original children should be hidden (given a `display` style of `none`). The currently visible node can be selected by clicking the buttons.
+Реалізуйте простий інтерфейс з вкладками. Напишіть функцію `asTabs`, яка отримує DOM-вузол і створює інтерфейс з вкладками, що показує дочірні елементи цього вузла. Вона повинна вставити список елементів `<button>` у верхній частині вузла, по одному для кожного дочірнього елемента, що містить текст, отриманий з атрибуту `data-tabname` дочірнього елемента. Усі дочірні вузли, окрім одного, слід приховати (встановити стиль відображення `display` у значення `none`). Поточний видимий вузол можна вибрати за допомогою кнопок.
 
-When that works, extend it to style the button for the currently selected tab differently so that it is obvious which tab is selected.
+Коли це спрацює, розширте його, щоб змінити стиль кнопки для поточно вибраної вкладки так, щоб було зрозуміло, яку саме вкладку вибрано.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{lang: html, test: no}
 <tab-panel>
-  <div data-tabname="one">Tab one</div>
-  <div data-tabname="two">Tab two</div>
-  <div data-tabname="three">Tab three</div>
-</tab-panel>
-<script>
+  <div data-tabname=«one»>Вкладка один</div>
+  <div data-tabname=«two»>Друга вкладка</div>
+  <div data-tabname=«three»>Табуляція три</div>
+</tab-panel> </tab-panel
+<скрипт
   function asTabs(node) {
-    // Your code here.
+    // Ваш код тут.
   }
-  asTabs(document.querySelector("tab-panel"));
+  asTabs(document.querySelector(«tab-panel»));
 </script>
 ```
 
@@ -778,16 +777,16 @@ if}}
 
 {{hint
 
-{{index "text node", "childNodes property", "live data structure", "tabbed interface (exercise)", [whitespace, "in HTML"]}}
+{{індекс «текстовий вузол», «властивість childNodes», «жива структура даних», «інтерфейс з вкладками (вправа)», [пробіл, «в HTML»]}}
 
-One pitfall you might run into is that you can't directly use the node's `childNodes` property as a collection of tab nodes. For one thing, when you add the buttons, they will also become child nodes and end up in this object because it is a live data structure. For another, the text nodes created for the whitespace between the nodes are also in `childNodes` but should not get their own tabs. You can use `children` instead of `childNodes` to ignore text nodes.
+Однією з пасток, з якою ви можете зіткнутися, є те, що ви не можете безпосередньо використовувати властивість `childNodes` вузла як колекцію вузлів вкладок. З одного боку, коли ви додасте кнопки, вони також стануть дочірніми вузлами і опиняться у цьому об'єкті, оскільки він є живою структурою даних. З іншого боку, текстові вузли, створені для заповнення пробілів між вузлами, також знаходяться у `childNodes`, але не повинні мати власних вкладок. Ви можете використовувати `children` замість `childNodes`, щоб ігнорувати текстові вузли.
 
-{{index "TEXT_NODE code", "nodeType property"}}
+{{index «TEXT_NODE code», «nodeType property»}}
 
-You could start by building up an array of tabs so that you have easy access to them. To implement the styling of the buttons, you could store objects that contain both the tab panel and its button.
+Ви можете почати зі створення масиву вкладок, щоб мати легкий доступ до них. Щоб реалізувати стилізацію кнопок, ви можете зберігати об'єкти, які містять як панель вкладок, так і їхні кнопки.
 
-I recommend writing a separate function for changing tabs. You can either store the previously selected tab and change only the styles needed to hide that and show the new one, or you can just update the style of all tabs every time a new tab is selected.
+Я рекомендую написати окрему функцію для зміни вкладок. Ви можете або зберігати попередньо вибрану вкладку і змінювати лише стилі, необхідні для того, щоб приховати її і показати нову, або просто оновлювати стиль усіх вкладок щоразу, коли вибирається нова вкладка.
 
-You might want to call this function immediately to make the interface start with the first tab visible.
+Можливо, ви захочете викликати цю функцію негайно, щоб інтерфейс починався з першої видимої вкладки.
 
-hint}}
+підказка}}

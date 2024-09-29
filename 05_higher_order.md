@@ -1,24 +1,24 @@
-{{meta {load_files: ["code/scripts.js", "code/chapter/05_higher_order.js", "code/intro.js"], zip: "node/html"}}}
+{{meta {load_files: [«code/scripts.js», «code/chapter/05_higher_order.js», «code/intro.js»], zip: «node/html"}}}
 
-# Higher-Order Functions
+# Функції вищого порядку
 
-{{quote {author: "C.A.R. Hoare", title: "1980 ACM Turing Award Lecture", chapter: true}
+{{quote {author: «C.A.R. Hoare», title: «1980 ACM Turing Award Lecture», chapter: true}}
 
-{{index "Hoare, C.A.R."}}
+{{index «Hoare, C.A.R.»}}
 
-There are two ways of constructing a software design: One way is to make it so simple that there are obviously no deficiencies, and the other way is to make it so complicated that there are no obvious deficiencies.
+Існує два способи побудови дизайну програмного забезпечення: Один спосіб - зробити його настільки простим, щоб не було очевидних недоліків, а інший - зробити його настільки складним, щоб не було очевидних недоліків.
 
 quote}}
 
-{{figure {url: "img/chapter_picture_5.jpg", alt: "Illustration showing letters and hieroglyphs from different scripts—Latin, Greek, Arabic, ancient Egyptian, and others", chapter: true}}}
+{{figure {url: «img/chapter_picture_5.jpg», alt: «Ілюстрація із зображенням літер та ієрогліфів різних писемностей - латинської, грецької, арабської, давньоєгипетської та інших», chapter: true}}}
 
-{{index "program size"}}
+{{index «size of program»}}
 
-A large program is a costly program, and not just because of the time it takes to build. Size almost always involves ((complexity)), and complexity confuses programmers. Confused programmers, in turn, introduce mistakes (_((bug))s_) into programs. A large program then provides a lot of space for these bugs to hide, making them hard to find.
+Велика програма - це дорога програма, і не лише через час, який вона потребує для створення. Розмір майже завжди передбачає ((складність)), а складність збиває з пантелику програмістів. Розгублені програмісти, у свою чергу, вносять у програми помилки (_((баги))s_). У великій програмі є багато місця, де ці помилки можуть сховатися, що ускладнює їх пошук.
 
-{{index "summing example"}}
+{{index «summing example»}}
 
-Let's briefly go back to the final two example programs in the introduction. The first is self contained and six lines long.
+Давайте коротко повернемося до двох останніх прикладів програм, наведених у вступі. Перший з них є самодостатнім і має довжину шість рядків.
 
 ```
 let total = 0, count = 1;
@@ -29,67 +29,67 @@ while (count <= 10) {
 console.log(total);
 ```
 
-The second relies on two external functions and is one line long.
+Другий приклад використовує дві зовнішні функції і має довжину в один рядок.
 
 ```
 console.log(sum(range(1, 10)));
 ```
 
-Which one is more likely to contain a bug?
+Який з них з більшою ймовірністю містить помилку?
 
-{{index "program size"}}
+{{index «size of program»}}
 
-If we count the size of the definitions of `sum` and `range`, the second program is also big—even bigger than the first. But still, I'd argue that it is more likely to be correct.
+Якщо порахувати розмір визначень функцій `сума` та `діапазон`, то друга програма також велика - навіть більша за першу. Але все ж таки, я б сказав, що вона є більш вірогідною.
 
-{{index [abstraction, "with higher-order functions"], "domain-specific language"}}
+{{index [абстракція, «з функціями вищого порядку»], «специфічна мова предметної області»}}
 
-This is because the solution is expressed in a ((vocabulary)) that corresponds to the problem being solved. Summing a range of numbers isn't about loops and counters. It is about ranges and sums.
+Це тому, що розв'язок виражається у ((словнику)), який відповідає задачі, що розв'язується. Підсумовування діапазону чисел не пов'язане з циклами та лічильниками. Це про діапазони та суми.
 
-The definitions of this vocabulary (the functions `sum` and `range`) will still involve loops, counters, and other incidental details. But because they are expressing simpler concepts than the program as a whole, they are easier to get right.
+У визначеннях цієї лексики (функцій «сума» і «діапазон») все ще будуть фігурувати цикли, лічильники та інші супутні деталі. Але оскільки вони виражають простіші концепції, ніж програма в цілому, їх легше зробити правильними.
 
-## Abstraction
+## Абстрагування
 
-In the context of programming, these kinds of vocabularies are usually called _((abstraction))s_. Abstractions give us the ability to talk about problems at a higher (or more abstract) level, without getting sidetracked by uninteresting details.
+У контексті програмування такі словники зазвичай називають _((абстракція))s_. Абстракції дають нам можливість говорити про проблеми на вищому (або більш абстрактному) рівні, не відволікаючись на нецікаві деталі.
 
-{{index "recipe analogy", "pea soup"}}
+{{index «аналогія рецепта», «гороховий суп»}}
 
-As an analogy, compare these two recipes for pea soup. The first goes like this:
-
-{{quote
-
-Put 1 cup of dried peas per person into a container. Add water until the peas are well covered. Leave the peas in water for at least 12 hours. Take the peas out of the water and put them in a cooking pan. Add 4 cups of water per person. Cover the pan and keep the peas simmering for two hours. Take half an onion per person. Cut it into pieces with a knife. Add it to the peas. Take a stalk of celery per person. Cut it into pieces with a knife. Add it to the peas. Take a carrot per person. Cut it into pieces. With a knife! Add it to the peas. Cook for 10 more minutes.
-
-quote}}
-
-And this is the second recipe:
+Як аналогію, порівняйте ці два рецепти горохового супу. Перший виглядає так:
 
 {{quote
 
-Per person: 1 cup dried split peas, 4 cups of water, half a chopped onion, a stalk of celery, and a carrot.
-
-Soak peas for 12 hours. Simmer for 2 hours. Chop and add vegetables. Cook for 10 more minutes.
+Покладіть у каструлю 1 склянку сушеного гороху на одну людину. Додайте води, щоб горох був добре покритий. Залиште горох у воді щонайменше на 12 годин. Вийміть горох з води і покладіть його в каструлю. Додайте 4 склянки води на одну людину. Накрийте каструлю кришкою і варіть горох на повільному вогні протягом двох годин. Візьміть половину цибулини на людину. Наріжте її ножем на шматочки. Додаємо до гороху. Візьміть стебло селери з розрахунку на одну людину. Нарізати ножем на шматочки. Додайте до гороху. Візьміть моркву з розрахунку на одну людину. Наріжте її на шматочки. Ножем! Додайте до гороху. Варіть ще 10 хвилин.
 
 quote}}
 
-{{index vocabulary}}
+А це другий рецепт:
 
-The second is shorter and easier to interpret. But you do need to understand a few more cooking-related words such as _soak_, _simmer_, _chop_, and, I guess, _vegetable_.
+{{quote
 
-When programming, we can't rely on all the words we need to be waiting for us in the dictionary. Thus, we might fall into the pattern of the first recipe—work out the precise steps the computer has to perform, one by one, blind to the higher-level concepts they express.
+На одну особу: 1 склянка сушеного колотого гороху, 4 склянки води, половина нарізаної цибулини, стебло селери та моркви.
 
-{{index abstraction}}
+Замочити горох на 12 годин. Варити на повільному вогні 2 години. Подрібнюємо та додаємо овочі. Варити ще 10 хвилин.
 
-It is a useful skill, in programming, to notice when you are working at too low a level of abstraction.
+quote}}
 
-## Abstracting repetition
+{{індексний словник}}
 
-{{index [array, iteration]}}
+Другий варіант коротший і простіший для розуміння. Але вам потрібно розуміти ще кілька слів, пов'язаних з кулінарією, таких як _замочувати_, _тушкувати_, _нарізати_ і, мабуть, _овочі_.
 
-Plain functions, as we've seen them so far, are a good way to build abstractions. But sometimes they fall short.
+При програмуванні ми не можемо покладатися на те, що всі потрібні нам слова вже є у словнику. Таким чином, ми можемо потрапити в патерн першого рецепту - розробити точні кроки, які має виконати комп'ютер, один за одним, не звертаючи уваги на концепції вищого рівня, які вони виражають.
 
-{{index "for loop"}}
+{Абстрагування індексів
 
-It is common for a program to do something a given number of times. You can write a `for` ((loop)) for that, like this:
+У програмуванні корисно вміти помічати, коли ви працюєте на надто низькому рівні абстракції.
+
+## Абстрагування повторення
+
+{{індекс [масиву, ітерації]}}
+
+Прості функції, як ми бачили досі, є гарним способом побудови абстракцій. Але іноді вони бувають недостатніми.
+
+{{index «for loop»}}
+
+У програмі часто буває потрібно виконати щось певну кількість разів. Ви можете написати `for` ((цикл)) для цього, ось так:
 
 ```
 for (let i = 0; i < 10; i++) {
@@ -97,7 +97,7 @@ for (let i = 0; i < 10; i++) {
 }
 ```
 
-Can we abstract "doing something _N_ times" as a function? Well, it's easy to write a function that calls `console.log` _N_ times.
+Чи можна абстрагувати «зробити щось _N_ разів» у вигляді функції? Так, легко написати функцію, яка викликає `console.log` _N_ разів.
 
 ```
 function repeatLog(n) {
@@ -107,13 +107,13 @@ function repeatLog(n) {
 }
 ```
 
-{{index [function, "higher-order"], loop, [function, "as value"]}}
+{{index [функція, «вищого порядку»], loop, [функція, «як значення»]}}
 
-{{indexsee "higher-order function", "function, higher-order"}}
+{{indexsee «функція вищого порядку», «функція вищого порядку»}}
 
-But what if we want to do something other than logging the numbers? Since "doing something" can be represented as a function and functions are just values, we can pass our action as a function value.
+Але що, якщо ми хочемо зробити щось інше, ніж просто записати числа? Оскільки «робити щось» можна представити у вигляді функції, а функції - це просто значення, ми можемо передати нашу дію як значення функції.
 
-```{includeCode: "top_lines: 5"}
+```{includeCode: «top_lines: 5"}
 function repeat(n, action) {
   for (let i = 0; i < n; i++) {
     action(i);
@@ -126,57 +126,57 @@ repeat(3, console.log);
 // → 2
 ```
 
-We don't have to pass a predefined function to `repeat`. Often, it is easier to create a function value on the spot instead.
+Нам не обов'язково передавати в `repeat` заздалегідь визначену функцію. Часто простіше створити значення функції на місці.
 
 ```
 let labels = [];
 repeat(5, i => {
-  labels.push(`Unit ${i + 1}`);
+  labels.push(`Одиниця ${i + 1}`);
 });
 console.log(labels);
-// → ["Unit 1", "Unit 2", "Unit 3", "Unit 4", "Unit 5"]
+// → [«Unit 1», «Unit 2», «Unit 3», «Unit 4», «Unit 5»]
 ```
 
-{{index "loop body", [braces, body], [parentheses, arguments]}}
+{{індекс «тіло циклу», [дужки, тіло], [дужки, аргументи]}}
 
-This is structured a little like a `for` loop—it first describes the kind of loop and then provides a body. However, the body is now written as a function value, which is wrapped in the parentheses of the call to `repeat`. This is why it has to be closed with the closing brace _and_ closing parenthesis. In cases like this example, where the body is a single small expression, you could also omit the braces and write the loop on a single line.
+За структурою це трохи схоже на цикл `for` - спочатку описується тип циклу, а потім надається тіло. Однак тіло тепер записується як значення функції, яке загорнуте в дужки виклику `repeat`. Ось чому його потрібно закривати закриваючою дужкою _та_ закриваючою дужкою. У випадках, подібних до цього прикладу, де тіло є одним невеликим виразом, ви також можете опустити дужки і написати цикл в одному рядку.
 
-## Higher-order functions
+## Функції вищого порядку
 
-{{index [function, "higher-order"], [function, "as value"]}}
+{{index [функція, «вищого порядку»], [функція, «як значення»]}}
 
-Functions that operate on other functions, either by taking them as arguments or by returning them, are called _higher-order functions_. Since we have already seen that functions are regular values, there is nothing particularly remarkable about the fact that such functions exist. The term comes from ((mathematics)), where the distinction between functions and other values is taken more seriously.
+Функції, які оперують іншими функціями, приймаючи їх як аргументи або повертаючи їх, називаються _функціями вищого порядку_. Оскільки ми вже бачили, що функції є регулярними величинами, немає нічого особливо дивного у тому, що такі функції існують. Термін походить з ((математики)), де відмінність між функціями та іншими значеннями сприймається більш серйозно.
 
-{{index abstraction}}
+{{Абстракція індексу}}
 
-Higher-order functions allow us to abstract over _actions_, not just values. They come in several forms. For example, we can have functions that create new functions.
+Функції вищих порядків дозволяють нам абстрагуватися від _дій_, а не лише від значень. Вони бувають декількох видів. Наприклад, ми можемо мати функції, які створюють нові функції.
 
 ```
 function greaterThan(n) {
   return m => m > n;
 }
-let greaterThan10 = greaterThan(10);
+нехай greaterThan10 = greaterThan(10);
 console.log(greaterThan10(11));
 // → true
 ```
 
-We can also have functions that change other functions.
+Ми також можемо мати функції, які змінюють інші функції.
 
 ```
 function noisy(f) {
   return (...args) => {
-    console.log("calling with", args);
+    console.log(«виклик з», args);
     let result = f(...args);
-    console.log("called with", args, ", returned", result);
+    console.log(«викликається з», args, «, повернуто», result);
     return result;
   };
 }
 noisy(Math.min)(3, 2, 1);
-// → calling with [3, 2, 1]
-// → called with [3, 2, 1] , returned 1
+// → виклик з [3, 2, 1]
+// → виклик з [3, 2, 1] , повернуто 1
 ```
 
-We can even write functions that provide new types of ((control flow)).
+Можна навіть писати функції, які надають нові типи ((потоку управління)).
 
 ```
 function unless(test, then) {
@@ -185,62 +185,62 @@ function unless(test, then) {
 
 repeat(3, n => {
   unless(n % 2 == 1, () => {
-    console.log(n, "is even");
+    console.log(n, «is even»);
   });
 });
-// → 0 is even
-// → 2 is even
+// → 0 парне
+// → 2 парне
 ```
 
-{{index [array, methods], [array, iteration], "forEach method"}}
+{{index [array, methods], [array, iteration], «forEach method»}}
 
-There is a built-in array method, `forEach`, that provides something like a `for`/`of` loop as a higher-order function.
+Існує вбудований метод масиву `forEach`, який надає щось на зразок циклу `for`/`of` як функцію вищого порядку.
 
 ```
-["A", "B"].forEach(l => console.log(l));
+[«A», «B»].forEach(l => console.log(l));
 // → A
 // → B
 ```
 
 {{id scripts}}
 
-## Script dataset
+## Набір даних скриптів
 
-One area where higher-order functions shine is data processing. To process data, we'll need some actual example data. This chapter will use a ((dataset)) about scripts—((writing system))s such as Latin, Cyrillic, or Arabic.
+Однією зі сфер застосування функцій вищих порядків є обробка даних. Для обробки даних нам знадобляться деякі реальні приклади даних. У цій главі буде використано ((набір даних)) про скрипти - ((системи письма)), такі як латиниця, кирилиця або арабська.
 
-Remember ((Unicode)), the system that assigns a number to each character in written language, from [Chapter ?](values#unicode)? Most of these characters are associated with a specific script. The standard contains 140 different scripts, of which 81 are still in use today and 59 are historic.
+Пам'ятаєте ((Юнікод)), систему, яка призначає номер кожному символу у письмовій мові, з [Глава ?](значення#юнікод)? Більшість цих символів пов'язані з певним шрифтом. Стандарт містить 140 різних шрифтів, з яких 81 все ще використовується сьогодні, а 59 є історичними.
 
-Though I can fluently read only Latin characters, I appreciate the fact that people are writing texts in at least 80 other writing systems, many of which I wouldn't even recognize. For example, here's a sample of ((Tamil)) handwriting:
+Хоча я можу вільно читати лише латинські символи, я ціную той факт, що люди пишуть тексти щонайменше 80 іншими системами письма, багато з яких я навіть не впізнаю. Наприклад, ось зразок ((тамільського)) почерку:
 
-{{figure {url: "img/tamil.png", alt: "A line of verse in Tamil handwriting. The characters are relatively simple, and neatly separated, yet completely different from Latin."}}}
+{{figure {url: «img/tamil.png», alt: «Рядок вірша тамільським почерком. Символи відносно прості, акуратно розділені, але зовсім не схожі на латинські."}}}.
 
-{{index "SCRIPTS dataset"}}
+{{index «SCRIPTS dataset»}}
 
-The example ((dataset)) contains some pieces of information about the 140 scripts defined in Unicode. It is available in the [coding sandbox](https://eloquentjavascript.net/code#5) for this chapter[ ([_https://eloquentjavascript.net/code#5_](https://eloquentjavascript.net/code#5))]{if book} as the `SCRIPTS` binding. The binding contains an array of objects, each of which describes a script.
+Приклад ((набір даних)) містить деяку інформацію про 140 скриптів, визначених у Юнікоді. Він доступний у [пісочниці кодування](https://eloquentjavascript.net/code#5) для цієї глави [[_https://eloquentjavascript.net/code#5_](https://eloquentjavascript.net/code#5))]{if book} як зв'язка `SCRIPTS`. Обв'язка містить масив об'єктів, кожен з яких описує скрипт.
 
 
-```{lang: "json"}
+```{lang: «json"}
 {
-  name: "Coptic",
+  name: «Coptic»,
   ranges: [[994, 1008], [11392, 11508], [11513, 11520]],
-  direction: "ltr",
-  year: -200,
-  living: false,
-  link: "https://en.wikipedia.org/wiki/Coptic_alphabet"
+  напрям: «ltr»,
+  рік: -200,
+  живий: несправжній,
+  link: «https://en.wikipedia.org/wiki/Coptic_alphabet»
 }
 ```
 
-Such an object tells us the name of the script, the Unicode ranges assigned to it, the direction in which it is written, the (approximate) origin time, whether it is still in use, and a link to more information. The direction may be `"ltr"` for left to right, `"rtl"` for right to left (the way Arabic and Hebrew text are written), or `"ttb"` for top to bottom (as with Mongolian writing).
+Такий об'єкт повідомляє нам назву скрипту, діапазони Unicode, призначені для нього, напрямок, в якому він написаний, (приблизний) час створення, чи використовується він досі, а також посилання на додаткову інформацію. Напрямок може бути ``ltr`` для зліва направо, ``rtl`` для справа наліво (так пишуть арабські та івритські тексти) або ``ttb`` для зверху вниз (як у монгольській писемності).
 
-{{index "slice method"}}
+{{index «slice method»}}
 
-The `ranges` property contains an array of Unicode character ((range))s, each of which is a two-element array containing a lower bound and an upper bound. Any character codes within these ranges are assigned to the script. The lower ((bound)) is inclusive (code 994 is a Coptic character) and the upper bound is noninclusive (code 1008 isn't).
+Властивість `ranges` містить масив символів Unicode ((range))s, кожен з яких є двоелементним масивом, що містить нижню та верхню межі. Будь-які коди символів у межах цих діапазонів призначаються скрипту. Нижня межа ((діапазон)) є інклюзивною (код 994 є коптським символом), а верхня межа не є інклюзивною (код 1008 не є таким).
 
-## Filtering arrays
+## Фільтрування масивів
 
-{{index [array, methods], [array, filtering], "filter method", [function, "higher-order"], "predicate function"}}
+{{index [масив, методи], [масив, фільтрація], «метод фільтрації», [функція, «вищого порядку»], «функція-предикат»}}
 
-If we want to find the scripts in the dataset that are still in use, the following function might be helpful. It filters out elements in an array that don't pass a test.
+Якщо ми хочемо знайти скрипти у наборі даних, які все ще використовуються, наступна функція може бути корисною. Вона відфільтровує елементи масиву, які не пройшли перевірку.
 
 ```
 function filter(array, test) {
@@ -254,35 +254,35 @@ function filter(array, test) {
 }
 
 console.log(filter(SCRIPTS, script => script.living));
-// → [{name: "Adlam", …}, …]
+// → [{name: «Adlam», ...}, ...]
 ```
 
-{{index [function, "as value"], [function, application]}}
+{{index [function, «as value»], [function, application]}}
 
-The function uses the argument named `test`, a function value, to fill a "gap" in the computation—the process of deciding which elements to collect.
+Функція використовує аргумент на ім'я `test`, значення функції, щоб заповнити «прогалину» в обчисленнях - процес прийняття рішення про те, які елементи збирати.
 
-{{index "filter method", "pure function", "side effect"}}
+{{index «метод фільтрації», «чиста функція», «побічний ефект»}}
 
-Note how the `filter` function, rather than deleting elements from the existing array, builds up a new array with only the elements that pass the test. This function is _pure_. It does not modify the array it is given.
+Зверніть увагу, що функція `filter` замість того, щоб видаляти елементи з існуючого масиву, створює новий масив, до якого включаються лише ті елементи, які пройшли перевірку. Ця функція є _чистою_. Вона не модифікує масив, який їй передається.
 
-Like `forEach`, `filter` is a ((standard)) array method. The example defined the function only to show what it does internally. From now on, we'll use it like this instead:
+Як і `forEach`, `filter` є ((стандартним)) методом масиву. У прикладі функція була визначена лише для того, щоб показати, що вона робить всередині. Відтепер ми будемо використовувати її так:
 
 ```
-console.log(SCRIPTS.filter(s => s.direction == "ttb"));
-// → [{name: "Mongolian", …}, …]
+console.log(SCRIPTS.filter(s => s.direction == «ttb»));
+// → [{name: «Mongolian», ...}, ...]
 ```
 
 {{id map}}
 
-## Transforming with map
+## Перетворення з допомогою map
 
-{{index [array, methods], "map method"}}
+{{index [array, methods], «map method»}}
 
-Say we have an array of objects representing scripts, produced by filtering the `SCRIPTS` array somehow. We want an array of names instead, which is easier to inspect.
+Скажімо, у нас є масив об'єктів, що представляють скрипти, отриманий шляхом фільтрації масиву `SCRIPTS`. Натомість нам потрібен масив імен, який легше перевіряти.
 
-{{index [function, "higher-order"]}}
+{{index [function, «higher-order»]}}
 
-The `map` method transforms an array by applying a function to all of its elements and building a new array from the returned values. The new array will have the same length as the input array, but its content will have been _mapped_ to a new form by the function.
+Метод `map` перетворює масив, застосовуючи функцію до всіх його елементів і створюючи новий масив з повернутих значень. Новий масив матиме ту саму довжину, що й вхідний масив, але його вміст буде _відображено_ у новій формі за допомогою функції.
 
 ```
 function map(array, transform) {
@@ -293,31 +293,31 @@ function map(array, transform) {
   return mapped;
 }
 
-let rtlScripts = SCRIPTS.filter(s => s.direction == "rtl");
+let rtlScripts = SCRIPTS.filter(s => s.direction == «rtl»);
 console.log(map(rtlScripts, s => s.name));
-// → ["Adlam", "Arabic", "Imperial Aramaic", …]
+// → [«Adlam», «Arabic», «Imperial Aramaic», ...]
 ```
 
-Like `forEach` and `filter`, `map` is a standard array method.
+Як і `forEach` та `filter`, `map` є стандартним методом роботи з масивами.
 
-## Summarizing with reduce
+## Підсумовування за допомогою reduce
 
-{{index [array, methods], "summing example", "reduce method"}}
+{{index [array, methods], «приклад підсумовування», «метод reduce»}}
 
-Another common thing to do with arrays is to compute a single value from them. Our recurring example, summing a collection of numbers, is an instance of this. Another example is finding the script with the most characters.
+Ще одна поширена операція з масивами - це обчислення з них одного значення. Наш повторюваний приклад, підсумовування набору чисел, є прикладом цього. Іншим прикладом є пошук сценарію з найбільшою кількістю символів.
 
-{{indexsee "fold", "reduce method"}}
+{{indexsee «fold», «reduce method»}}
 
-{{index [function, "higher-order"], "reduce method"}}
+{{index [function, «higher-order»], «reduce method»}}
 
-The higher-order operation that represents this pattern is called _reduce_ (sometimes also called _fold_). It builds a value by repeatedly taking a single element from the array and combining it with the current value. When summing numbers, you'd start with the number zero and, for each element, add that to the sum.
+Операція вищого порядку, яка представляє цей шаблон, називається _reduce_ (іноді її також називають _fold_). Вона створює значення шляхом багаторазового взяття одного елемента з масиву і об'єднання його з поточним значенням. Підсумовуючи числа, ви починаєте з нуля і для кожного елемента додаєте його до суми.
 
-The parameters to `reduce` are, apart from the array, a combining function and a start value. This function is a little less straightforward than `filter` and `map`, so take a close look at it:
+Параметрами для «зменшення», окрім масиву, є функція об'єднання та початкове значення. Ця функція трохи менш проста, ніж `filter` і `map`, тому подивіться на неї уважніше:
 
 ```
 function reduce(array, combine, start) {
   let current = start;
-  for (let element of array) {
+  for (let елемент масиву) {
     current = combine(current, element);
   }
   return current;
@@ -327,61 +327,61 @@ console.log(reduce([1, 2, 3, 4], (a, b) => a + b, 0));
 // → 10
 ```
 
-{{index "reduce method", "SCRIPTS dataset"}}
+{{index «reduce method», «SCRIPTS dataset»}}
 
-The standard array method `reduce`, which of course corresponds to this function, has an added convenience. If your array contains at least one element, you are allowed to leave off the `start` argument. The method will take the first element of the array as its start value and start reducing at the second element.
+Стандартний метод роботи з масивами `reduce`, якому, звичайно, відповідає ця функція, має додаткову зручність. Якщо ваш масив містить хоча б один елемент, ви можете не вказувати аргумент `start`. Метод прийме перший елемент масиву як початкове значення і почне зменшувати з другого елемента.
 
 ```
 console.log([1, 2, 3, 4].reduce((a, b) => a + b));
 // → 10
 ```
 
-{{index maximum, "characterCount function"}}
+{{index maximum, «characterCount function»}}
 
-To use `reduce` (twice) to find the script with the most characters, we can write something like this:
+Щоб використати `reduce` (двічі) для пошуку скрипту з найбільшою кількістю символів, ми можемо написати щось на кшталт цього:
 
 ```
 function characterCount(script) {
-  return script.ranges.reduce((count, [from, to]) => {
-    return count + (to - from);
+  return script.ranges.reduce((count, [from, to]) => { } </ p
+    повернути count + (to - from);
   }, 0);
 }
 
 console.log(SCRIPTS.reduce((a, b) => {
   return characterCount(a) < characterCount(b) ? b : a;
 }));
-// → {name: "Han", …}
+// → {name: «Han», ...}
 ```
 
-The `characterCount` function reduces the ranges assigned to a script by summing their sizes. Note the use of destructuring in the parameter list of the reducer function. The second call to `reduce` then uses this to find the largest script by repeatedly comparing two scripts and returning the larger one.
+Функція `characterCount` зменшує діапазони, призначені скрипту, шляхом підсумовування їх розмірів. Зверніть увагу на використання деструктуризації у списку параметрів функції-зменшувача. Другий виклик `reduce` потім використовує це для знаходження найбільшого скрипта шляхом багаторазового порівняння двох скриптів і повернення більшого з них.
 
-The Han script has more than 89,000 characters assigned to it in the Unicode standard, making it by far the biggest writing system in the dataset. Han is a script sometimes used for Chinese, Japanese, and Korean text. Those languages share a lot of characters, though they tend to write them differently. The (US-based) Unicode Consortium decided to treat them as a single writing system to save character codes. This is called _Han unification_ and still makes some people very angry.
+У стандарті Юнікод для ієрогліфів хань призначено понад 89 000 символів, що робить його найбільшою писемністю у нашому наборі даних. Ієрогліф хань іноді використовується для китайської, японської та корейської мов. Ці мови мають багато спільних ієрогліфів, хоча й пишуть їх по-різному. Консорціум Юнікод (США) вирішив розглядати їх як єдину систему письма, щоб зберегти коди символів. Це називається _Ханьська уніфікація_ і досі викликає невдоволення деяких людей.
 
-## Composability
+Компоновка ## Компоновка
 
-{{index loop, maximum}}
+{{індексний цикл, максимум}}
 
-Consider how we would have written the previous example (finding the biggest script) without higher-order functions. The code is not that much worse.
+Подумайте, як би ми написали попередній приклад (знаходження найбільшого скрипту) без функцій вищого порядку. Код не набагато гірший.
 
 ```{test: no}
 let biggest = null;
 for (let script of SCRIPTS) {
-  if (biggest == null ||
-      characterCount(biggest) < characterCount(script)) {
+  if (biggest == null ||)
+      characterCount(biggest) < characterCount(script)) { if (biggest == null ||)
     biggest = script;
   }
 }
 console.log(biggest);
-// → {name: "Han", …}
+// → {name: «Han», ...}
 ```
 
-There are a few more bindings, and the program is four lines longer, but it is still very readable.
+Є ще кілька прив'язок, і програма стала на чотири рядки довшою, але вона все одно дуже читабельна.
 
-{{index "average function", composability, [function, "higher-order"], "filter method", "map method", "reduce method"}}
+{{index «average function», composability, [function, «higher-order»], «filter method», «map method», «reduce method»}}
 
 {{id average_function}}
 
-The abstractions these functions provide really shine when you need to _compose_ operations. As an example, let's write code that finds the average year of origin for living and dead scripts in the dataset.
+Абстракції, які надають ці функції, дійсно блищать, коли вам потрібно _компонувати_ операції. Для прикладу, давайте напишемо код, який знаходить середній рік походження для живих і мертвих скриптів у наборі даних.
 
 ```
 function average(array) {
@@ -396,9 +396,9 @@ console.log(Math.round(average(
 // → 204
 ```
 
-As you can see, the dead scripts in Unicode are, on average, older than the living ones. This is not a terribly meaningful or surprising statistic. But I hope you'll agree that the code used to compute it isn't hard to read. You can see it as a pipeline: we start with all scripts, filter out the living (or dead) ones, take the years from those, average them, and round the result.
+Як бачите, мертві скрипти в Юнікоді в середньому старіші за живі. Це не дуже значуща або дивовижна статистика. Але я сподіваюся, ви погодитеся, що код, який використовується для її підрахунку, не складно прочитати. Ви можете розглядати його як конвеєр: ми починаємо з усіх скриптів, відфільтровуємо живі (або мертві), беремо з них роки, усереднюємо їх і округляємо результат.
 
-You could definitely also write this computation as one big ((loop)).
+Ви також можете записати ці обчислення як один великий ((цикл)).
 
 ```
 let total = 0, count = 0;
@@ -412,21 +412,21 @@ console.log(Math.round(total / count));
 // → 1165
 ```
 
-However, it is harder to see what was being computed and how. And because intermediate results aren't represented as coherent values, it'd be a lot more work to extract something like `average` into a separate function.
+Однак, тут складніше побачити, що і як обчислювалося. А оскільки проміжні результати не представлено у вигляді цілісних значень, виокремлення чогось на кшталт `average` в окрему функцію потребуватиме набагато більше зусиль.
 
-{{index efficiency, [array, creation]}}
+{{ефективність індексу, [масив, створення]}}
 
-In terms of what the computer is actually doing, these two approaches are also quite different. The first will build up new arrays when running `filter` and `map`, whereas the second computes only some numbers, doing less work. You can usually afford the readable approach, but if you're processing huge arrays and doing so many times, the less abstract style might be worth the extra speed.
+З точки зору того, що насправді робить комп'ютер, ці два підходи також сильно відрізняються. Перший створює нові масиви при виконанні `filter` і `map`, тоді як другий обчислює лише деякі числа, виконуючи менший обсяг роботи. Зазвичай ви можете дозволити собі читабельний підхід, але якщо ви обробляєте величезні масиви і робите це багато разів, менш абстрактний стиль може бути вартий додаткової швидкості.
 
-## Strings and character codes
+## Рядки та коди символів
 
-{{index "SCRIPTS dataset"}}
+{{index «SCRIPTS dataset»}}
 
-One interesting use of this dataset would be figuring out what script a piece of text is using. Let's go through a program that does this.
+Одним з цікавих застосувань цього набору даних може бути з'ясування того, який скрипт використовується у фрагменті тексту. Давайте розглянемо програму, яка робить це.
 
-Remember that each script has an array of character code ranges associated with it. Given a character code, we could use a function like this to find the corresponding script (if any):
+Пам'ятайте, що кожен скрипт має масив діапазонів кодів символів, пов'язаних з ним. Маючи код символу, ми можемо використати таку функцію, щоб знайти відповідний скрипт (якщо такий є):
 
-{{index "some method", "predicate function", [array, methods]}}
+{{індекс «деякий метод», «предикатна функція», [масив, методи]}}
 
 ```{includeCode: strip_log}
 function characterScript(code) {
@@ -434,55 +434,55 @@ function characterScript(code) {
     if (script.ranges.some(([from, to]) => {
       return code >= from && code < to;
     })) {
-      return script;
+      повернути скрипт;
     }
   }
   return null;
 }
 
 console.log(characterScript(121));
-// → {name: "Latin", …}
+// → {name: «Latin», ...}
 ```
 
-The `some` method is another higher-order function. It takes a test function and tells you whether that function returns true for any of the elements in the array.
+Метод ``some`` - це ще одна функція вищого порядку. Він приймає тестову функцію і повідомляє вам, чи повертає ця функція значення true для будь-якого з елементів масиву.
 
 {{id code_units}}
 
-But how do we get the character codes in a string?
+Але як отримати коди символів у рядку?
 
-In [Chapter ?](values) I mentioned that JavaScript ((string))s are encoded as a sequence of 16-bit numbers. These are called _((code unit))s_. A ((Unicode)) ((character)) code was initially supposed to fit within such a unit (which gives you a little over 65,000 characters). When it became clear that wasn't going to be enough, many people balked at the need to use more memory per character. To address these concerns, ((UTF-16)), the format also used by JavaScript strings, was invented. It describes most common characters using a single 16-bit code unit but uses a pair of two such units for others.
+У [Розділі ?](значення) я згадував, що JavaScript ((рядок))и кодуються як послідовність 16-бітних чисел. Вони називаються _((одиниця коду))s_. Спочатку передбачалося, що код ((Unicode)) ((символ)) вміщується в таку одиницю (що дає трохи більше 65 000 символів). Коли стало зрозуміло, що цього буде недостатньо, багато хто заперечував проти необхідності використання більшого обсягу пам'яті на символ. Для вирішення цієї проблеми було винайдено формат ((UTF-16)), який також використовується в рядках JavaScript. Він описує найпоширеніші символи за допомогою однієї 16-бітної кодової одиниці, а для інших використовує пару з двох таких одиниць.
 
-{{index error}}
+{{помилка індексу}}
 
-UTF-16 is generally considered a bad idea today. It seems almost intentionally designed to invite mistakes. It's easy to write programs that pretend code units and characters are the same thing. And if your language doesn't use two-unit characters, that will appear to work just fine. But as soon as someone tries to use such a program with some less common ((Chinese characters)), it breaks. Fortunately, with the advent of ((emoji)), everybody has started using two-unit characters, and the burden of dealing with such problems is more fairly distributed.
+UTF-16 сьогодні, як правило, вважається поганою ідеєю. Здається, що вона майже навмисно створена для того, щоб провокувати помилки. Легко писати програми, які вдають, що одиниці коду і символи - це одне і те ж саме. І якщо у вашій мові не використовуються двоодиницькі символи, це буде виглядати чудово. Але як тільки хтось спробує використати таку програму з менш поширеними (китайськими ієрогліфами), вона зламається. На щастя, з появою ((емодзі)) всі почали використовувати двоосновні символи, і тягар вирішення таких проблем розподілено більш справедливо.
 
-{{index [string, length], [string, indexing], "charCodeAt method"}}
+{{index [рядок, довжина], [рядок, індексація], «charCodeAt метод»}}
 
-Unfortunately, obvious operations on JavaScript strings, such as getting their length through the `length` property and accessing their content using square brackets, deal only with code units.
+На жаль, очевидні операції над рядками JavaScript, такі як отримання їх довжини через властивість `length` та доступ до їх вмісту за допомогою квадратних дужок, мають справу лише з одиницями коду.
 
 ```{test: no}
-// Two emoji characters, horse and shoe
-let horseShoe = "🐴👟";
+// Два символи емодзі, кінь і черевик
+let horseShoe = «🐴👟»;
 console.log(horseShoe.length);
 // → 4
 console.log(horseShoe[0]);
-// → (Invalid half-character)
+// → (Недопустимий напівсимвол)
 console.log(horseShoe.charCodeAt(0));
-// → 55357 (Code of the half-character)
+// → 55357 (Код напівсимволу)
 console.log(horseShoe.codePointAt(0));
-// → 128052 (Actual code for horse emoji)
+// → 128052 (Фактичний код емодзі коня)
 ```
 
-{{index "codePointAt method"}}
+{{index «codePointAt method»}}
 
-JavaScript's `charCodeAt` method gives you a code unit, not a full character code. The `codePointAt` method, added later, does give a full Unicode character, so we could use that to get characters from a string. But the argument passed to `codePointAt` is still an index into the sequence of code units. To run over all characters in a string, we'd still need to deal with the question of whether a character takes up one or two code units.
+Метод JavaScript `charCodeAt` повертає одиницю коду, а не повний код символу. Метод `codePointAt`, доданий пізніше, повертає повний символ Unicode, тому ми можемо використовувати його для отримання символів з рядка. Але аргумент, переданий до `codePointAt`, все одно є індексом послідовності кодових одиниць. Щоб перебрати всі символи у рядку, нам все одно доведеться вирішувати питання, чи займає символ одну або дві кодові одиниці.
 
-{{index "for/of loop", character}}
+{{індекс «for/of loop», символ}}
 
-In the [previous chapter](data#for_of_loop), I mentioned that a `for`/`of` loop can also be used on strings. Like `codePointAt`, this type of loop was introduced at a time when people were acutely aware of the problems with UTF-16. When you use it to loop over a string, it gives you real characters, not code units.
+У [попередній главі](data#for_of_loop) я згадував, що цикл `for`/`of` також можна використовувати у рядках. Як і `codePointAt`, цей тип циклу було введено у той час, коли люди гостро усвідомлювали проблеми з UTF-16. Коли ви використовуєте його для циклу над рядком, він повертає вам реальні символи, а не кодові одиниці.
 
 ```
-let roseDragon = "🌹🐉";
+let roseDragon = «🌹🐉»;
 for (let char of roseDragon) {
   console.log(char);
 }
@@ -490,13 +490,13 @@ for (let char of roseDragon) {
 // → 🐉
 ```
 
-If you have a character (which will be a string of one or two code units), you can use `codePointAt(0)` to get its code.
+Якщо у вас є символ (який буде рядком з однієї або двох кодових одиниць), ви можете використати `codePointAt(0)` для отримання його коду.
 
-## Recognizing text
+## Розпізнавання тексту
 
-{{index "SCRIPTS dataset", "countBy function", [array, counting]}}
+{{index «SCRIPTS dataset», «countBy function», [array, counting]}}
 
-We have a `characterScript` function and a way to correctly loop over characters. The next step is to count the characters that belong to each script. The following counting abstraction will be useful there:
+У нас є функція `characterScript` і спосіб коректного перебору символів. Наступним кроком буде підрахунок символів, які належать кожному скрипту. Наступна абстракція підрахунку буде корисною для цього:
 
 ```{includeCode: strip_log}
 function countBy(items, groupName) {
@@ -510,85 +510,85 @@ function countBy(items, groupName) {
       known.count++;
     }
   }
-  return counts;
+  повернути counts;
 }
 
 console.log(countBy([1, 2, 3, 4, 5], n => n > 2));
 // → [{name: false, count: 2}, {name: true, count: 3}]
 ```
 
-The `countBy` function expects a collection (anything that we can loop over with `for`/`of`) and a function that computes a group name for a given element. It returns an array of objects, each of which names a group and tells you the number of elements that were found in that group.
+Функція `countBy` очікує на колекцію (все, що можна перебрати за допомогою `for`/`of`) і функцію, яка обчислює назву групи для заданого елемента. Вона повертає масив об'єктів, кожен з яких називає групу і повідомляє вам кількість елементів, знайдених у цій групі.
 
-{{index "find method"}}
+{{index «метод find»}}
 
-It uses another array method, `find`, which goes over the elements in the array and returns the first one for which a function returns true. It returns `undefined` when it finds no such element.
+Використовує інший метод масиву, `find`, який перебирає елементи масиву і повертає перший елемент, для якого функція повертає true. Він повертає `undefined`, якщо не знаходить такого елемента.
 
-{{index "textScripts function", "Chinese characters"}}
+{{index «textScripts function», «Chinese characters»}}
 
-Using `countBy`, we can write the function that tells us which scripts are used in a piece of text.
+Використовуючи `countBy`, ми можемо написати функцію, яка покаже нам, які скрипти використовуються у фрагменті тексту.
 
 ```{includeCode: strip_log, startCode: true}
 function textScripts(text) {
   let scripts = countBy(text, char => {
     let script = characterScript(char.codePointAt(0));
-    return script ? script.name : "none";
-  }).filter(({name}) => name != "none");
+    return script ? script.name : «none»;
+  }).filter(({name}) => name != «none»);
 
   let total = scripts.reduce((n, {count}) => n + count, 0);
-  if (total == 0) return "No scripts found";
+  if (total == 0) return «Скриптів не знайдено»;
 
   return scripts.map(({name, count}) => {
     return `${Math.round(count * 100 / total)}% ${name}`;
-  }).join(", ");
+  }).join(», »);
 }
 
-console.log(textScripts('英国的狗说"woof", 俄罗斯的狗说"тяв"'));
-// → 61% Han, 22% Latin, 17% Cyrillic
+console.log(textScripts('英国的狗说 «гав», 俄罗斯的狗说 «тяв»'));
+// → 61% ханьська, 22% латиниця, 17% кирилиця
 ```
 
-{{index "characterScript function", "filter method"}}
+{{index «characterScript function», «filter method»}}
 
-The function first counts the characters by name, using `characterScript` to assign them a name and falling back to the string `"none"` for characters that aren't part of any script. The `filter` call drops the entry for `"none"` from the resulting array, since we aren't interested in those characters.
+Функція спочатку підраховує символи за іменами, використовуючи `characterScript` для присвоєння їм імен і повертаючись до рядка `«none»` для символів, які не є частиною жодного скрипту. Виклик `filter` вилучає запис для `«none»` з результуючого масиву, оскільки ці символи нас не цікавлять.
 
-{{index "reduce method", "map method", "join method", [array, methods]}}
+{{index «reduce method», «map method», «join method», [array, methods]}}
 
-To be able to compute ((percentage))s, we first need the total number of characters that belong to a script, which we can compute with `reduce`. If we find no such characters, the function returns a specific string. Otherwise, it transforms the counting entries into readable strings with `map` and then combines them with `join`.
+Щоб мати можливість обчислити ((percentage))s, нам спочатку потрібна загальна кількість символів, що належать скрипту, яку ми можемо обчислити за допомогою `reduce`. Якщо таких символів не знайдено, функція повертає певний рядок. В іншому випадку, вона перетворює підраховані записи в читабельні рядки за допомогою `map`, а потім об'єднує їх за допомогою `join`.
 
-## Summary
+## Підсумок
 
-Being able to pass function values to other functions is a deeply useful aspect of JavaScript. It allows us to write functions that model computations with "gaps" in them. The code that calls these functions can fill in the gaps by providing function values.
+Можливість передавати значення функцій іншим функціям є дуже корисним аспектом JavaScript. Вона дозволяє нам писати функції, які моделюють обчислення з «прогалинами» в них. Код, який викликає ці функції, може заповнити прогалини, передавши значення функції.
 
-Arrays provide a number of useful higher-order methods. You can use `forEach` to loop over the elements in an array. The `filter` method returns a new array containing only the elements that pass the ((predicate function)). You can transform an array by putting each element through a function using `map`. You can use `reduce` to combine all the elements in an array into a single value. The `some` method tests whether any element matches a given predicate function, while `find` finds the first element that matches a predicate.
+Масиви надають ряд корисних методів вищого порядку. Ви можете використовувати `forEach` для циклічного перебору елементів масиву. Метод `filter` повертає новий масив, що містить лише ті елементи, які пройшли через функцію ((предикат)). Ви можете перетворити масив, застосувавши до кожного елемента функцію за допомогою `map`. Ви можете використовувати `reduce` для об'єднання всіх елементів масиву в одне значення. Метод `ome` перевіряє, чи відповідає будь-який елемент заданій предикатній функції, а `find` знаходить перший елемент, який відповідає предикату.
 
-## Exercises
+## Вправи
 
-### Flattening
+## Flattening (вирівнювання)
 
-{{index "flattening (exercise)", "reduce method", "concat method", [array, flattening]}}
+{{index «flattening (exercise)», «reduce method», «concat method», [array, flattening]}}
 
-Use the `reduce` method in combination with the `concat` method to "flatten" an array of arrays into a single array that has all the elements of the original arrays.
+Використовуйте метод `reduce` у поєднанні з методом `concat` для «сплющення» масиву масивів в один масив, який містить всі елементи вихідних масивів.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-let arrays = [[1, 2, 3], [4, 5], [6]];
-// Your code here.
+нехай масиви = [[1, 2, 3], [4, 5], [6]];
+// Ваш код тут.
 // → [1, 2, 3, 4, 5, 6]
 ```
 if}}
 
-### Your own loop
+### Ваш власний цикл
 
-{{index "your own loop (example)", "for loop"}}
+{{index «ваш власний цикл (приклад)», «for loop»}}
 
-Write a higher-order function `loop` that provides something like a `for` loop statement. It should take a value, a test function, an update function, and a body function. Each iteration, it should first run the test function on the current loop value and stop if that returns `false`. It should then call the body function, giving it the current value, and finally call the update function to create a new value and start over from the beginning.
+Напишіть функцію вищого порядку `loop`, яка забезпечує щось на кшталт інструкції циклу `for`. Вона повинна приймати значення, тестову функцію, функцію оновлення та основну функцію. На кожній ітерації вона повинна спочатку запускати тестову функцію для поточного значення циклу і зупинятися, якщо вона повертає `false`. Потім слід викликати основну функцію, передавши їй поточне значення, і, нарешті, викликати функцію оновлення, щоб створити нове значення і почати все з початку.
 
-When defining the function, you can use a regular loop to do the actual looping.
+При визначенні функції ви можете використовувати звичайний цикл для виконання циклу.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
 loop(3, n => n > 0, n => n - 1, console.log);
 // → 3
@@ -600,17 +600,17 @@ if}}
 
 ### Everything
 
-{{index "predicate function", "everything (exercise)", "every method", "some method", [array, methods], "&& operator", "|| operator"}}
+{{індекс «предикатна функція», «все (вправа)», «кожен метод», «деякий метод», [масив, методи], «оператор &&», «оператор ||»}}
 
-Arrays also have an `every` method analogous to the `some` method. This method returns `true` when the given function returns `true` for _every_ element in the array. In a way, `some` is a version of the `||` operator that acts on arrays, and `every` is like the `&&` operator.
+Масиви також мають метод `every`, аналогічний методу `default`. Цей метод повертає значення `true`, коли задана функція повертає значення `true` для _кожного_ елемента масиву. У певному сенсі, `ome` - це версія оператора `||`, який діє на масиви, а `every` - це оператор `&&`.
 
-Implement `every` as a function that takes an array and a predicate function as parameters. Write two versions, one using a loop and one using the `some` method.
+Реалізуйте `every` як функцію, яка отримує масив і предикатну функцію як параметри. Напишіть дві версії, одну з використанням циклу, а другу - з використанням методу `some`.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
 function every(array, test) {
-  // Your code here.
+  // Ваш код тут.
 }
 
 console.log(every([1, 3, 5], n => n < 10));
@@ -625,46 +625,46 @@ if}}
 
 {{hint
 
-{{index "everything (exercise)", "short-circuit evaluation", "return keyword"}}
+{{індекс «everything (вправа)», «оцінка короткого замикання», «ключове слово return»}}
 
-Like the `&&` operator, the `every` method can stop evaluating further elements as soon as it has found one that doesn't match. So the loop-based version can jump out of the loop—with `break` or `return`—as soon as it runs into an element for which the predicate function returns `false`. If the loop runs to its end without finding such an element, we know that all elements matched and we should return `true`.
+Як і оператор `&&`, метод `every` може припинити обчислення наступних елементів, як тільки знайде той, що не збігається. Таким чином, циклічна версія може вийти з циклу за допомогою `break` або `return`, щойно натрапить на елемент, для якого предикатна функція повертає значення `false`. Якщо цикл добігає до кінця, не знайшовши такого елемента, ми знаємо, що всі елементи співпали, і ми повинні повернути `true`.
 
-To build `every` on top of `some`, we can apply _((De Morgan's laws))_, which state that `a && b` equals `!(!a || !b)`. This can be generalized to arrays, where all elements in the array match if there is no element in the array that does not match.
+Для побудови `всіх` над `деякими` ми можемо застосувати _((закони Де Моргана))_, які стверджують, що `a && b` дорівнює `!(!a || !b)`. Це можна узагальнити на масиви, де всі елементи масиву збігаються, якщо у масиві немає жодного елемента, який не збігається.
 
-hint}}
+підказка}}
 
-### Dominant writing direction
+### Домінуючий напрямок запису
 
-{{index "SCRIPTS dataset", "direction (writing)", "groupBy function", "dominant direction (exercise)"}}
+{{index «SCRIPTS dataset», «direction (writing)», «groupBy function», «dominant direction (exercise)»}}
 
-Write a function that computes the dominant writing direction in a string of text. Remember that each script object has a `direction` property that can be `"ltr"` (left to right), `"rtl"` (right to left), or `"ttb"` (top to bottom).
+Напишіть функцію, яка обчислює домінуючий напрямок письма у рядку тексту. Пам'ятайте, що кожен об'єкт сценарію має властивість `direction`, яка може бути `ltr` (зліва направо), `rtl` (справа наліво) або `ttb` (зверху вниз).
 
-{{index "characterScript function", "countBy function"}}
+{{index «characterScript function», «countBy function»}}
 
-The dominant direction is the direction of a majority of the characters that have a script associated with them. The `characterScript` and `countBy` functions defined earlier in the chapter are probably useful here.
+Домінуючий напрямок - це напрямок більшості символів, з якими пов'язано скрипт. Функції `characterScript` і `countBy`, визначені раніше у цій главі, можуть бути тут корисними.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
 function dominantDirection(text) {
-  // Your code here.
+  // Ваш код тут.
 }
 
-console.log(dominantDirection("Hello!"));
+console.log(dominantDirection(«Hello!»));
 // → ltr
-console.log(dominantDirection("Hey, مساء الخير"));
+console.log(dominantDirection(«Hey, مساء الخير»));
 // → rtl
 ```
 if}}
 
 {{hint
 
-{{index "dominant direction (exercise)", "textScripts function", "filter method", "characterScript function"}}
+{{індекс «домінуючий напрямок (вправа)», «функція textScripts», «метод фільтрації», «функція characterScript»}}
 
-Your solution might look a lot like the first half of the `textScripts` example. You again have to count characters by a criterion based on `characterScript` and then filter out the part of the result that refers to uninteresting (script-less) characters.
+Ваш розв'язок може бути дуже схожим на першу частину прикладу з `textScripts`. Вам знову доведеться рахувати символи за критерієм на основі `characterScript`, а потім відфільтрувати ту частину результату, яка відноситься до нецікавих (нескриптових) символів.
 
-{{index "reduce method"}}
+{{index «reduce method»}}
 
-Finding the direction with the highest character count can be done with `reduce`. If it's not clear how, refer to the example earlier in the chapter, where `reduce` was used to find the script with the most characters.
+Знайти напрямок з найбільшою кількістю символів можна за допомогою `reduce`. Якщо вам незрозуміло, як це зробити, зверніться до прикладу на початку глави, де `reduce` було використано для пошуку сценарію з найбільшою кількістю символів.
 
-hint}}
+підказка}}

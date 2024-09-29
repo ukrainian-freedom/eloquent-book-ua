@@ -1,333 +1,333 @@
-# Regular Expressions
+# Регулярні вирази
 
-{{quote {author: "Jamie Zawinski", chapter: true}
+{{quote {author: «Jamie Zawinski», chapter: true}}
 
-Some people, when confronted with a problem, think 'I know, I'll use regular expressions.' Now they have two problems.
+Деякі люди, коли стикаються з проблемою, думають: «Я знаю, я використаю регулярні вирази». Тепер вони мають дві проблеми.
 
 quote}}
 
-{{index "Zawinski, Jamie"}}
+{{index «Zawinski, Jamie»}}
 
-{{if interactive
+{{if інтерактивний
 
-{{quote {author: "Master Yuan-Ma", title: "The Book of Programming", chapter: true}
+{{quote {автор: «Master Yuan-Ma», title: «Книга про програмування», chapter: true}} {{quote {автор: “Майстер Юань-Ма”, title: “Книга про програмування”, chapter: true}}
 
-When you cut against the grain of the wood, much strength is needed. When you program against the grain of the problem, much code is needed.
+Коли ви ріжете проти волокон дерева, потрібно багато сили. Коли ви програмуєте проти суті проблеми, потрібно багато коду.
 
 quote}}
 
 if}}
 
-{{figure {url: "img/chapter_picture_9.jpg", alt: "Illustration of a railroad system representing the syntactic structure of regular expressions", chapter: "square-framed"}}}
+{{figure {url: «img/chapter_picture_9.jpg», alt: «Ілюстрація залізничної системи, що представляє синтаксичну структуру регулярних виразів», chapter: «square-framed"}}}
 
-{{index evolution, adoption, integration}}
+{{Еволюція, прийняття, інтеграція індексів}}
 
-Programming ((tool))s and techniques survive and spread in a chaotic, evolutionary way. It's not always the best or most brilliant ones that win, but rather the ones that function well enough within the right niche or that happen to be integrated with another successful piece of technology.
+Інструменти і методи програмування виживають і поширюються хаотично, еволюційним шляхом. Перемагають не завжди найкращі чи найгеніальніші з них, а ті, що досить добре функціонують у правильній ніші або інтегруються з іншою успішною технологією.
 
-{{index "domain-specific language"}}
+{{index «domain-specific language»}}
 
-In this chapter, I will discuss one such tool, _((regular expression))s_. Regular expressions are a way to describe ((pattern))s in string data. They form a small, separate language that is part of JavaScript and many other languages and systems.
+У цій главі я розповім про один з таких інструментів, _((регулярні вирази))s_. Регулярні вирази - це спосіб опису ((шаблону))s у рядкових даних. Вони утворюють невелику окрему мову, яка є частиною JavaScript та багатьох інших мов і систем.
 
-{{index [interface, design]}}
+{{index [інтерфейс, дизайн]}}
 
-Regular expressions are both terribly awkward and extremely useful. Their syntax is cryptic and the programming interface JavaScript provides for them is clumsy. But they are a powerful ((tool)) for inspecting and processing strings. Properly understanding regular expressions will make you a more effective programmer.
+Регулярні вирази є одночасно жахливо незручними і надзвичайно корисними. Їх синтаксис загадковий, а програмний інтерфейс, який надає JavaScript для них, незграбний. Але вони є потужним ((інструментом)) для перевірки та обробки рядків. Правильне розуміння регулярних виразів зробить вас більш ефективним програмістом.
 
-## Creating a regular expression
+## Створення регулярного виразу
 
-{{index ["regular expression", creation], "RegExp class", "literal expression", "slash character"}}
+{{index [«регулярний вираз», створення], «клас RegExp», «буквальний вираз», «коса риска»}}
 
-A regular expression is a type of object. It can be either constructed with the `RegExp` constructor or written as a literal value by enclosing a pattern in forward slash (`/`) characters.
+Регулярний вираз - це тип об'єкта. Його можна створити за допомогою конструктора `RegExp` або записати як буквальне значення, уклавши шаблон у символи прямої похилої риски (`/`).
 
 ```
-let re1 = new RegExp("abc");
+let re1 = new RegExp(«abc»);
 let re2 = /abc/;
 ```
 
-Both of those regular expression objects represent the same ((pattern)): an _a_ character followed by a _b_ followed by a _c_.
+Обидва ці об'єкти регулярних виразів представляють один і той самий ((шаблон)): символ _a_, за яким слідує символ _b_, за яким слідує символ _c_.
 
-{{index ["backslash character", "in regular expressions"], "RegExp class"}}
+{{index [«символ зворотного слешу», «у регулярних виразах»], «клас RegExp»}}
 
-When using the `RegExp` constructor, the pattern is written as a normal string, so the usual rules apply for backslashes.
+При використанні конструктора `RegExp` шаблон записується як звичайний рядок, тому для зворотної косої риски застосовуються звичайні правила.
 
-{{index ["regular expression", escaping], [escaping, "in regexps"], "slash character"}}
+{{index [«регулярний вираз», екранування], [екранування, «у regexps»], «символ слеша»}}
 
-The second notation, where the pattern appears between slash characters, treats backslashes somewhat differently. First, since a forward slash ends the pattern, we need to put a backslash before any forward slash that we want to be _part_ of the pattern. In addition, backslashes that aren't part of special character codes (like `\n`) will be _preserved_, rather than ignored as they are in strings, and change the meaning of the pattern. Some characters, such as question marks and plus signs, have special meanings in regular expressions and must be preceded by a backslash if they are meant to represent the character itself.
-
-```
-let aPlus = /A\+/;
-```
-
-## Testing for matches
-
-{{index matching, "test method", ["regular expression", methods]}}
-
-Regular expression objects have a number of methods. The simplest one is `test`. If you pass it a string, it will return a ((Boolean)) telling you whether the string contains a match of the pattern in the expression.
+У другому записі, де шаблон відображається між символами похилої риски, зворотні косі риски розглядаються дещо по-іншому. По-перше, оскільки пряма коса риска завершує шаблон, то перед будь-якою прямою косою рискою, яку ми хочемо зробити _частиною_ шаблону, слід ставити зворотну косу риску. Крім того, зворотні слеші, які не є частиною спеціальних кодів символів (наприклад, `\n`), буде _збережено_, а не проігноровано, як у рядках, і вони змінять значення шаблону. Деякі символи, такі як знаки питання і знаки плюс, мають спеціальне значення у регулярних виразах, і перед ними слід ставити зворотну косу похилу риску, якщо вони призначені для позначення самого символу.
 
 ```
-console.log(/abc/.test("abcde"));
+нехай aPlus = /A\+/;
+```
+
+## Перевірка на збіг
+
+{{index matching, «test method», [«регулярний вираз», methods]}}
+
+Об'єкти регулярних виразів мають ряд методів. Найпростіший з них - `test`. Якщо ви передасте йому рядок, він поверне значення ((Boolean)), яке покаже вам, чи містить рядок збіг з шаблоном у виразі.
+
+```
+console.log(/abc/.test(«abcde»));
 // → true
-console.log(/abc/.test("abxde"));
+console.log(/abc/.test(«abxde»));
 // → false
 ```
 
-{{index pattern}}
+{{індексний шаблон}}
 
-A ((regular expression)) consisting of only nonspecial characters simply represents that sequence of characters. If _abc_ occurs anywhere in the string we are testing against (not just at the start), `test` will return `true`.
+((регулярний вираз)), що складається лише з неспеціальних символів, просто представляє цю послідовність символів. Якщо _abc_ зустрічається в будь-якому місці рядка, який ми перевіряємо (не тільки на початку), `test` поверне `true`.
 
-## Sets of characters
+## Набори символів
 
-{{index "regular expression", "indexOf method"}}
+{{index «регулярний вираз», «indexOf методу»}}
 
-Finding out whether a string contains _abc_ could just as well be done with a call to `indexOf`. Regular expressions are useful because they allow us to describe more complicated ((pattern))s.
+З'ясувати, чи містить рядок _abc_, можна також за допомогою виклику `indexOf`. Регулярні вирази корисні тим, що дозволяють описувати більш складні ((шаблони)).
 
-Say we want to match any ((number)). In a regular expression, putting a ((set)) of characters between square brackets makes that part of the expression match any of the characters between the brackets.
+Скажімо, ми хочемо знайти будь-яке ((число)). У регулярному виразі, якщо помістити ((набір)) символів між квадратними дужками, ця частина виразу буде відповідати будь-якому з символів у дужках.
 
-Both of the following expressions match all strings that contain a ((digit)):
+Обидва наступні вирази відповідають усім рядкам, які містять ((цифру)):
 
 ```
-console.log(/[0123456789]/.test("in 1992"));
+console.log(/[0123456789]/.test(«in 1992»));
 // → true
-console.log(/[0-9]/.test("in 1992"));
+console.log(/[0-9]/.test(«in 1992»));
 // → true
 ```
 
-{{index "hyphen character"}}
+{{index «символ дефісу»}}
 
-Within square brackets, a hyphen (`-`) between two characters can be used to indicate a ((range)) of characters, where the ordering is determined by the character's ((Unicode)) number. Characters 0 to 9 sit right next to each other in this ordering (codes 48 to 57), so `[0-9]` covers all of them and matches any ((digit)).
+У квадратних дужках дефіс (`-`) між двома символами можна використовувати для позначення ((діапазону)) символів, де порядок визначається номером символу ((Unicode)). Символи від 0 до 9 знаходяться поруч один з одним у цьому порядку (коди від 48 до 57), тому `[0-9]` охоплює їх усі і відповідає будь-якій ((цифрі)).
 
-{{index [whitespace, matching], "alphanumeric character", "period character"}}
+{{індекс [пробіл, відповідність], «алфавітно-цифровий символ», «символ крапки»}}
 
-A number of common character groups have their own built-in shortcuts. Digits are one of them: `\d` means the same thing as `[0-9]`.
+Для деяких поширених груп символів існують власні вбудовані комбінації клавіш. Однією з них є цифри: `\d` означає те саме, що й `[0-9]`.
 
-{{index "newline character", [whitespace, matching]}}
+{{index «символ нового рядка», [пробіл, збіг]}}
 
 {{table {cols: [1, 5]}}}
 
-| `\d`    | Any ((digit)) character
-| `\w`    | An alphanumeric character ("((word character))")
-| `\s`    | Any whitespace character (space, tab, newline, and similar)
-| `\D`    | A character that is _not_ a digit
-| `\W`    | A nonalphanumeric character
-| `\S`    | A nonwhitespace character
-| `.`     | Any character except for newline
+| `\d` | Будь-який ((цифра)) символ
+| `\w` | Буквено-цифровий символ («((символ слова)»)
+| `\s` | Будь-який пробіл (пробіл, табуляція, новий рядок тощо)
+| Символ, який  не є цифрою
+| Не буквено-цифровий символ
+| не пробіл, не символ пробілу
+| Будь-який символ, окрім нового рядка
 
-You could match a ((date)) and ((time)) format like 01-30-2003 15:20 with the following expression:
+Ви можете зіставити формат ((дата)) і ((час)), наприклад, 01-30-2003 15:20, з наступним виразом:
 
 ```
-let dateTime = /\d\d-\d\d-\d\d\d\d \d\d:\d\d/;
-console.log(dateTime.test("01-30-2003 15:20"));
+нехай dateTime = /\d\d-\d\d-\d\d\d\d\d \d\d:\d\d/;
+console.log(dateTime.test(«01-30-2003 15:20»));
 // → true
-console.log(dateTime.test("30-jan-2003 15:20"));
+console.log(dateTime.test(«30-jan-2003 15:20»));
 // → false
 ```
 
-{{index ["backslash character", "in regular expressions"]}}
+{{index [«символ зворотного слешу», «у регулярних виразах»]}}
 
-That regular expression looks completely awful, doesn't it? Half of it is backslashes, producing a background noise that makes it hard to spot the actual ((pattern)) expressed. We'll see a slightly improved version of this expression [later](regexp#date_regexp_counted).
+Цей регулярний вираз виглядає просто жахливо, чи не так? Половину його складають символи зворотної косої риски, що створюють фоновий шум, який заважає розпізнати власне ((шаблон)) вираз. Ми побачимо дещо покращену версію цього виразу [пізніше](regexp#date_regexp_counted).
 
-{{index [escaping, "in regexps"], "regular expression", set}}
+{{index [екранування, «у regexps»], «регулярний вираз», set}}
 
-These backslash codes can also be used inside ((square brackets)). For example, `[\d.]` means any digit or a period character. The period itself, between square brackets, loses its special meaning. The same goes for other special characters, such as the plus sign (`+`).
+Ці коди зворотної косої риски також можна використовувати всередині ((квадратних дужок)). Наприклад, `[\d.]` означає будь-яку цифру або символ крапки. Сама крапка між квадратними дужками втрачає своє особливе значення. Те саме стосується інших спеціальних символів, таких як знак плюс (`+`).
 
-{{index "square brackets", inversion, "caret character"}}
+{{індекс «квадратні дужки», інверсія, «символ каретки»}}
 
-To _invert_ a set of characters—that is, to express that you want to match any character _except_ the ones in the set—you can write a caret (`^`) character after the opening bracket.
+Щоб _інвертувати_ набір символів, тобто вказати, що ви хочете знайти будь-який символ , окрім тих, що є у наборі, ви можете написати символ лапок (`^`) після відкриваючої дужки.
 
 ```
-let nonBinary = /[^01]/;
-console.log(nonBinary.test("1100100010100110"));
+нехай nonBinary = /[^01]/;
+console.log(nonBinary.test(«1100100010100110»));
 // → false
-console.log(nonBinary.test("0111010112101001"));
+console.log(nonBinary.test(«0111010112101001»));
 // → true
 ```
 
-## International characters
+## Міжнародні символи
 
-{{index internationalization, Unicode, ["regular expression", internationalization]}}
+{{індекс інтернаціоналізації, Unicode, [«регулярний вираз», інтернаціоналізація]}}
 
-Because of JavaScript's initial simplistic implementation and the fact that this simplistic approach was later set in stone as ((standard)) behavior, JavaScript's regular expressions are rather dumb about characters that do not appear in the English language. For example, as far as JavaScript's regular expressions are concerned, a "((word character))" is only one of the 26 characters in the Latin alphabet (uppercase or lowercase), decimal digits, and, for some reason, the underscore character. Things like _é_ or _β_, which most definitely are word characters, will not match `\w` (and _will_ match uppercase `\W`, the nonword category).
+Через початкову спрощену реалізацію JavaScript і той факт, що цей спрощений підхід пізніше був закріплений як ((стандартна)) поведінка, регулярні вирази JavaScript досить тупо реагують на символи, які не зустрічаються в англійській мові. Наприклад, з точки зору регулярних виразів JavaScript, «((символ слова))» - це лише один з 26 символів латинського алфавіту (великі або малі літери), десяткові цифри і, чомусь, символ підкреслення. Такі символи, як _é_ або _β_, які, безумовно, є символами слів, не відповідатимуть `\w` (і _w_ відповідатиме великій букві `\W`, категорії не-слів).
 
-{{index [whitespace, matching]}}
+{{індекс [пробіли, відповідність]}}
 
-By a strange historical accident, `\s` (whitespace) does not have this problem and matches all characters that the Unicode standard considers whitespace, including things like the ((nonbreaking space)) and the ((Mongolian vowel separator)).
+За дивним історичним збігом обставин, `\s` (пробіл) не має цієї проблеми і відповідає усім символам, які стандарт Юнікоду вважає пробілами, включаючи такі, як ((нерозривний пробіл)) та ((монгольський роздільник голосних)).
 
-{{index "character category", [Unicode, property]}}
+{{index «категорія символів», [Unicode, властивість]}}
 
-It is possible to use `\p` in a regular expression to match all characters to which the Unicode standard assigns a given property. This allows us to match things like letters in a more cosmopolitan way. However, again due to compatibility with the original language standards, those are recognized only when you put a `u` character (for ((Unicode))) after the regular expression.
+Можна використовувати `\p` у регулярному виразі для зіставлення усіх символів, яким стандарт Юнікоду присвоює певну властивість. Це дозволяє нам зіставляти такі речі, як літери, у більш космополітичний спосіб. Однак, знову ж таки через сумісність зі стандартами оригінальної мови, вони розпізнаються лише тоді, коли ви додаєте символ `u` (для ((Unicode))) після регулярного виразу.
 
 {{table {cols: [1, 5]}}}
 
-| `\p{L}`             | Any letter
-| `\p{N}`             | Any numeric character
-| `\p{P}`             | Any punctuation character
-| `\P{L}`             | Any nonletter (uppercase P inverts)
-| `\p{Script=Hangul}` | Any character from the given script (see [Chapter ?](higher_order#scripts))
+| `\p{L}` | Будь-яка літера
+| `\p{N}` | Будь-який цифровий символ
+| Будь-який знак пунктуації
+| `\P{L}` | Будь-яка нелітера (інвертує велику літеру P)
+| `\p{Script=Hangul}` | Будь-який символ із заданого сценарію (див. [Глава ?](higher_order#scripts))
 
-Using `\w` for text processing that may need to handle non-English text (or even English text with borrowed words like “cliché”) is a liability, since it won't treat characters like “é” as letters. Though they tend to be a bit more verbose, `\p` property groups are more robust.
+Використання `\w` для обробки неанглійського тексту (або навіть англійського тексту із запозиченими словами, як-от «кліше») є ризикованим, оскільки такі символи, як «é», не вважатимуться літерами. Хоча групи властивостей `\p`, як правило, є дещо багатослівнішими, вони є більш надійними.
 
 ```{test: never}
-console.log(/\p{L}/u.test("α"));
+console.log(/\p{L}/u.test(«α»));
 // → true
-console.log(/\p{L}/u.test("!"));
+console.log(/\p{L}/u.test(«!»));
 // → false
-console.log(/\p{Script=Greek}/u.test("α"));
+console.log(/\p{Script=Greek}/u.test(«α»));
 // → true
-console.log(/\p{Script=Arabic}/u.test("α"));
+console.log(/\p{Script=Arabic}/u.test(«α»));
 // → false
 ```
 
-{{index "Number function"}}
+{{index «Числова функція»}}
 
-On the other hand, if you are matching numbers in order to do something with them, you often do want `\d` for digits, since converting arbitrary numeric characters into a JavaScript number is not something that a function like `Number` can do for you.
+З іншого боку, якщо ви порівнюєте числа для того, щоб щось з ними зробити, вам часто потрібен `\d` для цифр, оскільки перетворення довільних числових символів у JavaScript-число - це не те, що функція типу `Number` може зробити для вас.
 
-## Repeating parts of a pattern
+## Повторення частин шаблону
 
-{{index ["regular expression", repetition]}}
+{{index [«регулярний вираз», повторення]}}
 
-We now know how to match a single digit. What if we want to match a whole number—a ((sequence)) of one or more ((digit))s?
+Тепер ми знаємо, як знайти одну цифру. А що, якщо ми хочемо знайти ціле число - ((послідовність)) з однієї або декількох ((цифр))?
 
-{{index "plus character", repetition, "+ operator"}}
+{{індекс «знак плюс», повторення, «+ оператор»}}
 
-When you put a plus sign (`+`) after something in a regular expression, it indicates that the element may be repeated more than once. Thus, `/\d+/` matches one or more digit characters.
+Коли ви ставите знак плюс (`+`) після чогось у регулярному виразі, це означає, що елемент може повторюватися більше одного разу. Таким чином, `/\d+/` відповідає одному або декільком цифровим символам.
 
 ```
-console.log(/'\d+'/.test("'123'"));
+console.log(/'\d+'/.test(«“123”»));
 // → true
-console.log(/'\d+'/.test("''"));
+console.log(/'\d+'/.test(«“”»));
 // → false
-console.log(/'\d*'/.test("'123'"));
+console.log(/'\d*'/.test(«“123”»));
 // → true
-console.log(/'\d*'/.test("''"));
-// → true
-```
-
-{{index "* operator", asterisk}}
-
-The star (`*`) has a similar meaning but also allows the pattern to match zero times. Something with a star after it never prevents a pattern from matching—it'll just match zero instances if it can't find any suitable text to match.
-
-{{index "British English", "American English", "question mark"}}
-
-A question mark (`?`) makes a part of a pattern _((optional))_, meaning it may occur zero times or one time. In the following example, the _u_ character is allowed to occur, but the pattern also matches when it is missing:
-
-```
-let neighbor = /neighbou?r/;
-console.log(neighbor.test("neighbour"));
-// → true
-console.log(neighbor.test("neighbor"));
+console.log(/'\d*'/.test(«“”»));
 // → true
 ```
 
-{{index repetition, [braces, "in regular expression"]}}
+{{index «* operator», asterisk}}
 
-To indicate that a pattern should occur a precise number of times, use braces. Putting `{4}` after an element, for example, requires it to occur exactly four times. It is also possible to specify a ((range)) this way: `{2,4}` means the element must occur at least twice and at most four times.
+Зірочка (`*`) має схоже значення, але також дозволяє шаблону збігатися нуль разів. Оператор із зірочкою ніколи не забороняє збіг шаблону - він просто не знайде жодного відповідного тексту, якщо не знайде потрібного тексту.
+
+{{індекс «британська англійська», «американська англійська», «знак питання»}}
+
+Знак питання (`?`) входить до складу шаблону _((необов'язково))_, тобто він може зустрічатися нуль разів або один раз. У наведеному нижче прикладі дозволено використовувати символ _u_, але шаблон збігається і за його відсутності:
+
+```
+нехай neighbor = /neighbou?r/;
+console.log(neighbor.test(«neighbour»));
+// → true
+console.log(neighbor.test(«neighbor»));
+// → true
+```
+
+{{повторення індексу, [дужки, «у регулярному виразі»]}}
+
+Щоб вказати, що шаблон повинен зустрічатися точну кількість разів, використовуйте фігурні дужки. Наприклад, додавання `{4}` після елемента означає, що він зустрінеться рівно чотири рази. Також можна вказати ((діапазон)) таким чином: `{2,4}` означає, що елемент має зустрітися щонайменше двічі і щонайбільше чотири рази.
 
 {{id date_regexp_counted}}
 
-Here is another version of the ((date)) and ((time)) pattern that allows both single- and double-((digit)) days, months, and hours. It is also slightly easier to decipher.
+Ось ще одна версія шаблону ((дата)) і ((час)), яка дозволяє використовувати як одинарні, так і подвійні ((цифри)) дні, місяці та години. Його також трохи легше розшифрувати.
 
 ```
-let dateTime = /\d{1,2}-\d{1,2}-\d{4} \d{1,2}:\d{2}/;
-console.log(dateTime.test("1-30-2003 8:45"));
+нехай dateTime = /\d{1,2}-\d{1,2}-\d{4} \d{1,2}:\d{2}/;
+console.log(dateTime.test(«1-30-2003 8:45»));
 // → true
 ```
 
-You can also specify open-ended ((range))s when using braces by omitting the number after the comma. For example, `{5,}` means five or more times.
+Ви також можете вказати відкриті ((діапазон))и, використовуючи фігурні дужки, опускаючи число після коми. Наприклад, `{5,}` означає п'ять або більше разів.
 
-## Grouping subexpressions
+## Групування підвиразів
 
-{{index ["regular expression", grouping], grouping, [parentheses, "in regular expressions"]}}
+{{індекс [«регулярний вираз», групування], групування, [дужки, «у регулярних виразах»]}}
 
-To use an operator like `*` or `+` on more than one element at a time, you must use parentheses. A part of a regular expression that is enclosed in parentheses counts as a single element as far as the operators following it are concerned.
+Щоб використати оператор типу `*` або `+` для більш ніж одного елемента одночасно, ви повинні використовувати круглі дужки. Частина регулярного виразу, взята в круглі дужки, вважається одним елементом для операторів, що йдуть після неї.
 
 ```
-let cartoonCrying = /boo+(hoo+)+/i;
-console.log(cartoonCrying.test("Boohoooohoohooo"));
+нехай cartoonCrying = /boo+(hoo+)+/i;
+console.log(cartoonCrying.test(«Boohoooohoohooo»));
 // → true
 ```
 
 {{index crying}}
 
-The first and second `+` characters apply only to the second `o` in `boo` and `hoo`, respectively. The third `+` applies to the whole group `(hoo+)`, matching one or more sequences like that.
+Перший і другий символи `+` застосовуються лише до другого `o` у словах `boo` і `hoo` відповідно. Третій `+` застосовується до всієї групи `(hoo+)`, що відповідає одній або декільком таким послідовностям.
 
-{{index "case sensitivity", capitalization, ["regular expression", flags]}}
+{{індекс «чутливість до регістру», великі літери, [«регулярний вираз», прапори]}}
 
-The `i` at the end of the expression in the example makes this regular expression case insensitive, allowing it to match the uppercase _B_ in the input string, even though the pattern is itself all lowercase.
+Символ `i` у кінці виразу у прикладі робить цей регулярний вираз нечутливим до регістру, дозволяючи йому співставлятися з великими літерами _B_ у вхідному рядку, навіть якщо сам шаблон містить лише малі літери.
 
-## Matches and groups
+## Співпадіння та групування
 
-{{index ["regular expression", grouping], "exec method", [array, "RegExp match"]}}
+{{index [«регулярний вираз», групування], «метод виконання», [array, «RegExp match»]}}
 
-The `test` method is the absolute simplest way to match a regular expression. It tells you only whether it matched and nothing else. Regular expressions also have an `exec` (execute) method that will return `null` if no match was found and return an object with information about the match otherwise.
+Метод `test` - це найпростіший спосіб перевірки регулярного виразу. Він повідомляє вам лише про те, чи співпав вираз, і нічого більше. Регулярні вирази також мають метод `exec` (виконати), який поверне `null`, якщо співпадіння не знайдено, і поверне об'єкт з інформацією про співпадіння у протилежному випадку.
 
 ```
-let match = /\d+/.exec("one two 100");
+let match = /\d+/.exec(«one two 100»);
 console.log(match);
-// → ["100"]
+// → [«100»]
 console.log(match.index);
 // → 8
 ```
 
-{{index "index property", [string, indexing]}}
+{{index «властивість індексу», [рядок, індексація]}}
 
-An object returned from `exec` has an `index` property that tells us _where_ in the string the successful match begins. Other than that, the object looks like (and in fact is) an array of strings, whose first element is the string that was matched. In the previous example, this is the sequence of ((digit))s that we were looking for.
+Об'єкт, що повертається з `exec`, має властивість `index`, яка вказує нам _де_ у рядку починається успішний збіг. В іншому об'єкт виглядає як (і фактично є) масивом рядків, першим елементом якого є рядок, який було знайдено. У попередньому прикладі це послідовність ((цифра)), яку ми шукали.
 
-{{index [string, methods], "match method"}}
+{{index [string, methods], «match method»}}
 
-String values have a `match` method that behaves similarly.
-
-```
-console.log("one two 100".match(/\d+/));
-// → ["100"]
-```
-
-{{index grouping, "capture group", "exec method"}}
-
-When the regular expression contains subexpressions grouped with parentheses, the text that matched those groups will also show up in the array. The whole match is always the first element. The next element is the part matched by the first group (the one whose opening parenthesis comes first in the expression), then the second group, and so on.
+Рядкові значення мають метод `match`, який поводиться аналогічно.
 
 ```
-let quotedText = /'([^']*)'/;
-console.log(quotedText.exec("she said 'hello'"));
-// → ["'hello'", "hello"]
+console.log(«one two 100».match(/\d+/));
+// → [«100»]
 ```
 
-{{index "capture group"}}
+{{групування індексів, «група захоплення», «метод виконання»}}
 
-When a group does not end up being matched at all (for example, when followed by a question mark), its position in the output array will hold `undefined`. When a group is matched multiple times (for example, when followed by a `+`), only the last match ends up in the array.
-
-```
-console.log(/bad(ly)?/.exec("bad"));
-// → ["bad", undefined]
-console.log(/(\d)+/.exec("123"));
-// → ["123", "3"]
-```
-
-If you want to use parentheses purely for grouping, without having them show up in the array of matches, you can put `?:` after the opening parenthesis.
+Якщо регулярний вираз містить під-вирази, згруповані за допомогою круглих дужок, текст, який відповідає цим групам, також буде показано у масиві. Першим елементом завжди буде весь вираз. Наступним елементом буде частина, що відповідає першій групі (та, чия відкриваюча дужка стоїть першою у виразі), потім другій групі, і так далі.
 
 ```
-console.log(/(?:na)+/.exec("banana"));
-// → ["nana"]
+нехай quotedText = /'([^']*)'/;
+console.log(quotedText.exec(«she said “hello”»));
+// → [«“hello”», «hello»]
 ```
 
-{{index "exec method", ["regular expression", methods], extraction}}
+{{index «capture group»}}
 
-Groups can be useful for extracting parts of a string. If we don't just want to verify whether a string contains a ((date)) but also extract it and construct an object that represents it, we can wrap parentheses around the digit patterns and directly pick the date out of the result of `exec`.
+Якщо група не буде знайдена взагалі (наприклад, якщо після неї стоїть знак питання), її позиція у вихідному масиві буде `невизначеною`. Якщо групу буде знайдено декілька разів (наприклад, після `+`), до масиву буде занесено лише останню знайдену групу.
 
-But first we'll take a brief detour to discuss the built-in way to represent date and ((time)) values in JavaScript.
+```
+console.log(/bad(ly)?/.exec(«bad»));
+// → [«bad», undefined].
+console.log(/(\d)+/.exec(«123»));
+// → [«123», «3»]
+```
 
-## The Date class
+Якщо ви хочете використовувати дужки суто для групування, не показуючи їх у масиві збігів, ви можете поставити `?:` після відкриваючої дужки.
 
-{{index constructor, "Date class"}}
+```
+console.log(/(?:na)+/.exec(«banana»));
+// → [«nana»]
+```
 
-JavaScript has a standard `Date` class for representing ((date))s, or rather, points in ((time)). If you simply create a date object using `new`, you get the current date and time.
+{{index «exec method», [«регулярний вираз», methods], extraction}}
+
+Групи можуть бути корисними для вилучення частин рядка. Якщо ми хочемо не лише перевірити, чи містить рядок ((дата)), але й витягти його та створити об'єкт, який його представляє, ми можемо взяти дужки навколо шаблонів цифр і безпосередньо витягти дату з результату виконання `exec`.
+
+Але спочатку ми зробимо невеликий обхідний маневр, щоб обговорити вбудований спосіб представлення значень дати і ((time)) в JavaScript.
+
+## Клас Date
+
+{{index-конструктор, «Клас Date»}}
+
+У JavaScript є стандартний клас `Date` для представлення ((date)), а точніше, точок у ((time)). Якщо ви просто створите об'єкт дати за допомогою `new`, ви отримаєте поточну дату і час.
 
 ```{test: no}
 console.log(new Date());
 // → Fri Feb 02 2024 18:03:06 GMT+0100 (CET)
 ```
 
-{{index "Date class"}}
+{{index «Date class»}}
 
-You can also create an object for a specific time.
+Ви також можете створити об'єкт для конкретного часу.
 
 ```
 console.log(new Date(2009, 11, 9));
@@ -336,15 +336,15 @@ console.log(new Date(2009, 11, 9, 12, 59, 59, 999));
 // → Wed Dec 09 2009 12:59:59 GMT+0100 (CET)
 ```
 
-{{index "zero-based counting", [interface, design]}}
+{{index «zero-based counting», [interface, design]}}
 
-JavaScript uses a convention where month numbers start at zero (so December is 11), yet day numbers start at one. This is confusing and silly. Be careful.
+JavaScript використовує угоду, згідно з якою номери місяців починаються з нуля (тому грудень - це 11), а номери днів починаються з одиниці. Це заплутано і безглуздо. Будьте уважні.
 
-The last four arguments (hours, minutes, seconds, and milliseconds) are optional and taken to be zero when not given.
+Останні чотири аргументи (години, хвилини, секунди і мілісекунди) є необов'язковими і приймаються за нуль, якщо їх не вказано.
 
-{{index "getTime method", timestamp}}
+{{index «getTime method», timestamp}}
 
-Timestamps are stored as the number of milliseconds since the start of 1970, in the UTC ((time zone)). This follows a convention set by "((Unix time))", which was invented around that time. You can use negative numbers for times before 1970. The `getTime` method on a date object returns this number. It is big, as you can imagine.
+Мітки часу зберігаються як кількість мілісекунд з початку 1970 року у UTC (часовому поясі). Це відповідає домовленості, встановленій «((Unix time))», яку було винайдено приблизно у той самий час. Ви можете використовувати від'ємні числа для часу до 1970 року. Метод `getTime` на об'єкті дати повертає це число. Як ви можете собі уявити, воно велике.
 
 ```
 console.log(new Date(2013, 11, 19).getTime());
@@ -353,409 +353,409 @@ console.log(new Date(1387407600000));
 // → Thu Dec 19 2013 00:00:00 GMT+0100 (CET)
 ```
 
-{{index "Date.now function", "Date class"}}
+{{index «Date.now function», «Date class»}}
 
-If you give the `Date` constructor a single argument, that argument is treated as such a millisecond count. You can get the current millisecond count by creating a new `Date` object and calling `getTime` on it or by calling the `Date.now` function.
+Якщо ви передаєте конструктору `Date` єдиний аргумент, цей аргумент розглядається як відлік у мілісекундах. Ви можете отримати поточний відлік мілісекунд, створивши новий об'єкт `Date` і викликавши для нього `getTime` або викликавши функцію `Date.now`.
 
-{{index "getFullYear method", "getMonth method", "getDate method", "getHours method", "getMinutes method", "getSeconds method", "getYear method"}}
+{{index «метод getFullYear», «метод getMonth», «метод getDate», «метод getHours», «метод getMinutes», «метод getSeconds», «метод getYear»}}
 
-Date objects provide methods such as `getFullYear`, `getMonth`, `getDate`, `getHours`, `getMinutes`, and `getSeconds` to extract their components. Besides `getFullYear` there's also `getYear`, which gives you the year minus 1900 (such as `98` or `125`) and is mostly useless.
+Об'єкти типу Date надають такі методи, як `getFullYear`, `getMonth`, `getDate`, `getHours`, `getMinutes` та `getSeconds` для вилучення їхніх компонентів. Окрім `getFullYear`, існує також `getYear`, який повертає рік мінус 1900 (наприклад, `98` або `125`) і здебільшого є марним.
 
-{{index "capture group", "getDate method", [parentheses, "in regular expressions"]}}
+{{індекс «група захоплення», «метод getDate», [дужки, «у регулярних виразах»]}}
 
-Putting parentheses around the parts of the expression that we are interested in, we can now create a date object from a string.
+Поставивши дужки навколо частин виразу, які нас цікавлять, ми можемо створити об'єкт дати з рядка.
 
 ```
 function getDate(string) {
-  let [_, month, day, year] =
+  let [_, місяць, день, рік] =
     /(\d{1,2})-(\d{1,2})-(\d{4})/.exec(string);
-  return new Date(year, month - 1, day);
+  return new Date(рік, місяць - 1, день);
 }
-console.log(getDate("1-30-2003"));
+console.log(getDate(«1-30-2003»));
 // → Thu Jan 30 2003 00:00:00 GMT+0100 (CET)
 ```
 
-{{index destructuring, "underscore character"}}
+{{деструктуризація індексу, «символ підкреслення»}}
 
-The underscore (`_`) binding is ignored and used only to skip the full match element in the array returned by `exec`.
+Прив'язка підкреслення (`_`) ігнорується і використовується лише для того, щоб пропустити елемент повного збігу у масиві, повернутому `exec`.
 
-## Boundaries and look-ahead
+## Межі та забігання наперед
 
-{{index matching, ["regular expression", boundary]}}
+{{індекс збігу, [«регулярний вираз», межа]}}
 
-Unfortunately, `getDate` will also happily extract a date from the string `"100-1-30000"`. A match may happen anywhere in the string, so in this case, it'll just start at the second character and end at the second-to-last character.
+На жаль, `getDate` також успішно витягне дату з рядка `«100-1-30000»`. Збіг може статися будь-де у рядку, тому у цьому випадку він просто почнеться з другого символу і закінчиться передостаннім символом.
 
-{{index boundary, "caret character", "dollar sign"}}
+{{межа індексу, «символ каретки», «знак долара»}}
 
-If we want to enforce that the match must span the whole string, we can add the markers `^` and `$`. The caret matches the start of the input string, whereas the dollar sign matches the end. Thus `/^\d+$/` matches a string consisting entirely of one or more digits, `/^!/` matches any string that starts with an exclamation mark, and `/x^/` does not match any string (there cannot be an `x` before the start of the string).
+Якщо ми хочемо, щоб збіг охоплював увесь рядок, ми можемо додати маркери `^` і `$`. Символ каретки відповідає початку вхідного рядка, а знак долара - його кінцю. Таким чином, `/^\d+$/` відповідає рядку, що складається з однієї або більше цифр, `/^!/` відповідає будь-якому рядку, що починається зі знаку оклику, а `/x^/` не відповідає жодному рядку (перед початком рядка не може стояти `x`).
 
-{{index "word boundary", "word character"}}
+{{індекс «межа слова», «символ слова»}}
 
-There is also a `\b` marker that matches _word boundaries_, positions that have a word character on one side, and a nonword character on the other. Unfortunately, these use the same simplistic concept of word characters as `\w` and are therefore not very reliable.
+Існує також маркер `\b`, який відповідає _межам слів_, позиціям, які з одного боку містять символ слова, а з іншого - несловесний символ. На жаль, ці маркери використовують таке саме спрощене поняття символів слова, як і `\w`, і тому не є дуже надійними.
 
-Note that these boundary markers don't match any actual characters. They just enforce that a given condition holds at the place where it appears in the pattern.
+Зауважте, що ці маркери меж не відповідають жодним реальним символам. Вони лише забезпечують виконання заданої умови у тому місці, де вона з'являється у шаблоні.
 
-{{index "look-ahead"}}
+{{index «look-ahead»}}
 
-_Look-ahead_ tests do something similar. They provide a pattern and will make the match fail if the input doesn't match that pattern, but don't actually move the match position forward. They are written between `(?=` and `)`.
+Тести_Look-ahead_ роблять щось подібне. Вони надають шаблон і спричиняють невдачу, якщо вхідні дані не відповідають цьому шаблону, але насправді не переміщують позицію збігу вперед. Вони пишуться між `(?=` і `)`.
 
 ```
-console.log(/a(?=e)/.exec("braeburn"));
-// → ["a"]
-console.log(/a(?! )/.exec("a b"));
+console.log(/a(?=e)/.exec(«braeburn»));
+// → [«a»]
+console.log(/a(?! )/.exec(«a b»));
 // → null
 ```
 
-The `e` in the first example is necessary to match, but is not part of the matched string. The `(?! )` notation expresses a _negative_ look-ahead. This matches only if the pattern in the parentheses _doesn't_ match, causing the second example to match only `a` characters that don't have a space after them.
+Символ `e` у першому прикладі необхідний для співставлення, але не є частиною рядка, що співставляється. Запис `(?! )` виражає _негативний_ перехід на крок вперед. Він спрацьовує, тільки якщо шаблон у дужках _не_ спрацьовує, тому у другому прикладі спрацьовують лише символи `a`, які не містять пробілу після себе.
 
-## Choice patterns
+## Шаблони вибору
 
-{{index branching, ["regular expression", alternatives], "farm example"}}
+{{розгалуження індексу, [«регулярний вираз», альтернативи], «приклад ферми»}}
 
-Say we want to know whether a piece of text contains not only a number but a number followed by one of the words _pig_, _cow_, or _chicken_, or any of their plural forms.
+Скажімо, ми хочемо дізнатися, чи містить фрагмент тексту не лише число, але й число, за яким слідує одне зі слів _pig_, _cow_, або _chicken_, або будь-яка з їхніх форм множини.
 
-We could write three regular expressions and test them in turn, but there is a nicer way. The ((pipe character)) (`|`) denotes a ((choice)) between the pattern to its left and the pattern to its right. We can use it in expressions like this:
+Ми могли б написати три регулярні вирази і перевірити їх по черзі, але є кращий спосіб. Символ ((труба)) (`|`) позначає ((вибір)) між шаблоном ліворуч і шаблоном праворуч. Ми можемо використовувати його у виразах на зразок цього:
 
 ```
-let animalCount = /\d+ (pig|cow|chicken)s?/;
-console.log(animalCount.test("15 pigs"));
+нехай animalCount = /\d+ (свиня|корова|курка)s?/;
+console.log(animalCount.test(«15 свиней»));
 // → true
-console.log(animalCount.test("15 pugs"));
+console.log(animalCount.test(«15 мопсів»));
 // → false
 ```
 
-{{index [parentheses, "in regular expressions"]}}
+{{index [дужки, «у регулярних виразах»]}}
 
-Parentheses can be used to limit the part of the pattern to which the pipe operator applies, and you can put multiple such operators next to each other to express a choice between more than two alternatives.
+Дужки можна використовувати для обмеження частини шаблону, до якої застосовується оператор pipe, і ви можете поставити декілька таких операторів поруч, щоб виразити вибір між більш ніж двома альтернативами.
 
-## The mechanics of matching
+## Механіка зіставлення
 
-{{index ["regular expression", matching], [matching, algorithm], "search problem"}}
+{{index [«регулярний вираз», співставлення], [співставлення, алгоритм], «задача пошуку»}}
 
-Conceptually, when you use `exec` or `test`, the regular expression engine looks for a match in your string by trying to match the expression first from the start of the string, then from the second character, and so on until it finds a match or reaches the end of the string. It'll either return the first match that can be found or fail to find any match at all.
+Концептуально, коли ви використовуєте `exec` або `test`, механізм регулярних виразів шукає збіг у вашому рядку, намагаючись порівняти вираз спочатку з початку рядка, потім з другого символу і так далі, поки не знайде збіг або не досягне кінця рядка. Програма поверне або перший знайдений збіг, або не знайде жодного збігу взагалі.
 
-{{index ["regular expression", matching], [matching, algorithm]}}
+{{index [«регулярний вираз», співставлення], [співставлення, алгоритм]}}
 
-To do the actual matching, the engine treats a regular expression something like a ((flow diagram)). This is the diagram for the livestock expression in the previous example:
+Щоб виконати власне співставлення, рушій обробляє регулярний вираз чимось на кшталт ((блок-схема)). Це діаграма для виразу livestock у попередньому прикладі:
 
-{{figure {url: "img/re_pigchickens.svg", alt: "Railroad diagram that first passes through a box labeled 'digit', which has a loop going back from after it to before it, and then a box for a space character. After that, the railroad splits in three, going through boxes for 'pig', 'cow', and 'chicken'. After those it rejoins, and goes through a box labeled 's', which, being optional, also has a railroad that passes it by. Finally, the line reaches the accepting state."}}}
+{{figure {url: «img/re_pigchickens.svg», alt: «Схема залізниці, яка спочатку проходить через клітинку з позначкою «цифра», яка має цикл, що повертається від неї до попередньої, а потім через клітинку для пробілу. Після цього залізниця розділяється на три частини, проходячи через клітинки для «свині», «корови» та «курки». Після цього вона знову з'єднується і проходить через клітинку з літерою «s», яка, будучи необов'язковою, також має залізницю, що проходить повз неї. Нарешті, лінія досягає прийнятного стану."}}}.
 
-{{index traversal}}
+{{обхід індексів}}
 
-If we can find a path from the left side of the diagram to the right side, our expression matches. We keep a current position in the string, and every time we move through a box, we verify that the part of the string after our current position matches that box.
+Якщо ми можемо знайти шлях з лівої частини діаграми до правої, то наш вираз збігається. Ми зберігаємо поточну позицію у рядку, і кожного разу, коли ми переходимо через рамку, ми перевіряємо, що частина рядка після нашої поточної позиції збігається з цією рамкою.
 
-{{id backtracking}}
+{{id відкочування}}
 
-## Backtracking
+## Відкат назад
 
-{{index ["regular expression", backtracking], "binary number", "decimal number", "hexadecimal number", "flow diagram", [matching, algorithm], backtracking}}
+{{індекс [«регулярний вираз», відстеження], «двійкове число», «десяткове число», «шістнадцяткове число», «блок-схема», [відповідність, алгоритм], відстеження}}
 
-The regular expression `/^([01]+b|[\da-f]+h|\d+)$/` matches either a binary number followed by a `b`, a hexadecimal number (that is, base 16, with the letters `a` to `f` standing for the digits 10 to 15) followed by an `h`, or a regular decimal number with no suffix character. This is the corresponding diagram:
+Регулярний вираз `/^([01]+b|[\da-f]+h|\d+)$/` відповідає або двійковому числу, до якого додається `b`, або шістнадцятковому числу (тобто основа 16, де літери `a` - `f` позначають цифри від 10 до 15), до якого додається `h`, або звичайному десятковому числу без суфікса. Ось відповідна діаграма:
 
-{{figure {url: "img/re_number.svg", alt: "Railroad diagram for the regular expression '^([01]+b|\\d+|[\\da-f]+h)$'"}}}
+{{figure {url: «img/re_number.svg», alt: «Залізнична діаграма для регулярного виразу '^([01]+b|\\d+|[\\da-f]+h)$'"}}}}
 
-{{index branching}}
+{{розгалуження індексів}}
 
-When matching this expression, the top (binary) branch will often be entered even though the input does not actually contain a binary number. When matching the string `"103"`, for example, it becomes clear only at the `3` that we are in the wrong branch. The string _does_ match the expression, just not the branch we are currently in.
+При збігу цього виразу часто буде введено верхнє (двійкове) розгалуження, навіть якщо вхідні дані не містять двійкового числа. Наприклад, при перевірці рядка `«103»` стає зрозуміло лише на `3`, що ми знаходимося у неправильній гілці. Рядок _співпадає_ з виразом, але не з тією гілкою, у якій ми зараз перебуваємо.
 
-{{index backtracking, "search problem"}}
+{{index backtracking, «проблема пошуку»}}
 
-So the matcher _backtracks_. When entering a branch, it remembers its current position (in this case, at the start of the string, just past the first boundary box in the diagram) so that it can go back and try another branch if the current one does not work out. For the string `"103"`, after encountering the `3` character, the matcher starts trying the branch for hexadecimal numbers, which fails again because there is no `h` after the number. It then tries the decimal number branch. This one fits, and a match is reported after all.
+Отже, відповідник _відстежує_. При вході у гілку він запам'ятовує свою поточну позицію (у цьому випадку на початку рядка, одразу за першою рамкою на діаграмі), щоб можна було повернутися назад і спробувати іншу гілку, якщо поточна не спрацює. Для рядка `«103»`, зустрівши символ `3`, пошуковик починає пробувати гілку для шістнадцяткових чисел, яка знову закінчується невдачею, оскільки після числа немає символу `h`. Після цього він пробує гілку десяткових чисел. Ця гілка підходить, і зрештою повідомляється про збіг.
 
-{{index [matching, algorithm]}}
+{{індекс [співпадіння, алгоритм]}}
 
-The matcher stops as soon as it finds a full match. This means that if multiple branches could potentially match a string, only the first one (ordered by where the branches appear in the regular expression) is used.
+Якщо знайдено повний збіг, пошук зупиняється. Це означає, що якщо рядку потенційно може відповідати декілька гілок, буде використано лише першу з них (упорядковану за місцем появи гілок у регулярному виразі).
 
-Backtracking also happens for ((repetition)) operators like + and `*`. If you match `/^.*x/` against `"abcxe"`, the `.*` part will first try to consume the whole string. The engine will then realize that it needs an `x` to match the pattern. Since there is no `x` past the end of the string, the star operator tries to match one character less. But the matcher doesn't find an `x` after `abcx` either, so it backtracks again, matching the star operator to just `abc`. _Now_ it finds an `x` where it needs it and reports a successful match from positions 0 to 4.
+Відстеження також відбувається для операторів ((повторення)), таких як + і `*`. Якщо ви зіставите `/^.*x/` з `«abcxe»`, частина `.*` спочатку спробує використати весь рядок. Потім рушій зрозуміє, що йому потрібен `x`, щоб відповідати шаблону. Оскільки після кінця рядка немає символу `x`, оператор зірочки намагається знайти на один символ менше. Але після `abcx` він також не знаходить символу `x`, тому повертається назад, зіставляючи оператор зірочки лише з `abc`. Тепер він знаходить `x` там, де потрібно, і повідомляє про успішний збіг з позицій від 0 до 4.
 
-{{index performance, complexity}}
+{Продуктивність індексів, складність}}
 
-It is possible to write regular expressions that will do a _lot_ of backtracking. This problem occurs when a pattern can match a piece of input in many different ways. For example, if we get confused while writing a binary-number regular expression, we might accidentally write something like `/([01]+)+b/`.
+Можна написати регулярні вирази, які будуть робити _багато_ відкотів назад. Ця проблема виникає, коли шаблон може відповідати фрагменту вхідних даних багатьма різними способами. Наприклад, якщо ми заплутаємося під час написання двійково-числового регулярного виразу, ми можемо випадково написати щось на кшталт `/([01]+)+b/`.
 
-{{figure {url: "img/re_slow.svg", alt: "Railroad diagram for the regular expression '([01]+)+b'",width: "6cm"}}}
+{{figure {url: «img/re_slow.svg», alt: «Схема залізниці для регулярного виразу '([01]+)+b'», width: “6cm”}}}}
 
-{{index "inner loop", [nesting, "in regexps"]}}
+{{index «internal loop», [nesting, «in regexps»]}}
 
-If that tries to match some long series of zeros and ones with no trailing _b_ character, the matcher first goes through the inner loop until it runs out of digits. Then it notices there is no _b_, so it backtracks one position, goes through the outer loop once, and gives up again, trying to backtrack out of the inner loop once more. It will continue to try every possible route through these two loops. This means the amount of work _doubles_ with each additional character. For even just a few dozen characters, the resulting match will take practically forever.
+Якщо програма намагається зіставити довгу серію нулів та одиниць без кінцевого символу _b_, вона спочатку проходить внутрішній цикл, доки не вичерпає всі цифри. Потім він помічає, що там немає символу _b_, тому повертається на одну позицію назад, проходить один раз по зовнішньому циклу і знову зупиняється, намагаючись знову вийти з внутрішнього циклу. Він буде продовжувати пробувати всі можливі маршрути через ці дві петлі. Це означає, що обсяг роботи  подвоюється з кожним додатковим символом. Навіть для декількох десятків символів пошук буде тривати практично вічно.
 
-## The replace method
+## Метод заміни
 
-{{index "replace method", "regular expression"}}
+{{index «метод заміни», «регулярний вираз»}}
 
-String values have a `replace` method that can be used to replace part of the string with another string.
+Рядкові значення мають метод ``замінити``, який можна використовувати для заміни частини рядка іншим рядком.
 
 ```
-console.log("papa".replace("p", "m"));
+console.log(«papa».replace(«p», «m»));
 // → mapa
 ```
 
-{{index ["regular expression", flags], ["regular expression", global]}}
+{{index [«регулярний вираз», flags], [«регулярний вираз», global]}}
 
-The first argument can also be a regular expression, in which case the first match of the regular expression is replaced. When a `g` option (for _global_) is added after the regular expression, _all_ matches in the string will be replaced, not just the first.
+Перший аргумент також може бути регулярним виразом, у цьому випадку буде замінено перший збіг регулярного виразу. Коли після регулярного виразу додається опція `g` (для _global_), будуть замінені _всі_ збіги у рядку, а не лише перший.
 
 ```
-console.log("Borobudur".replace(/[ou]/, "a"));
+console.log(«Borobudur».replace(/[ou]/, «a»));
 // → Barobudur
-console.log("Borobudur".replace(/[ou]/g, "a"));
+console.log(«Borobudur».replace(/[ou]/g, «a»));
 // → Barabadar
 ```
 
-{{index grouping, "capture group", "dollar sign", "replace method", ["regular expression", grouping]}}
+{{групування індексів, «група захоплення», «знак долара», «метод заміни», [«регулярний вираз», групування]}}
 
-The real power of using regular expressions with `replace` comes from the fact that we can refer to matched groups in the replacement string. For example, say we have a big string containing the names of people, one name per line, in the format `Lastname, Firstname`. If we want to swap these names and remove the comma to get a `Firstname Lastname` format, we can use the following code:
+Справжня сила використання регулярних виразів з `замінити` полягає у тому, що ми можемо посилатися на відповідні групи у рядку заміни. Наприклад, скажімо, у нас є великий рядок, що містить імена людей, по одному імені у рядку, у форматі `Прізвище, Ім'я`. Якщо ми хочемо поміняти місцями ці імена і видалити кому, щоб отримати формат `Прізвище, Ім'я`, ми можемо використати наступний код:
 
 ```
 console.log(
-  "Liskov, Barbara\nMcCarthy, John\nMilner, Robin"
-    .replace(/(\p{L}+), (\p{L}+)/gu, "$2 $1"));
-// → Barbara Liskov
-//   John McCarthy
-//   Robin Milner
+  «Лісков, Барбара\nМаккарті, Джон\nМілнер, Робін»
+    .replace(/(\p{L}+), (\p{L}+)/gu, «$2 $1»));
+// → Барбара Лісков
+// Джон Маккарті
+// Робін Мілнер
 ```
 
-The `$1` and `$2` in the replacement string refer to the parenthesized groups in the pattern. `$1` is replaced by the text that matched against the first group, `$2` by the second, and so on, up to `$9`. The whole match can be referred to with `$&`.
+Символи `$1` і `$2` у рядку заміни посилаються на групи у дужках у шаблоні. `$1` замінюється текстом, який збігається з першою групою, `$2` - з другою, і так далі, аж до `$9`. На весь збіг можна посилатися за допомогою `$&`.
 
-{{index [function, "higher-order"], grouping, "capture group"}}
+{{index [функція, «вищого порядку»], групування, «група захоплення»}}
 
-It is possible to pass a function—rather than a string—as the second argument to `replace`. For each replacement, the function will be called with the matched groups (as well as the whole match) as arguments, and its return value will be inserted into the new string.
+Ви можете передати функцію, а не рядок, як другий аргумент до `replace`. Для кожної заміни буде викликано функцію з відповідними групами (а також цілим збігом) як аргументами, а її значення, що повертається, буде вставлено у новий рядок.
 
-Here's an example:
+Ось приклад:
 
 ```
-let stock = "1 lemon, 2 cabbages, and 101 eggs";
+нехай stock = «1 лимон, 2 капустини і 101 яйце»;
 function minusOne(match, amount, unit) {
   amount = Number(amount) - 1;
-  if (amount == 1) { // only one left, remove the 's'
+  if (amount == 1) { // залишилось тільки одне, видаляємо 's'
     unit = unit.slice(0, unit.length - 1);
-  } else if (amount == 0) {
-    amount = "no";
+  } else if (amount == 0) { // тільки один, видаляємо 's'.
+    amount = «no»;
   }
-  return amount + " " + unit;
+  return amount + « » + unit;
 }
 console.log(stock.replace(/(\d+) (\p{L}+)/gu, minusOne));
-// → no lemon, 1 cabbage, and 100 eggs
+// → немає лимона, 1 капустини та 100 яєць
 ```
 
-This code takes a string, finds all occurrences of a number followed by an alphanumeric word, and returns a string that has one less of every such quantity.
+Цей код отримує рядок, знаходить усі входження числа, за яким слідує алфавітно-цифрове слово, і повертає рядок, який містить на одиницю менше кожної такої кількості.
 
-The `(\d+)` group ends up as the `amount` argument to the function, and the `(\p{L}+)` group gets bound to `unit`. The function converts `amount` to a number—which always works, since it matched `\d+` earlier—and makes some adjustments in case there is only one or zero left.
+Група `(\d+)` стає аргументом функції `amount`, а група `(\p{L}+)` прив'язується до `unit`. Функція перетворює `amount` на число - що завжди працює, оскільки раніше вона відповідала `\d+` - і робить деякі корективи, якщо залишається лише одиниця або нуль.
 
-## Greed
+## Жадібність
 
-{{index greed, "regular expression"}}
+{{index greed, «регулярний вираз»}}
 
-We can use `replace` to write a function that removes all ((comment))s from a piece of JavaScript ((code)). Here is a first attempt:
+Ми можемо використовувати `replace` для написання функції, яка видаляє всі ((коментар))и з фрагмента JavaScript ((код)). Ось перша спроба:
 
 ```{test: wrap}
 function stripComments(code) {
-  return code.replace(/\/\/.*|\/\*[^]*\*\//g, "");
+  return code.replace(/\/\/.*|\/\*[^]*\*\//g, «»);
 }
-console.log(stripComments("1 + /* 2 */3"));
+console.log(stripComments(«1 + /* 2 */3»));
 // → 1 + 3
-console.log(stripComments("x = 10;// ten!"));
+console.log(stripComments(«x = 10;// десять!»));
 // → x = 10;
-console.log(stripComments("1 /* a */+/* b */ 1"));
-// → 1  1
+console.log(stripComments(«1 /* a */+/* b */ 1»));
+// → 1 1
 ```
 
-{{index "period character", "slash character", "newline character", "empty set", "block comment", "line comment"}}
+{{index «символ крапки», «символ косої риски», «символ нового рядка», «порожній набір», «коментар блоку», «коментар рядка»}}
 
-The part before the `|` operator matches two slash characters followed by any number of non-newline characters. The part for multiline comments is more involved. We use `[^]` (any character that is not in the empty set of characters) as a way to match any character. We cannot just use a period here because block comments can continue on a new line, and the period character does not match newline characters.
+Частина перед оператором `|` відповідає двом символам косої риски, за якими слідує довільна кількість символів, що не є символами нового рядка. Частина для багаторядкових коментарів є більш складною. Ми використовуємо `[^]` (будь-який символ, який не входить до порожньої множини символів) як спосіб зіставлення з будь-яким символом. Ми не можемо просто використати крапку, оскільки блокові коментарі можуть продовжуватися з нового рядка, а символ крапки не співпадає з символами нового рядка.
 
-But the output for the last line appears to have gone wrong. Why?
+Але виведення останнього рядка, схоже, пішло не так. Чому?
 
-{{index backtracking, greed, "regular expression"}}
+{{індексний відкат, жадібність, «регулярний вираз»}}
 
-The `[^]*` part of the expression, as I described in the section on backtracking, will first match as much as it can. If that causes the next part of the pattern to fail, the matcher moves back one character and tries again from there. In the example, the matcher first tries to match the whole rest of the string and then moves back from there. It will find an occurrence of `*/` after going back four characters and match that. This is not what we wanted—the intention was to match a single comment, not to go all the way to the end of the code and find the end of the last block comment.
+Частина виразу `[^]*`, як я описав у розділі про відкочування, спочатку збігатиметься настільки, наскільки це можливо. Якщо це призводить до невдачі у наступній частині шаблону, зрівнювач повертається на один символ назад і повторює спробу з цього місця. У наведеному прикладі зіставлювач спочатку спробує збігтися з усією рештою рядка, а потім повернеться на один символ назад. Після повернення на чотири символи назад він знайде входження `*/` і порівняє його. Це не те, чого ми хотіли - ми хотіли зіставити один коментар, а не пройти весь шлях до кінця коду і знайти кінець останнього блочного коментаря.
 
-Because of this behavior, we say the repetition operators (`+`, `*`, `?`, and `{}`) are _((greed))y_, meaning they match as much as they can and backtrack from there. If you put a ((question mark)) after them (`+?`, `*?`, `??`, `{}?`), they become nongreedy and start by matching as little as possible, matching more only when the remaining pattern does not fit the smaller match.
+Через таку поведінку ми говоримо, що оператори повторення (`+`, `*`, `?` і `{}`) є _((жадібними))y_, тобто вони збігаються настільки, наскільки це можливо, і відступають назад звідти. Якщо після них поставити ((знак питання)) (`+?`, `*?`, `??`, `{}?`), то вони стануть нежадібними і почнуть підбирати якомога менше, підбираючи більше лише тоді, коли решта шаблонів не підходить до меншого шаблону.
 
-And that is exactly what we want in this case. By having the star match the smallest stretch of characters that brings us to a `*/`, we consume one block comment and nothing more.
+І це саме те, чого ми хочемо у цьому випадку. Якщо зірочка збігається з найменшою ділянкою символів, яка приводить нас до `*/`, ми споживаємо один блоковий коментар і нічого більше.
 
 ```{test: wrap}
 function stripComments(code) {
-  return code.replace(/\/\/.*|\/\*[^]*?\*\//g, "");
+  return code.replace(/\/\/.*|\/\*[^]*?\*\//g, «»);
 }
-console.log(stripComments("1 /* a */+/* b */ 1"));
+console.log(stripComments(«1 /* a */+/* b */ 1»));
 // → 1 + 1
 ```
 
-A lot of ((bug))s in ((regular expression)) programs can be traced to unintentionally using a greedy operator where a nongreedy one would work better. When using a ((repetition)) operator, prefer the nongreedy variant.
+Багато ((помилок)) у ((регулярний вираз)) програмах можна простежити через ненавмисне використання жадібного оператора там, де краще працював би нежадібний. При використанні оператора ((повторення)) віддавайте перевагу нежадібному варіанту.
 
-## Dynamically creating RegExp objects
+## Динамічне створення об'єктів RegExp
 
-{{index ["regular expression", creation], "underscore character", "RegExp class"}}
+{{index [«регулярний вираз», створення], «символ підкреслення», «клас RegExp»}}
 
-In some cases you may not know the exact ((pattern)) you need to match against when you are writing your code. Say you want to test for the user's name in a piece of text. You can build up a string and use the `RegExp` ((constructor)) on that.
+У деяких випадках під час написання коду ви можете не знати точного ((шаблону)), з яким вам потрібно зіставити результат. Скажімо, ви хочете перевірити наявність імені користувача у фрагменті тексту. Ви можете створити рядок і використати для цього `RegExp` ((конструктор)).
 
 ```
-let name = "harry";
-let regexp = new RegExp("(^|\\s)" + name + "($|\\s)", "gi");
-console.log(regexp.test("Harry is a dodgy character."));
+let name = «harry»;
+let regexp = new RegExp("(^|\\s)» + name + «($|\\s)», «gi»);
+console.log(regexp.test(«Harry is a dodgy character.»));
 // → true
 ```
 
-{{index ["regular expression", flags], ["backslash character", "in regular expressions"]}}
+{{index [«регулярний вираз», flags], [«символ зворотного слешу», «у регулярних виразах»]}}
 
-When creating the `\s` part of the string, we have to use two backslashes because we are writing them in a normal string, not a slash-enclosed regular expression. The second argument to the `RegExp` constructor contains the options for the regular expression—in this case, `"gi"` for global and case insensitive.
+При створенні частини рядка `\s` ми повинні використовувати дві зворотні косі риски, оскільки ми записуємо їх у звичайному рядку, а не у регулярному виразі, укладеному у косу риску. Другий аргумент конструктора `RegExp` містить опції регулярного виразу - у цьому випадку «gi»` для глобального та нечутливого до регістру.
 
-But what if the name is `"dea+hl[]rd"` because our user is a ((nerd))y teenager? That would result in a nonsensical regular expression that won't actually match the user's name.
+Але що, якщо ім'я буде `«dea+hl[]rd»`, тому що наш користувач - ((nerd))y підліток? Це призведе до безглуздого регулярного виразу, який не відповідатиме імені користувача.
 
-{{index ["backslash character", "in regular expressions"], [escaping, "in regexps"], ["regular expression", escaping]}}
+{{index [«символ зворотного слешу», «у регулярних виразах»], [екранування, «у regexps»], [«регулярний вираз», екранування]}}
 
-To work around this, we can add backslashes before any character that has a special meaning.
+Щоб обійти цю проблему, ми можемо додати зворотну косу риску перед будь-яким символом, що має особливе значення.
 
 ```
-let name = "dea+hl[]rd";
-let escaped = name.replace(/[\\[.+*?(){|^$]/g, "\\$&");
-let regexp = new RegExp("(^|\\s)" + escaped + "($|\\s)",
-                        "gi");
-let text = "This dea+hl[]rd guy is super annoying.";
+let name = «dea+hl[]rd»;
+let escaped = name.replace(/[\\[.+*?(){|^$]/g, «\\$&»);
+let regexp = new RegExp("(^|\\s)» + escaped + «($|\\s)»,
+                        «gi");
+let text = «Цей dea+hl[]rd guy is super annoying.»;
 console.log(regexp.test(text));
 // → true
 ```
 
-## The search method
+## Метод пошуку
 
-{{index ["regular expression", methods], "indexOf method", "search method"}}
+{{index [«регулярний вираз», methods], «indexOf методу», «метод пошуку»}}
 
-While the `indexOf` method on strings cannot be called with a regular expression, there is another method, `search`, that does expect a regular expression. Like `indexOf`, it returns the first index on which the expression was found, or -1 when it wasn't found.
+Хоча метод `indexOf` для рядків не можна викликати з регулярним виразом, існує інший метод, `earch`, який очікує регулярний вираз. Як і `indexOf`, він повертає перший індекс, за яким вираз було знайдено, або -1, якщо його не було знайдено.
 
 ```
-console.log("  word".search(/\S/));
+console.log(«word».search(/\S/));
 // → 2
-console.log("    ".search(/\S/));
+console.log(» ».search(/\S/));
 // → -1
 ```
 
-Unfortunately, there is no way to indicate that the match should start at a given offset (like we can with the second argument to `indexOf`), which would often be useful.
+На жаль, немає можливості вказати, що пошук має починатися з заданого зсуву (як це можна зробити з другим аргументом `indexOf`), а це часто буває корисно.
 
-## The lastIndex property
+## Властивість lastIndex
 
-{{index "exec method", "regular expression"}}
+{{index «метод виконання», «регулярний вираз»}}
 
-The `exec` method similarly does not provide a convenient way to start searching from a given position in the string. But it does provide an *in*convenient way.
+Метод `exec` також не надає зручного способу розпочати пошук із заданої позиції у рядку. Але він надає зручний спосіб *всередині*.
 
-{{index ["regular expression", matching], matching, "source property", "lastIndex property"}}
+{{index [«регулярний вираз», відповідність], відповідність, «властивість source», «властивість lastIndex»}}
 
-Regular expression objects have properties. One such property is `source`, which contains the string that expression was created from. Another property is `lastIndex`, which controls, in some limited circumstances, where the next match will start.
+Об'єкти регулярних виразів мають властивості. Однією з таких властивостей є `source`, яка містить рядок, з якого було створено вираз. Іншою властивістю є `lastIndex`, яка визначає, за певних обмежених обставин, де буде розпочато наступний збіг.
 
-{{index [interface, design], "exec method", ["regular expression", global]}}
+{{index [інтерфейс, дизайн], «метод виконання», [«регулярний вираз», глобальний]}}
 
-Those circumstances are that the regular expression must have the global (`g`) or sticky (`y`) option enabled, and the match must happen through the `exec` method. Again, a less confusing solution would have been to just allow an extra argument to be passed to `exec`, but confusion is an essential feature of JavaScript's regular expression interface.
+Ці обставини полягають у тому, що регулярний вираз повинен мати опцію global (`g`) або sticky (`y`), а збіг повинен відбуватися за допомогою методу `exec`. Знову ж таки, менш заплутаним рішенням було б просто дозволити передачу додаткового аргументу до `exec`, але заплутаність є невід'ємною рисою інтерфейсу регулярних виразів JavaScript.
 
 ```
-let pattern = /y/g;
+нехай pattern = /y/g;
 pattern.lastIndex = 3;
-let match = pattern.exec("xyzzy");
+let match = pattern.exec(«xyzzy»);
 console.log(match.index);
 // → 4
 console.log(pattern.lastIndex);
 // → 5
 ```
 
-{{index "side effect", "lastIndex property"}}
+{{index «побічний ефект», «властивість lastIndex»}}
 
-If the match was successful, the call to `exec` automatically updates the `lastIndex` property to point after the match. If no match was found, `lastIndex` is set back to 0, which is also the value it has in a newly constructed regular expression object.
+Якщо збіг знайдено успішно, виклик `exec` автоматично оновлює властивість `lastIndex`, щоб вона вказувала на точку після збігу. Якщо збігу не знайдено, `lastIndex` повертається до 0, що також є значенням, яке він має у новоствореному об'єкті регулярного виразу.
 
-The difference between the global and the sticky options is that when sticky is enabled, the match will succeed only if it starts directly at `lastIndex`, whereas with global, it will search ahead for a position where a match can start.
+Різниця між глобальною та липкою опціями полягає у тому, що коли увімкнено липку опцію, пошук буде успішним лише тоді, коли він починається безпосередньо з `lastIndex`, тоді як у глобальній опції буде здійснюватися пошук позиції, з якої може починатися збіг.
 
 ```
-let global = /abc/g;
-console.log(global.exec("xyz abc"));
-// → ["abc"]
+нехай global = /abc/g;
+console.log(global.exec(«xyz abc»));
+// → [«abc»].
 let sticky = /abc/y;
-console.log(sticky.exec("xyz abc"));
+console.log(sticky.exec(«xyz abc»));
 // → null
 ```
 
-{{index bug}}
+{{Індексна помилка}}
 
-When using a shared regular expression value for multiple `exec` calls, these automatic updates to the `lastIndex` property can cause problems. Your regular expression might be accidentally starting at an index left over from a previous call.
+При використанні спільного значення регулярного виразу для декількох викликів `exec` ці автоматичні оновлення властивості `lastIndex` можуть спричинити проблеми. Ваш регулярний вираз може випадково починатися з індексу, що залишився від попереднього виклику.
 
 ```
-let digit = /\d/g;
-console.log(digit.exec("here it is: 1"));
-// → ["1"]
-console.log(digit.exec("and now: 1"));
+нехай digit = /\d/g;
+console.log(digit.exec(«ось воно: 1»));
+// → [«1»]
+console.log(digit.exec(«а тепер: 1»));
 // → null
 ```
 
-{{index ["regular expression", global], "match method"}}
+{{index [«регулярний вираз», global], «метод порівняння»}}
 
-Another interesting effect of the global option is that it changes the way the `match` method on strings works. When called with a global expression, instead of returning an array similar to that returned by `exec`, `match` will find _all_ matches of the pattern in the string and return an array containing the matched strings.
-
-```
-console.log("Banana".match(/an/g));
-// → ["an", "an"]
-```
-
-So be cautious with global regular expressions. The cases where they are necessary—calls to `replace` and places where you want to explicitly use `lastIndex`—are typically the situations where you want to use them.
-
-{{index "lastIndex property", "exec method", loop}}
-
-A common thing to do is to find all the matches of a regular expression in a string. We can do this by using the `matchAll` method.
+Ще одним цікавим ефектом опції global є те, що вона змінює спосіб роботи методу `match` на рядках. При виклику з глобальним виразом, замість того, щоб повертати масив, подібний до того, що повертає `exec`, `match` знайде _всі_ збіги з шаблоном у рядку і поверне масив, що містить знайдені рядки.
 
 ```
-let input = "A string with 3 numbers in it... 42 and 88.";
+console.log(«Banana».match(/an/g));
+// → [«an», «an»]
+```
+
+Тому будьте обережні з глобальними регулярними виразами. Випадки, коли вони необхідні - це виклики `replace` і місця, де ви хочете явно використовувати `lastIndex` - це, як правило, ситуації, де ви хочете їх використовувати.
+
+{{index «lastIndex property», «exec method», loop}}
+
+Поширеною задачею є пошук усіх збігів регулярного виразу у рядку. Це можна зробити за допомогою методу `matchAll`.
+
+```
+нехай input = «Рядок, що містить 3 числа... 42 і 88.»;
 let matches = input.matchAll(/\d+/g);
 for (let match of matches) {
-  console.log("Found", match[0], "at", match.index);
+  console.log(«Знайдено», match[0], «at», match.index);
 }
-// → Found 3 at 14
-//   Found 42 at 33
-//   Found 88 at 40
+// → Знайдено 3 при 14
+// Знайдено 42 з 33
+// Знайдено 88 при 40
 ```
 
-{{index ["regular expression", global]}}
+{{index [«регулярний вираз», global]}}
 
-This method returns an array of match arrays. The regular expression given to `matchAll` _must_ have `g` enabled.
+Цей метод повертає масив масивів збігів. Регулярний вираз, переданий `matchAll` _повинен_ мати `g` увімкненим.
 
 {{id ini}}
-## Parsing an INI file
+## Розбір INI-файлу
 
-{{index comment, "file format", "enemies example", "INI file"}}
+{{index comment, «file format», «enemies example», «INI file»}}
 
-To conclude the chapter, we'll look at a problem that calls for ((regular expression))s. Imagine we are writing a program to automatically collect information about our enemies from the ((internet)). (We will not actually write that program here, just the part that reads the ((configuration)) file. Sorry.) The configuration file looks like this:
+На завершення розділу ми розглянемо задачу, яка вимагає використання ((регулярних виразів))s. Уявіть, що ми пишемо програму для автоматичного збору інформації про наших ворогів з ((Інтернету)). (Тут ми не будемо писати саму програму, лише ту частину, яка читає файл ((конфігурації)). Вибачте). Конфігураційний файл має такий вигляд:
 
-```{lang: "null"}
+```{lang: «null"}
 searchengine=https://duckduckgo.com/?q=$1
 spitefulness=9.7
 
-; comments are preceded by a semicolon...
-; each section concerns an individual enemy
+; перед коментарями ставиться крапка з комою...
+; кожен розділ стосується окремого ворога
 [larry]
-fullname=Larry Doe
-type=kindergarten bully
-website=http://www.geocities.com/CapeCanaveral/11451
+повне ім'я=Ларрі Доу
+тип=дитячий хуліган
+сайт=http://www.geocities.com/CapeCanaveral/11451
 
 [davaeorn]
-fullname=Davaeorn
-type=evil wizard
+повне ім'я=Давеорн
+type=злий чарівник
 outputdir=/home/marijn/enemies/davaeorn
 ```
 
-{{index grammar}}
+{{індексна граматика}}
 
-The exact rules for this format—which is a widely used file format, usually called an _INI_ file—are as follows:
+Точні правила для цього формату - широко використовуваного формату файлів, який зазвичай називають _INI_-файлом - такі:
 
-- Blank lines and lines starting with semicolons are ignored.
+- Порожні рядки та рядки, що починаються з крапки з комою, ігноруються.
 
-- Lines wrapped in `[` and `]` start a new ((section)).
+- Рядки, обгорнуті символами `[` і `]`, починають новий ((розділ)).
 
-- Lines containing an alphanumeric identifier followed by an `=`   character add a setting to the current section.
+- Рядки, що містять алфавітно-цифровий ідентифікатор, за яким слідує символ `=`, додають параметр до поточної секції.
 
-- Anything else is invalid.
+- Все інше є невірним.
 
-Our task is to convert a string like this into an object whose properties hold strings for settings written before the first section header and subobjects for sections, with those subobjects holding the section's settings.
+Наше завдання - перетворити такий рядок в об'єкт, властивості якого містять рядки налаштувань, записані перед першим заголовком секції, та підоб'єкти для секцій, а ці підоб'єкти містять налаштування секції.
 
-{{index "carriage return", "line break", "newline character"}}
+{{індекс «повернення каретки», «переведення рядка», «символ нового рядка»}}
 
-Since the format has to be processed ((line)) by line, splitting up the file into separate lines is a good start. We saw the `split` method in [Chapter ?](data#split). Some operating systems, however, use not just a newline character to separate lines but a carriage return character followed by a newline (`"\r\n"`). Given that the `split` method also allows a regular expression as its argument, we can use a regular expression like `/\r?\n/` to split in a way that allows both `"\n"` and `"\r\n"` between lines.
+Оскільки формат має оброблятися ((рядок)) рядок за рядком, розбиття файлу на окремі рядки є гарним початком. Ми розглядали метод `split` у [Розділ ?](data#split). Однак деякі операційні системи використовують для розділення рядків не просто символ нового рядка, а символ повернення каретки, за яким слідує новий рядок (`«\r\n»`). Враховуючи, що метод ``plit`` також допускає регулярний вираз як аргумент, ми можемо використовувати регулярний вираз типу `/\r?\n/` для розділення у спосіб, який дозволяє використовувати як `«\n»`, так і `«\r\n»` між рядками.
 
 ```{startCode: true}
 function parseINI(string) {
-  // Start with an object to hold the top-level fields
+  // Почати з об'єкту для зберігання полів верхнього рівня
   let result = {};
   let section = result;
   for (let line of string.split(/\r?\n/)) {
@@ -765,221 +765,221 @@ function parseINI(string) {
     } else if (match = line.match(/^\[(.*)\]$/)) {
       section = result[match[1]] = {};
     } else if (!/^\s*(;|$)/.test(line)) {
-      throw new Error("Line '" + line + "' is not valid.");
+      throw new Error(«Рядок “» + line + «” є недійсним.»);
     }
   };
-  return result;
+  повернути результат;
 }
 
 console.log(parseINI(`
-name=Vasilis
-[address]
+ім'я=Vasilis
+[адреса]
 city=Tessaloniki`));
-// → {name: "Vasilis", address: {city: "Tessaloniki"}}
+// → {name: «Vasilis», address: {city: «Салоніки"}}
 ```
 
-{{index "parseINI function", parsing}}
+{{index «parseINI function», parsing}}
 
-The code goes over the file's lines and builds up an object. Properties at the top are stored directly into that object, whereas properties found in sections are stored in a separate section object. The `section` binding points at the object for the current section.
+Код переглядає рядки файлу і створює об'єкт. Властивості у верхній частині зберігаються безпосередньо у цьому об'єкті, тоді як властивості, знайдені у секціях, зберігаються в окремому об'єкті секції. Прив'язка `секція` вказує на об'єкт для поточної секції.
 
-There are two kinds of significant lines—section headers or property lines. When a line is a regular property, it is stored in the current section. When it is a section header, a new section object is created, and `section` is set to point at it.
+Існує два типи значущих рядків - заголовки секцій або рядки властивостей. Коли рядок є звичайною властивістю, він зберігається у поточній секції. Якщо це заголовок секції, створюється новий об'єкт секції, і `секція` встановлюється для вказівки на нього.
 
-{{index "caret character", "dollar sign", boundary}}
+{{індекс «символ кегля», «знак долара», межа}}
 
-Note the recurring use of `^` and `$` to make sure the expression matches the whole line, not just part of it. Leaving these out results in code that mostly works but behaves strangely for some input, which can be a difficult bug to track down.
+Зверніть увагу на повторюване використання символів `^` і `$`, щоб переконатися, що вираз відповідає всьому рядку, а не лише його частині. Якщо їх не врахувати, код здебільшого працюватиме, але поводитиметься дивно для деяких вхідних даних, що може бути складною помилкою, яку важко відстежити.
 
-{{index "if keyword", assignment, ["= operator", "as expression"]}}
+{{індекс «ключове слово if», присвоєння, [«= оператор», «як вираз»]}}
 
-The pattern `if (match = string.match(...))` makes use of the fact that the value of an ((assignment)) expression (`=`) is the assigned value. You often aren't sure that your call to `match` will succeed, so you can access the resulting object only inside an `if` statement that tests for this. To not break the pleasant chain of `else if` forms, we assign the result of the match to a binding and immediately use that assignment as the test for the `if` statement.
+Шаблон `if (match = string.match(...))` використовує той факт, що значення виразу ((присвоєння)) (`=`) є присвоєним значенням. Часто ви не впевнені, що ваш виклик `match` буде успішним, тому ви можете отримати доступ до результуючого об'єкту тільки всередині інструкції `if`, яка перевіряє це. Щоб не розривати приємний ланцюжок форм `else if`, ми присвоюємо результат співпадіння прив'язці і одразу використовуємо це присвоєння як тест для оператора `if`.
 
-{{index [parentheses, "in regular expressions"]}}
+{{index [дужки, «у регулярних виразах»]}}
 
-If a line is not a section header or a property, the function checks whether it is a comment or an empty line using the expression `/^\s*(;|$)/` to match lines that either contain only whitespace, or whitespace followed by a semicolon (making the rest of the line a comment). When a line doesn't match any of the expected forms, the function throws an exception.
+Якщо рядок не є заголовком розділу або властивістю, функція перевіряє, чи є він коментарем або порожнім рядком, використовуючи вираз `/^\s*(;|$)/` для пошуку рядків, які містять лише пробіли або пробіли з крапкою з комою (решта рядка стає коментарем). Якщо рядок не відповідає жодній з очікуваних форм, функція згенерує виключення.
 
-## Code units and characters
+## Одиниці коду та символи
 
-Another design mistake that's been standardized in JavaScript regular expressions is that by default, operators like `.` or `?` work on code units (as discussed in [Chapter ?](higher_order#code_units)), not actual characters. This means characters that are composed of two code units behave strangely.
+Ще одна помилка проектування, яка була стандартизована у регулярних виразах JavaScript, полягає в тому, що за замовчуванням оператори типу `.` або `?` працюють з одиницями коду (як описано в [Глава ?](вищий_порядок#одиниці_коду)), а не з дійсними символами. Це означає, що символи, які складаються з двох кодових одиниць, поводяться дивно.
 
 ```
-console.log(/🍎{3}/.test("🍎🍎🍎"));
+console.log(/🍎{3}/.test(«🍎🍎🍎»));
 // → false
-console.log(/<.>/.test("<🌹>"));
+console.log(/<.>/.test(«<🌹>»));
 // → false
-console.log(/<.>/u.test("<🌹>"));
+console.log(/<.>/u.test(«<🌹>»));
 // → true
 ```
 
-The problem is that the 🍎 in the first line is treated as two code units, and `{3}` is applied only to the second unit. Similarly, the dot matches a single code unit, not the two that make up the rose ((emoji)).
+Проблема в тому, що 🍎 у першому рядку сприймається як дві кодові одиниці, а `{3}` застосовується лише до другої одиниці. Аналогічно, крапка відповідає одній кодовій одиниці, а не двом, з яких складається троянда ((емодзі)).
 
-You must add the `u` (Unicode) option to your regular expression to make it treat such characters properly.
+Ви повинні додати опцію `u` (Юнікод) до вашого регулярного виразу, щоб він правильно обробляв такі символи.
 
 ```
-console.log(/🍎{3}/u.test("🍎🍎🍎"));
+console.log(/🍎{3}/u.test(«🍎🍎🍎»));
 // → true
 ```
 
 {{id summary_regexp}}
 
-## Summary
+## Підсумок
 
-Regular expressions are objects that represent patterns in strings. They use their own language to express these patterns.
+Регулярні вирази - це об'єкти, які представляють шаблони у рядках. Вони використовують власну мову для вираження цих шаблонів.
 
 {{table {cols: [1, 5]}}}
 
-| `/abc/`     | A sequence of characters
-| `/[abc]/`   | Any character from a set of characters
-| `/[^abc]/`  | Any character _not_ in a set of characters
-| `/[0-9]/`   | Any character in a range of characters
-| `/x+/`      | One or more occurrences of the pattern `x`
-| `/x+?/`     | One or more occurrences, nongreedy
-| `/x*/`      | Zero or more occurrences
-| `/x?/`      | Zero or one occurrence
-| `/x{2,4}/`  | Two to four occurrences
-| `/(abc)/`   | A group
-| `/a|b|c/`   | Any one of several patterns
-| `/\d/`      | Any digit character
-| `/\w/`      | An alphanumeric character ("word character")
-| `/\s/`      | Any whitespace character
-| `/./`       | Any character except newlines
-| `/\p{L}/u`  | Any letter character
-| `/^/`       | Start of input
-| `/$/`       | End of input
-| `/(?=a)/`   | A look-ahead test
+| `/abc/` | Послідовність символів
+| `/[abc]/` | Будь-який символ з набору символів
+| `/[^abc]/` | Будь-який символ _не_ з набору символів
+| `/[0-9]/` | Будь-який символ з діапазону символів
+| `/x+/` | Одне або більше входжень шаблону `x`
+| Одне або більше входжень, не жадібне
+| Нуль або більше входжень
+| Нуль або одне входження
+| Від двох до чотирьох випадків.
+| Група
+| a|b|c/` | Будь-який з декількох шаблонів
+| Будь-який цифровий символ
+| `/\w/` | Буквено-цифровий символ («символ слова»)
+| `/\s/` | Будь-який пробіл
+| `/./` | Будь-який символ, окрім нових рядків
+| `/\p{L}/u` | Будь-який символ літери
+| Початок введення
+| `/$/` | Кінець введення
+| `/(?=a)/` | Попередній тест
 
-A regular expression has a method `test` to test whether a given string matches it. It also has a method `exec` that, when a match is found, returns an array containing all matched groups. Such an array has an `index` property that indicates where the match started.
+Регулярний вираз має метод `test` для перевірки відповідності заданого рядка. Він також має метод `exec`, який, якщо збіг знайдено, повертає масив, що містить усі знайдені групи. Такий масив має властивість `index`, яка вказує на те, де почався збіг.
 
-Strings have a `match` method to match them against a regular expression and a `search` method to search for one, returning only the starting position of the match. Their `replace` method can replace matches of a pattern with a replacement string or function.
+Рядки мають метод `match` для зіставлення їх з регулярним виразом і метод `search` для пошуку, який повертає лише початкову позицію збігу. Їхній метод `replace` може замінити збіги шаблону на рядок або функцію.
 
-Regular expressions can have options, which are written after the closing slash. The `i` option makes the match case insensitive. The `g` option makes the expression _global_, which, among other things, causes the `replace` method to replace all instances instead of just the first. The `y` option makes and expression sticky, which means that it will not search ahead and skip part of the string when looking for a match. The `u` option turns on Unicode mode, which enables `\p` syntax and fixes a number of problems around the handling of characters that take up two code units.
+Регулярні вирази можуть мати опції, які записуються після закриваючої косої риски. Опція `i` робить вираз нечутливим до регістру символів. Опція `g` робить вираз _global_, що, серед іншого, призводить до того, що метод `replace` замінює всі екземпляри, а не тільки перший. Опція `y` робить вираз липким, що означає, що він не буде шукати наперед і пропускатиме частину рядка під час пошуку збігу. Опція `u` вмикає режим Unicode, який дозволяє використовувати синтаксис `\p` і виправляє ряд проблем, пов'язаних з обробкою символів, які займають дві кодові одиниці.
 
-Regular expressions are a sharp ((tool)) with an awkward handle. They simplify some tasks tremendously but can quickly become unmanageable when applied to complex problems. Part of knowing how to use them is resisting the urge to try to shoehorn things into them that they cannot cleanly express.
+Регулярні вирази - це гострий ((інструмент)) з незручною ручкою. Вони значно спрощують деякі завдання, але можуть швидко стати некерованими, коли застосовуються до складних проблем. Частиною вміння користуватися регулярними виразами є протистояння бажанню впихнути в них те, що вони не можуть виразити в чистому вигляді.
 
-## Exercises
+## Вправи
 
-{{index debugging, bug}}
+{Налагодження індексів, виправлення помилок
 
-It is almost unavoidable that, in the course of working on these exercises, you will get confused and frustrated by some regular expression's inexplicable ((behavior)). Sometimes it helps to enter your expression into an online tool like [_debuggex.com_](https://www.debuggex.com) to see whether its visualization corresponds to what you intended and to ((experiment)) with the way it responds to various input strings.
+Майже неминуче, що під час роботи над цими вправами ви заплутаєтесь і розчаруєтесь через незрозумілу ((поведінку)) деякого регулярного виразу. Іноді корисно ввести вираз у онлайн-інструмент на кшталт [_debuggex.com_](https://www.debuggex.com), щоб побачити, чи відповідає його візуалізація тому, що ви задумали, і ((поекспериментувати)) з тим, як він реагує на різні вхідні рядки.
 
 ### Regexp golf
 
-{{index "program size", "code golf", "regexp golf (exercise)"}}
+{{index «size of program», «code golf», «regexp golf (exercise)»}}
 
-_Code golf_ is a term used for the game of trying to express a particular program in as few characters as possible. Similarly, _regexp golf_ is the practice of writing as tiny a regular expression as possible to match a given pattern and _only_ that pattern.
+Кодовий гольф_ - це термін, який використовується для позначення гри, що полягає у спробі виразити певну програму якомога меншою кількістю символів. Аналогічно, _regexp-гольф_ - це практика написання якомога меншого регулярного виразу, який відповідає заданому шаблону і _лише_ цьому шаблону.
 
-{{index boundary, matching}}
+{{межа індексу, відповідність}}
 
-For each of the following items, write a ((regular expression)) to test whether the given pattern occurs in a string. The regular expression should match only strings containing the pattern. When your expression works, see whether you can make it any smaller.
+Для кожного з наступних елементів запишіть ((регулярний вираз)), щоб перевірити, чи зустрічається заданий шаблон у рядку. Регулярний вираз повинен знаходити тільки ті рядки, які містять шаблон. Якщо ваш вираз працює, подивіться, чи можна зробити його ще меншим.
 
- 1. _car_ and _cat_
- 2. _pop_ and _prop_
- 3. _ferret_, _ferry_, and _ferrari_
- 4. Any word ending in _ious_
- 5. A whitespace character followed by a period, comma, colon, or semicolon
- 6. A word longer than six letters
- 7. A word without the letter _e_ (or _E_)
+ 1. _car_ та _cat_
+ 2. _pop_ та _prop_
+ 3. тхір_,  пором_ та  феррарі
+ 4. Будь-яке слово, що закінчується на _ious_.
+ 5. Пробіл, за яким слідує крапка, кома, двокрапка або крапка з комою
+ 6. Слово довше шести літер
+ 7. Слово без літери _e_ (або _E_)
 
-Refer to the table in the [chapter summary](regexp#summary_regexp) for help. Test each solution with a few test strings.
+Зверніться за допомогою до таблиці в [короткий зміст розділу](regexp#summary_regexp). Перевірте кожне рішення за допомогою декількох тестових рядків.
 
-{{if interactive
+{{якщо інтерактивно
 ```
-// Fill in the regular expressions
+// Заповніть регулярні вирази
 
 verify(/.../,
-       ["my car", "bad cats"],
-       ["camper", "high art"]);
+       [«моя машина», «погані коти»],
+       [«кемпер», «високе мистецтво»]);
 
 verify(/.../,
-       ["pop culture", "mad props"],
-       ["plop", "prrrop"]);
+       [«поп-культура», «божевільний реквізит»],
+       [«plop», «prrrrop»]);
 
 verify(/.../,
-       ["ferret", "ferry", "ferrari"],
-       ["ferrum", "transfer A"]);
+       [«тхір», «пором», «феррарі»],
+       [«ferrum», «transfer A»]);
 
 verify(/.../,
-       ["how delicious", "spacious room"],
-       ["ruinous", "consciousness"]);
+       [«як смачно», «простора кімната»],
+       [«руйнівний», «свідомість»]);
 
 verify(/.../,
-       ["bad punctuation ."],
-       ["escape the period"]);
+       [«погана пунктуація»],
+       [«уникнути крапки»]);
 
 verify(/.../,
-       ["Siebentausenddreihundertzweiundzwanzig"],
-       ["no", "three small words"]);
+       [«Siebentausenddreihundertzweiundzwanzig»],
+       [«ні», «три маленьких слова»]);
 
 verify(/.../,
-       ["red platypus", "wobbling nest"],
-       ["earth bed", "bedrøvet abe", "BEET"]);
+       [«червоний качконіс», «гніздо, що хитається»],
+       [«земляна грядка», «bedrøvet abe», «BEET»]);
 
 
 function verify(regexp, yes, no) {
-  // Ignore unfinished exercises
-  if (regexp.source == "...") return;
-  for (let str of yes) if (!regexp.test(str)) {
+  // Ігнорувати незавершені вправи
+  if (regexp.source == «...») return;
+  for (let str of yes) if (!regexp.test(str)) { // Ігнорувати незавершені вправи
     console.log(`Failure to match '${str}'`);
   }
   for (let str of no) if (regexp.test(str)) {
-    console.log(`Unexpected match for '${str}'`);
+    console.log(`Неочікуваний збіг для '${str}'`);
   }
 }
 ```
 
 if}}
 
-### Quoting style
+### Стиль цитування
 
-{{index "quoting style (exercise)", "single-quote character", "double-quote character"}}
+{{індекс «стиль цитування (вправа)», «одинарні лапки», «подвійні лапки»}}
 
-Imagine you have written a story and used single ((quotation mark))s throughout to mark pieces of dialogue. Now you want to replace all the dialogue quotes with double quotes, while keeping the single quotes used in contractions like _aren't_.
+Уявіть, що ви написали оповідання і використовували одинарні ((лапки)) для позначення фрагментів діалогів. Тепер ви хочете замінити всі лапки у діалогах на подвійні лапки, зберігши при цьому одинарні лапки, що використовуються у репліках на кшталт _aren't_.
 
-{{index "replace method"}}
+{{index «replace method»}}
 
-Think of a pattern that distinguishes these two kinds of quote usage and craft a call to the `replace` method that does the proper replacement.
+Придумайте шаблон, який розрізняє ці два типи використання лапок, і створіть виклик методу `replace`, який виконує відповідну заміну.
 
-{{if interactive
+{{if інтерактивний
 ```{test: no}
-let text = "'I'm the cook,' he said, 'it's my job.'";
-// Change this call.
-console.log(text.replace(/A/g, "B"));
-// → "I'm the cook," he said, "it's my job."
+let text = «»Я кухар«, - сказав він, - “це моя робота”.»;
+// Змініть цей виклик.
+console.log(text.replace(/A/g, «B»));
+// → «I'm the cook,» he said, «it's my job.»
 ```
 if}}
 
 {{hint
 
-{{index "quoting style (exercise)", boundary}}
+{{index «стиль цитування (вправа)», boundary}}
 
-The most obvious solution is to replace only quotes with a nonletter character on at least one side—something like `/\P{L}'|'\P{L}/u`. But you also have to take the start and end of the line into account.
+Найочевиднішим рішенням є заміна лише лапок на нелітерні символи принаймні з одного боку - щось на кшталт `/\P{L}'|'\P{L}/u`. Але ви також повинні взяти до уваги початок і кінець рядка.
 
-{{index grouping, "replace method", [parentheses, "in regular expressions"]}}
+{{групування індексів, «метод заміни», [дужки, «у регулярних виразах»]}}
 
-In addition, you must ensure that the replacement also includes the characters that were matched by the `\P{L}` pattern so that those are not dropped. This can be done by wrapping them in parentheses and including their groups in the replacement string (`$1`, `$2`). Groups that are not matched will be replaced by nothing.
+Крім того, ви повинні переконатися, що заміна також включає символи, які було знайдено за шаблоном `\P{L}`, щоб вони не були відкинуті. Це можна зробити, взявши їх у круглі дужки і включивши їхні групи у рядок заміни (`$1`, `$2`). Групи, які не співпадають, буде замінено нічим.
 
-hint}}
+підказка}}
 
-### Numbers again
+### Знову числа
 
-{{index sign, "fractional number", [syntax, number], minus, "plus character", exponent, "scientific notation", "period character"}}
+{{знак індексу, «дробове число», [синтаксис, число], мінус, «знак плюс», експонента, «наукові позначення», «знак крапки»}}
 
-Write an expression that matches only JavaScript-style ((number))s. It must support an optional minus _or_ plus sign in front of the number, the decimal dot, and exponent notation—`5e-3` or `1E10`—again with an optional sign in front of the exponent. Also note that it is not necessary for there to be digits in front of or after the dot, but the number cannot be a dot alone. That is, `.5` and `5.` are valid JavaScript numbers, but a lone dot isn't.
+Напишіть вираз, який відповідає лише формату JavaScript ((число))s. Він повинен підтримувати необов'язковий знак мінус _або_ плюс перед числом, десяткову крапку та запис експоненти - `5e-3` або `1E10` - знову ж таки з необов'язковим знаком перед експонентою. Також зверніть увагу, що не обов'язково, щоб перед або після крапки були цифри, але число не може бути лише крапкою. Тобто, `.5` і `5.` є допустимими JavaScript-числами, але одна крапка - ні.
 
-{{if interactive
+{{якщо інтерактивний
 ```{test: no}
-// Fill in this regular expression.
+// Заповніть цей регулярний вираз.
 let number = /^...$/;
 
-// Tests:
-for (let str of ["1", "-1", "+15", "1.55", ".5", "5.",
-                 "1.3e2", "1E-4", "1e+12"]) {
+// Тести:
+for (let str of [«1», «-1», «+15», «1.55», «.5», «5.»,
+                 «1.3e2», “1E-4”, “1e+12”]) {
   if (!number.test(str)) {
     console.log(`Failed to match '${str}'`);
   }
 }
-for (let str of ["1a", "+-1", "1.2.3", "1+1", "1e4.5",
-                 ".5.", "1f5", "."]) {
+for (let str of [«1a», «+-1», «1.2.3», «1+1», «1e4.5,
+                 «.5.», “1f5”, “.”]) {
   if (number.test(str)) {
-    console.log(`Incorrectly accepted '${str}'`);
+    console.log(`Неправильно прийнято '${str}'`);
   }
 }
 ```
@@ -988,18 +988,18 @@ if}}
 
 {{hint
 
-{{index ["regular expression", escaping], ["backslash character", "in regular expressions"]}}
+{{index [«регулярний вираз», екранування], [«символ зворотної косої риски», «у регулярних виразах»]}}
 
-First, do not forget the backslash in front of the period.
+По-перше, не забувайте про зворотну косу риску перед крапкою.
 
-Matching the optional ((sign)) in front of the ((number)), as well as in front of the ((exponent)), can be done with `[+\-]?` or `(\+|-|)` (plus, minus, or nothing).
+Відповідність необов'язкового ((знак)) перед ((число)), а також перед ((показник)) можна зробити за допомогою `[+\-]?` або `(\+|-|)` (плюс, мінус або нічого).
 
-{{index "pipe character"}}
+{{index «pipe character»}}
 
-The more complicated part of the exercise is the problem of matching both `"5."` and `".5"` without also matching `"."`. For this, a good solution is to use the `|` operator to separate the two cases—either one or more digits optionally followed by a dot and zero or more digits _or_ a dot followed by one or more digits.
+Більш складною частиною вправи є проблема зіставлення `«5.»` і `«.5»` без зіставлення `«.»`. Для цього гарним рішенням буде використання оператора `|` для розділення двох випадків - або одна чи більше цифр, за бажанням, з крапкою та нулем чи більше цифр _або_ з крапкою та однією чи більше цифрами.
 
-{{index exponent, "case sensitivity", ["regular expression", flags]}}
+{{вираз індексу, «чутливість до регістру», [«регулярний вираз», прапори]}}
 
-Finally, to make the _e_ case insensitive, either add an `i` option to the regular expression or use `[eE]`.
+Нарешті, щоб зробити регістр _e_ нечутливим, додайте до регулярного виразу опцію `i` або використовуйте `[eE]`.
 
-hint}}
+підказка}}

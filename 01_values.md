@@ -1,250 +1,252 @@
 {{meta {docid: values}}}
 
-# Values, Types, and Operators
+# Значення, типи та оператори
 
-{{quote {author: "Master Yuan-Ma", title: "The Book of Programming", chapter: true}
+{{quote {author: «Master Yuan-Ma», title: «Книга з програмування», chapter: true}}
 
-Below the surface of the machine, the program moves. Without effort, it expands and contracts. In great harmony, electrons scatter and regroup. The forms on the monitor are but ripples on the water. The essence stays invisibly below.
+Під поверхнею машини рухається програма. 
+
+Без зусиль вона розширюється і стискається. У великій гармонії електрони розсіюються і перегруповуються. Форми на моніторі - лише брижі на воді. Суть залишається невидимою внизу.
 
 quote}}
 
-{{index "Yuan-Ma", "Book of Programming"}}
+{{index «Yuan-Ma», «Книга з програмування»}}
 
-{{figure {url: "img/chapter_picture_1.jpg", alt: "Illustration of a sea of dark and bright dots (bits) with islands in it", chapter: framed}}}
+{{figure {url: «img/chapter_picture_1.jpg», alt: «Ілюстрація моря темних і світлих точок (бітів) з островами в ньому», “chapter”, “framed” }}}
 
-{{index "binary data", data, bit, memory}}
+{{індекс «двійкові дані», дані, біт, пам'ять}}
 
-In the computer's world, there is only data. You can read data, modify data, create new data—but that which isn't data cannot be mentioned. All this data is stored as long sequences of bits and is thus fundamentally alike.
+У комп'ютерному світі існують лише дані. Ви можете читати дані, змінювати їх, створювати нові дані - але про те, що не є даними, не можна говорити. Всі ці дані зберігаються у вигляді довгих послідовностей бітів і, таким чином, є принципово однаковими.
 
-{{index CD, signal}}
+{{index CD, сигнал}}
 
-_Bits_ are any kind of two-valued things, usually described as zeros and ones. Inside the computer, they take forms such as a high or low electrical charge, a strong or weak signal, or a shiny or dull spot on the surface of a CD. Any piece of discrete information can be reduced to a sequence of zeros and ones and thus represented in bits.
+Біти - це будь-які двозначні величини, які зазвичай описуються як нулі та одиниці. У комп'ютері вони приймають такі форми, як високий або низький електричний заряд, сильний або слабкий сигнал, блискуча або тьмяна пляма на поверхні компакт-диска. Будь-який фрагмент дискретної інформації можна звести до послідовності нулів та одиниць і таким чином представити у вигляді бітів.
 
-{{index "binary number", "decimal number"}}
+{{індекс «двійкове число», «десяткове число»}}
 
-For example, we can express the number 13 in bits. This works the same way as a decimal number, but instead of 10 different ((digit))s, we have only 2, and the weight of each increases by a factor of 2 from right to left. Here are the bits that make up the number 13, with the weights of the digits shown below them:
+Наприклад, ми можемо подати число 13 у бітах. Це працює так само, як і десяткове число, але замість 10 різних ((цифр)) ми маємо лише 2, і вага кожної з них збільшується у 2 рази справа наліво. Ось біти, з яких складається число 13, а під ними вказано вагу цифр:
 
 ```{lang: null}
-   0   0   0   0   1   1   0   1
- 128  64  32  16   8   4   2   1
+   0 0 0 0 1 1 0 1
+ 128 64 32 16 8 4 2 1
 ```
 
-That's the binary number 00001101. Its nonzero digits stand for 8, 4, and 1, and add up to 13.
+Це двійкове число 00001101. Його ненульові цифри означають 8, 4 і 1, і в сумі дають 13.
 
-## Values
+## Значення
 
-{{index [memory, organization], "volatile data storage", "hard drive"}}
+{{індекс [пам'ять, організація], «сховище даних», «жорсткий диск»}}
 
-Imagine a sea of bits—an ocean of them. A typical modern computer has more than 100 billion bits in its volatile data storage (working memory). Nonvolatile storage (the hard disk or equivalent) tends to have yet a few orders of magnitude more.
+Уявіть собі море бітів - їх цілий океан. Типовий сучасний комп'ютер має понад 100 мільярдів бітів у своєму енергонезалежному сховищі даних (робочій пам'яті). Енергонезалежне сховище (жорсткий диск або його еквівалент), як правило, має ще на кілька порядків більше.
 
-To be able to work with such quantities of bits without getting lost, we separate them into chunks that represent pieces of information. In a JavaScript environment, those chunks are called _((value))s_. Though all values are made of bits, they play different roles. Every value has a ((type)) that determines its role. Some values are numbers, some values are pieces of text, some values are functions, and so on.
+Щоб мати можливість працювати з такою кількістю бітів, не гублячись, ми розбиваємо їх на фрагменти, які представляють частини інформації. У середовищі JavaScript ці фрагменти називаються _((значення))s_. Хоча всі значення складаються з бітів, вони відіграють різні ролі. Кожне значення має ((тип)), який визначає його роль. Деякі значення є числами, деякі - фрагментами тексту, деякі - функціями, і так далі.
 
-{{index "garbage collection"}}
+{{index «garbage collection»}}
 
-To create a value, you must merely invoke its name. This is convenient. You don't have to gather building material for your values or pay for them. You just call for one, and _whoosh_, you have it. Of course, values are not really created from thin air. Each one has to be stored somewhere, and if you want to use a gigantic number of them at the same time, you might run out of computer memory. Fortunately, this is a problem only if you need them all simultaneously. As soon as you no longer use a value, it will dissipate, leaving behind its bits to be recycled as building material for the next generation of values.
+Щоб створити значення, вам потрібно просто викликати його ім'я. Це дуже зручно. Вам не потрібно збирати будівельний матеріал для ваших значень або платити за них. Ви просто викликаєте цінність, і _бум_, вона  у вас є. Звичайно, цінності не створюються з повітря. Кожну з них потрібно десь зберігати, і якщо ви хочете використовувати гігантську кількість цінностей одночасно, вам може не вистачити пам'яті комп'ютера. На щастя, це проблема лише тоді, коли вони потрібні вам усі одночасно. Як тільки ви більше не використовуєте значення, воно розсіюється, залишаючи після себе біти, які можна переробити як будівельний матеріал для наступного покоління значень.
 
-The remainder of this chapter introduces the atomic elements of JavaScript programs, that is, the simple value types and the operators that can act on such values.
+Решта цієї глави знайомить з атомарними елементами JavaScript-програм, тобто простими типами значень і операторами, які можуть діяти над такими значеннями.
 
-## Numbers
+## Числа
 
-{{index [syntax, number], number, [number, notation]}}
+{{індекс [синтаксис, число], число, [число, позначення]}}
 
-Values of the _number_ type are, unsurprisingly, numeric values. In a JavaScript program, they are written as follows:
+Значення типу _число_ - це, як не дивно, числові значення. У програмі на JavaScript вони записуються наступним чином:
 
 ```
 13
 ```
 
-{{index "binary number"}}
+{{індекс «двійкове число»}}
 
-Using that in a program will cause the bit pattern for the number 13 to come into existence inside the computer's memory.
+Використання цього в програмі призведе до того, що в пам'яті комп'ютера з'явиться бітовий шаблон для числа 13.
 
-{{index [number, representation], bit}}
+{{index [число, представлення], біт}}
 
-JavaScript uses a fixed number of bits, 64 of them, to store a single number value. There are only so many patterns you can make with 64 bits, which limits the number of different numbers that can be represented. With _N_ decimal ((digit))s, you can represent 10^N^ numbers. Similarly, given 64 binary digits, you can represent 2^64^ different numbers, which is about 18 quintillion (an 18 with 18 zeros after it). That's a lot.
+JavaScript використовує фіксовану кількість бітів, 64, для зберігання одного числового значення. Існує лише стільки шаблонів, скільки можна створити за допомогою 64 біт, що обмежує кількість різних чисел, які можна представити. За допомогою _N_ десяткових ((цифр))s можна представити 10^N^ чисел. Аналогічно, маючи 64 двійкові цифри, ви можете представити 2^64^ різних чисел, що становить близько 18 квінтильйонів (18 з 18 нулями після неї). Це дуже багато.
 
-Computer memory used to be much smaller, and people tended to use groups of 8 or 16 bits to represent their numbers. It was easy to accidentally _((overflow))_ such small numbers—to end up with a number that did not fit into the given number of bits. Today, even computers that fit in your pocket have plenty of memory, so you are free to use 64-bit chunks, and you need to worry about overflow only when dealing with truly astronomical numbers.
+Раніше пам'ять комп'ютера була набагато меншою, і люди, як правило, використовували групи по 8 або 16 біт для представлення своїх чисел. Було легко випадково _((переповнити))_ такі маленькі числа - і в результаті отримати число, яке не вкладається у задану кількість бітів. Сьогодні навіть комп'ютери, що вміщаються у кишені, мають достатньо пам'яті, тому ви можете вільно використовувати 64-розрядні фрагменти, і турбуватися про переповнення потрібно лише тоді, коли маєте справу з дійсно астрономічними числами.
 
-{{index sign, "floating-point number", "sign bit"}}
+{{знак індексу, «число з плаваючою комою», «знаковий біт»}}
 
-Not all whole numbers less than 18 quintillion fit in a JavaScript number, though. Those bits also store negative numbers, so one bit indicates the sign of the number. A bigger issue is representing nonwhole numbers. To do this, some of the bits are used to store the position of the decimal point. The actual maximum whole number that can be stored is more in the range of 9 quadrillion (15 zeros)—which is still pleasantly huge.
+Однак не всі цілі числа, менші за 18 квінтильйонів, поміщаються в JavaScript-числа. Ці біти також зберігають від'ємні числа, тому один біт вказує на знак числа. Більшою проблемою є представлення нецілих чисел. Для цього деякі біти використовуються для зберігання позиції десяткової крапки. Максимальне ціле число, яке можна зберігати, знаходиться у діапазоні 9 квадрильйонів (15 нулів) - що все ще є приємно величезним.
 
-{{index [number, notation], "fractional number"}}
+{{індекс [число, позначення], «дробове число»}}
 
-Fractional numbers are written using a dot:
+Дробові числа записуються за допомогою крапки:
 
 ```
 9.81
 ```
 
-{{index exponent, "scientific notation", [number, notation]}}
+{{індекс показника степеня, «науковий запис», [число, позначення]}}
 
-For very big or very small numbers, you may also use scientific notation by adding an _e_ (for _exponent_), followed by the exponent of the number.
+Для дуже великих або дуже малих чисел ви також можете використовувати наукові позначення, додаючи _e_ (для _експонента_), а потім експоненту числа.
 
 ```
 2.998e8
 ```
 
-That's 2.998 × 10^8^ = 299,800,000.
+Це 2.998 × 10^8^ = 299 800 000.
 
-{{index pi, [number, "precision of"], "floating-point number"}}
+{{індекс pi, [число, «точність»], «число з плаваючою комою»}}
 
-Calculations with whole numbers (also called _((integer))s_) that are smaller than the aforementioned 9 quadrillion are guaranteed to always be precise. Unfortunately, calculations with fractional numbers are generally not. Just as π (pi) cannot be precisely expressed by a finite number of decimal digits, many numbers lose some precision when only 64 bits are available to store them. This is a shame, but it causes practical problems only in specific situations. The important thing is to be aware of it and treat fractional digital numbers as approximations, not as precise values.
+Обчислення з цілими числами (також званими _((ціле))s_), меншими за вищезгадані 9 квадрильйонів, гарантовано завжди будуть точними. На жаль, обчислення з дробовими числами, як правило, не є такими. Так само, як число π (пі) не може бути точно виражене скінченною кількістю десяткових цифр, багато чисел втрачають певну точність, коли для їх зберігання доступно лише 64 біти. Це прикро, але це викликає практичні проблеми лише у певних ситуаціях. Важливо знати про це і ставитися до дробових чисел як до наближених, а не як до точних значень.
 
-### Arithmetic
+### Арифметика
 
-{{index [syntax, operator], operator, "binary operator", arithmetic, addition, multiplication}}
+{{індекс [синтаксис, оператор], оператор, «бінарний оператор», арифметика, додавання, множення}}
 
-The main thing to do with numbers is arithmetic. Arithmetic operations such as addition or multiplication take two number values and produce a new number from them. Here is what they look like in JavaScript:
+Основна робота з числами - це арифметика. Арифметичні операції, такі як додавання або множення, беруть два числових значення і створюють з них нове число. Ось як вони виглядають у JavaScript:
 
-```{meta: "expr"}
+```{meta: «expr»}
 100 + 4 * 11
 ```
 
-{{index [operator, application], asterisk, "plus character", "* operator", "+ operator"}}
+{{індекс [оператор, додаток], зірочка, «символ плюс», «* оператор», «+ оператор»}}
 
-The `+` and `*` symbols are called _operators_. The first stands for addition and the second stands for multiplication. Putting an operator between two values will apply it to those values and produce a new value.
+Символи `+` та `*` називаються _операторами_. Перший означає додавання, а другий - множення. Якщо помістити оператор між двома значеннями, він буде застосований до цих значень і створить нове значення.
 
-{{index grouping, parentheses, precedence}}
+{{групування індексів, дужки, пріоритет}}
 
-Does this example mean "Add 4 and 100, and multiply the result by 11", or is the multiplication done before the adding? As you might have guessed, the multiplication happens first. As in mathematics, you can change this by wrapping the addition in parentheses.
+Чи означає цей приклад «Додати 4 і 100, а результат помножити на 11», або ж множення виконується перед додаванням? Як ви вже здогадалися, множення відбувається першим. Як і у математиці, ви можете змінити це, взявши додавання у круглі дужки.
 
-```{meta: "expr"}
+```{meta: «expr»}
 (100 + 4) * 11
 ```
 
-{{index "hyphen character", "slash character", division, subtraction, minus, "- operator", "/ operator"}}
+{{індекс «дефіс», «коса риска», ділення, віднімання, мінус, «- оператор», «/ оператор»}}
 
-For subtraction, there is the `-` operator. Division can be done with the `/` operator.
+Для віднімання існує оператор `-`. Ділення можна виконати за допомогою оператора `/`.
 
-When operators appear together without parentheses, the order in which they are applied is determined by the _((precedence))_ of the operators. The example shows that multiplication comes before addition. The `/` operator has the same precedence as `*`. Likewise, `+` and `-` have the same precedence. When multiple operators with the same precedence appear next to each other, as in `1 - 2 + 1`, they are applied left to right: `(1 - 2) + 1`.
+Коли оператори з'являються разом без круглих дужок, порядок їх застосування визначається _((пріоритетом))_ операторів. У прикладі показано, що множення відбувається перед додаванням. Оператор `/` має такий самий пріоритет, як і `*`. Аналогічно, `+` і `-` мають однаковий пріоритет. Коли декілька операторів з однаковим пріоритетом стоять поруч, як у виразі `1 - 2 + 1`, вони застосовуються зліва направо: `(1 - 2) + 1`.
 
-Don't worry too much about these precedence rules. When in doubt, just add parentheses.
+Не хвилюйтеся надто сильно про ці правила пріоритетів. Якщо ви сумніваєтеся, просто додайте дужки.
 
-{{index "modulo operator", division, "remainder operator", "% operator"}}
+{{індекс «оператор за модулем», «оператор ділення», «оператор остачі», «оператор %»}}
 
-There is one more arithmetic operator, which you might not immediately recognize. The `%` symbol is used to represent the _remainder_ operation. `X % Y` is the remainder of dividing `X` by `Y`. For example, `314 % 100` produces `14`, and `144 % 12` gives `0`. The remainder operator's precedence is the same as that of multiplication and division. You'll also often see this operator referred to as _modulo_.
+Існує ще один арифметичний оператор, який ви можете не одразу впізнати. Символ `%` використовується для позначення операції _залишок_. Вираз `X % Y` є остачею від ділення `X` на `Y`. Наприклад, `314 % 100` дає `14`, а `144 % 12` - `0`. Оператор залишку має такий самий пріоритет, як і оператори множення та ділення. Ви також часто можете бачити цей оператор, позначений як _modulo_.
 
-### Special numbers
+### Спеціальні числа
 
-{{index [number, "special values"], infinity}}
+{{index [число, «спеціальні значення»], нескінченність}}
 
-There are three special values in JavaScript that are considered numbers but don't behave like normal numbers. The first two are `Infinity` and `-Infinity`, which represent the positive and negative infinities. `Infinity - 1` is still `Infinity`, and so on. Don't put too much trust in infinity-based computation, though. It isn't mathematically sound, and it will quickly lead to the next special number: `NaN`.
+У JavaScript є три спеціальні значення, які вважаються числами, але не поводяться як звичайні числа. Перші два - `Infinity` та `Infinity`, які представляють додатну та від'ємну нескінченності. «Нескінченність - 1» - це все ще “Нескінченність”, і так далі. Однак не покладайтеся на обчислення на основі нескінченності. Вони не є математично обґрунтованими і швидко призведуть до наступного спеціального числа: `NaN`.
 
-{{index NaN, "not a number", "division by zero"}}
+{{індекс NaN, «не число», «ділення на нуль»}}
 
-`NaN` stands for "not a number", even though it _is_ a value of the number type. You'll get this result when you, for example, try to calculate `0 / 0` (zero divided by zero), `Infinity - Infinity`, or any number of other numeric operations that don't yield a meaningful result.
+`NaN` означає «не є числом», навіть якщо воно _є_ значенням типу числа. Ви отримаєте такий результат, коли, наприклад, спробуєте обчислити `0 / 0` (нуль поділити на нуль), `Нескінченність - Нескінченність` або будь-яку іншу числову операцію, яка не дасть осмисленого результату.
 
-## Strings
+## Рядки
 
-{{indexsee "grave accent", backtick}}
+{{indexsee «grave accent», backtick}}
 
-{{index [syntax, string], text, character, [string, notation], "single-quote character", "double-quote character", "quotation mark", backtick}}
+{{індекс [синтаксис, рядок], текст, символ, [рядок, позначення], «символ в одинарних лапках», «символ в подвійних лапках», «лапки», зворотна кома}}
 
-The next basic data type is the _((string))_. Strings are used to represent text. They are written by enclosing their content in quotes.
-
-```
-`Down on the sea`
-"Lie on the ocean"
-'Float on the ocean'
-```
-
-You can use single quotes, double quotes, or backticks to mark strings, as long as the quotes at the start and the end of the string match.
-
-{{index "line break", "newline character"}}
-
-You can put almost anything between quotes to have JavaScript make a string value out of it. But a few characters are more difficult. You can imagine how putting quotes between quotes might be hard, since they will look like the end of the string. _Newlines_ (the characters you get when you press [enter]{keyname}) can be included only when the string is quoted with backticks (`` ` ``).
-
-{{index [escaping, "in strings"], ["backslash character", "in strings"]}}
-
-To make it possible to include such characters in a string, the following notation is used: a backslash (`\`) inside quoted text indicates that the character after it has a special meaning. This is called _escaping_ the character. A quote that is preceded by a backslash will not end the string but be part of it. When an `n` character occurs after a backslash, it is interpreted as a newline. Similarly, a `t` after a backslash means a ((tab character)). Take the following string:
+Наступним базовим типом даних є _((рядок))_. Рядки використовуються для представлення тексту. Вони записуються шляхом взяття їх вмісту у лапки.
 
 ```
-"This is the first line\nAnd this is the second"
+«Внизу на морі
+«Лежати на океані»
+«Плавати по океану
 ```
 
-This is the actual text in that string:
+Ви можете використовувати одинарні лапки, подвійні лапки або зворотні лапки для позначення рядків, якщо лапки на початку та в кінці рядка збігаються.
+
+{{index «переведення рядка», «символ нового рядка»}}
+
+Між лапками можна помістити майже все, що завгодно, щоб JavaScript перетворив це на рядкове значення. Але з кількома символами складніше. Ви можете собі уявити, як важко помістити лапки між лапками, оскільки вони будуть виглядати як кінець рядка. _Нові рядки_ (символи, які ви отримуєте при натисканні [enter]{ім'я_клавіші}) можна включати лише тоді, коли рядок взято у лапки з зворотними лапками (`` `` ``).
+
+{{index [екранування, «у рядках»], [«символ зворотної косої риски», «у рядках»]}}
+
+Щоб зробити можливим включення таких символів у рядок, використовується наступна нотація: зворотна коса риска (`\`) всередині цитованого тексту вказує на те, що символ, який стоїть після неї, має особливе значення. Це називається _обтіканням_ символу. Лапки, яким передує зворотна коса риска, не завершують рядок, а є його частиною. Якщо після зворотної косої риски стоїть символ `n`, він інтерпретується як новий рядок. Аналогічно, символ `t` після зворотної косої риски означає символ табуляції. Візьмемо наступний рядок:
+
+```
+«Це перший рядок\nА це другий»
+```
+
+Це власне текст у цьому рядку:
 
 ```{lang: null}
-This is the first line
-And this is the second
+Це перший рядок
+А це другий
 ```
 
-There are, of course, situations where you want a backslash in a string to be just a backslash, not a special code. If two backslashes follow each other, they will collapse together, and only one will be left in the resulting string value. This is how the string "_A newline character is written like `"`\n`"`._" can be expressed:
+Звичайно, бувають ситуації, коли ви хочете, щоб зворотна коса риска у рядку була просто зворотною рискою, а не спеціальним кодом. Якщо дві зворотні косі риски йдуть одна за одною, вони згортаються разом, і в результуючому значенні рядка залишиться лише одна. Так можна записати рядок «_Символ нового рядка записується як `»`\n`«`._»:
 
 ```
-"A newline character is written like \"\\n\"."
+«Символ нового рядка записується як \«\\n\».
 ```
 
 {{id unicode}}
 
-{{index [string, representation], Unicode, character}}
+{{індекс [рядок, подання], Unicode, символ}}
 
-Strings, too, have to be modeled as a series of bits to be able to exist inside the computer. The way JavaScript does this is based on the _((Unicode))_ standard. This standard assigns a number to virtually every character you would ever need, including characters from Greek, Arabic, Japanese, Armenian, and so on. If we have a number for every character, a string can be described by a sequence of numbers. And that's what JavaScript does.
+Рядки також потрібно моделювати як послідовність бітів, щоб вони могли існувати у комп'ютері. Спосіб, у який JavaScript робить це, базується на стандарті _((Unicode))_. Цей стандарт присвоює номер практично кожному символу, який вам коли-небудь знадобиться, включаючи символи грецької, арабської, японської, вірменської і так далі мов. Якщо у нас є номер для кожного символу, то рядок можна описати послідовністю чисел. Саме це і робить JavaScript.
 
-{{index "UTF-16", emoji}}
+{{index «UTF-16», emoji}}
 
-There's a complication though: JavaScript's representation uses 16 bits per string element, which can describe up to 2^16^ different characters. However, Unicode defines more characters than that—about twice as many, at this point. So some characters, such as many emoji, take up two "character positions" in JavaScript strings. We'll come back to this in [Chapter ?](higher_order#code_units).
+Однак є одне ускладнення: JavaScript використовує 16 біт на елемент рядка, що дозволяє описати до 2^16^ різних символів. Однак Unicode визначає більше символів - приблизно вдвічі більше, на даний момент. Тому деякі символи, наприклад, багато емодзі, займають дві «позиції символів» у рядках JavaScript. Ми повернемося до цього у [Розділі ?](вищий_порядок#одиниці_коду).
 
-{{index "+ operator", concatenation}}
+{{індекс «+ оператор», конкатенація}}
 
-Strings cannot be divided, multiplied, or subtracted. The `+` operator _can_ be used on them, not to add, but to _concatenate_—to glue two strings together. The following line will produce the string `"concatenate"`:
+Рядки не можна ділити, множити або віднімати. До них  можна застосовувати оператор `+`, але не для додавання, а для _конкатенації_- склеювання двох рядків. Наступний рядок створить рядок `«concatenate»`:
 
-```{meta: "expr"}
-"con" + "cat" + "e" + "nate"
+```{meta: «expr»}
+«con» + “cat” + “e” + »nate»
 ```
 
-String values have a number of associated functions (_methods_) that can be used to perform other operations on them. I'll say more about these in [Chapter ?](data#methods).
+Рядкові значення мають ряд пов'язаних функцій (_методів_), які можна використовувати для виконання інших операцій над ними. Я розповім про них докладніше у [Розділі ?](data#methods).
 
-{{index interpolation, backtick}}
+{{Інтерполяція індексу, зворотна кома}}
 
-Strings written with single or double quotes behave very much the same—the only difference lies in which type of quote you need to escape inside of them. Backtick-quoted strings, usually called _((template literals))_, can do a few more tricks. Apart from being able to span lines, they can also embed other values.
+Рядки, написані в одинарних або подвійних лапках, поводяться майже однаково - різниця полягає лише у тому, який тип лапок вам потрібно використовувати для екранування всередині них. Рядки, взяті у лапки, які зазвичай називають _((шаблонні літерали))_, можуть виконувати ще кілька трюків. Окрім того, що вони можуть переносити рядки, вони також можуть вбудовувати інші значення.
 
-```{meta: "expr"}
-`half of 100 is ${100 / 2}`
+```{meta: «expr»}
+«половина від 100 дорівнює ${100 / 2}
 ```
 
-When you write something inside `${}` in a template literal, its result will be computed, converted to a string, and included at that position. This example produces the string `"half of 100 is 50"`.
+Коли ви пишете щось всередині `${}` у шаблонному літералі, його результат буде обчислено, перетворено у рядок і включено у цю позицію. У цьому прикладі буде виведено рядок `«половина від 100 дорівнює 50»`.
 
-## Unary operators
+## Унарні оператори
 
-{{index operator, "typeof operator", type}}
+{{індекс оператора, «тип оператора», тип}}
 
-Not all operators are symbols. Some are written as words. One example is the `typeof` operator, which produces a string value naming the type of the value you give it.
+Не всі оператори є символами. Деякі з них записуються як слова. Одним з прикладів є оператор `typeof`, який створює рядкове значення, що називає тип значення, яке ви йому надаєте.
 
 ```
 console.log(typeof 4.5)
-// → number
-console.log(typeof "x")
-// → string
+// → число
+console.log(typeof «x»)
+// → рядок
 ```
 
-{{index "console.log", output, "JavaScript console"}}
+{{index «console.log», output, «JavaScript console»}}
 
-{{id "console.log"}}
+{{id «console.log»}}
 
-We will use `console.log` in example code to indicate that we want to see the result of evaluating something. (More about that in the [next chapter](program_structure).)
+Ми будемо використовувати `console.log` у прикладі коду, щоб вказати, що ми хочемо побачити результат обчислення чогось. (Детальніше про це у [наступному розділі](структура_програми)).
 
-{{index negation, "- operator", "binary operator", "unary operator"}}
+{{заперечення індексу, «- оператор», «бінарний оператор», «унарний оператор»}}
 
-The other operators shown so far in this chapter all operated on two values, but `typeof` takes only one. Operators that use two values are called _binary_ operators, while those that take one are called _unary_ operators. The minus operator (`-`) can be used both as a binary operator and as a unary operator.
+Інші оператори, показані у цій главі, оперують з двома значеннями, але `typeof` приймає лише одне. Оператори, які використовують два значення, називаються _двійковими_ операторами, а ті, що приймають одне, називаються _унарними_ операторами. Оператор мінус (`-`) можна використовувати і як бінарний, і як унарний оператор.
 
 ```
 console.log(- (10 - 2))
 // → -8
 ```
 
-## Boolean values
+## Булеві значення
 
-{{index Boolean, operator, true, false, bit}}
+{{індекс Boolean, оператор, true, false, біт}}
 
-It is often useful to have a value that distinguishes between only two possibilities, like "yes" and "no" or "on" and "off". For this purpose, JavaScript has a _Boolean_ type, which has just two values, true and false, written as those words.
+Часто буває корисно мати значення, яке розрізняє лише дві можливості, наприклад, «так» і «ні» або «увімкнено» і «вимкнено». Для цього у JavaScript існує тип _Boolean_, який має лише два значення, true та false, записані у вигляді цих слів.
 
-### Comparison
+### Порівняння
 
-{{index comparison}}
+{{Порівняння індексів}}
 
-Here is one way to produce Boolean values:
+Ось один із способів отримання булевих значень:
 
 ```
 console.log(3 > 2)
@@ -253,52 +255,52 @@ console.log(3 < 2)
 // → false
 ```
 
-{{index [comparison, "of numbers"], "> operator", "< operator", "greater than", "less than"}}
+{{індекс [порівняння, «чисел»], «оператор >», «оператор <», «більше», «менше»}}
 
-The `>` and `<` signs are the traditional symbols for "is greater than" and "is less than", respectively. They are binary operators. Applying them results in a Boolean value that indicates whether they hold true in this case.
+Знаки `>` і `<` є традиційними символами для позначення «більше» і «менше» відповідно. Вони є бінарними операторами. Їх застосування призводить до отримання булевого значення, яке вказує, чи є вони істинними у даному випадку.
 
-Strings can be compared in the same way.
+У такий самий спосіб можна порівнювати рядки.
 
 ```
-console.log("Aardvark" < "Zoroaster")
+console.log(«Aardvark» < «Zoroaster»)
 // → true
 ```
 
-{{index [comparison, "of strings"]}}
+{{index [comparison, «of strings»]}}
 
-The way strings are ordered is roughly alphabetic but not really what you'd expect to see in a dictionary: uppercase letters are always "less" than lowercase ones, so `"Z" < "a"`, and nonalphabetic characters (!, -, and so on) are also included in the ordering. When comparing strings, JavaScript goes over the characters from left to right, comparing the ((Unicode)) codes one by one.
+Спосіб впорядкування рядків приблизно алфавітний, але не зовсім такий, як ви очікуєте побачити у словнику: великі літери завжди «менші» за малі, тому `«Z» < «a»`, і неалфавітні символи (!, -, і так далі) також враховуються при впорядкуванні. При порівнянні рядків JavaScript переглядає символи зліва направо, порівнюючи коди ((Unicode)) один за одним.
 
-{{index equality, ">= operator", "<= operator", "== operator", "!= operator"}}
+{{рівність індексів, «>= оператор», «<= оператор», «== оператор», «!= оператор»}}
 
-Other similar operators are `>=` (greater than or equal to), `<=` (less than or equal to), `==` (equal to), and `!=` (not equal to).
+Інші подібні оператори: `>=` (більше або дорівнює), `<=` (менше або дорівнює), `==` (дорівнює) і `!=` (не дорівнює).
 
 ```
-console.log("Garnet" != "Ruby")
+console.log(«Garnet» != «Ruby»)
 // → true
-console.log("Pearl" == "Amethyst")
+console.log(«Перлина» == «Аметист»)
 // → false
 ```
 
-{{index [comparison, "of NaN"], NaN}}
+{{index [comparison, «of NaN»], NaN}}
 
-There is only one value in JavaScript that is not equal to itself, and that is `NaN` ("not a number").
+У JavaScript існує лише одне значення, яке не дорівнює самому собі, і це `NaN` («не число»).
 
 ```
 console.log(NaN == NaN)
 // → false
 ```
 
-`NaN` is supposed to denote the result of a nonsensical computation, and as such, it isn't equal to the result of any _other_ nonsensical computations.
+`NaN` має позначати результат безглуздого обчислення, і як такий, він не дорівнює результату будь-яких _інших_ безглуздих обчислень.
 
-### Logical operators
+### Логічні оператори
 
-{{index reasoning, "logical operators"}}
+{{індекс міркувань, «логічні оператори»}}
 
-There are also some operations that can be applied to Boolean values themselves. JavaScript supports three logical operators: _and_, _or_, and _not_. These can be used to "reason" about Booleans.
+Існують також деякі операції, які можна застосовувати до самих булевих значень. JavaScript підтримує три логічні оператори: _і_, _або_ та _не_. Їх можна використовувати для «міркувань» над булевими значеннями.
 
-{{index "&& operator", "logical and"}}
+{{індекс «оператор &&», «логічне і»}}
 
-The `&&` operator represents logical _and_. It is a binary operator, and its result is true only if both the values given to it are true.
+Оператор `&&` представляє логічне _та_. Це бінарний оператор, і його результат є істинним лише тоді, коли обидва значення, надані йому, є істинними.
 
 ```
 console.log(true && false)
@@ -307,9 +309,9 @@ console.log(true && true)
 // → true
 ```
 
-{{index "|| operator", "logical or"}}
+{{індекс «оператор ||», «логічне або»}}
 
-The `||` operator denotes logical _or_. It produces true if either of the values given to it is true.
+Оператор `||` позначає логічне _або_. Він видає значення true, якщо будь-яке із заданих йому значень є істинним.
 
 ```
 console.log(false || true)
@@ -318,21 +320,21 @@ console.log(false || false)
 // → false
 ```
 
-{{index negation, "! operator"}}
+{{заперечення індексу, оператор «!»}}
 
-_Not_ is written as an exclamation mark (`!`). It is a unary operator that flips the value given to it—`!true` produces `false` and `!false` gives `true`.
+Оператор_Not_ записується у вигляді знаку оклику (`!`). Це унарний оператор, який перевертає задане йому значення - `!true` дає `false`, а `!false` дає `true`.
 
-{{index precedence}}
+{{Пріоритет індексу}}
 
-When mixing these Boolean operators with arithmetic and other operators, it is not always obvious when parentheses are needed. In practice, you can usually get by with knowing that of the operators we have seen so far, `||` has the lowest precedence, then comes `&&`, then the comparison operators (`>`, `==`, and so on), and then the rest. This order has been chosen such that, in typical expressions like the following one, as few parentheses as possible are necessary:
+При змішуванні цих булевих операторів з арифметичними та іншими операторами не завжди очевидно, коли потрібні дужки. На практиці зазвичай достатньо знати, що з операторів, які ми розглядали, найнижчий пріоритет має `||`, далі йде `&&`, потім оператори порівняння (`>`, `==` і т.д.), а потім решта. Такий порядок обрано для того, щоб у типових виразах, подібних до наведеного нижче, було якомога менше круглих дужок:
 
-```{meta: "expr"}
+```{meta: «expr»}
 1 + 1 == 2 && 10 * 10 > 50
 ```
 
-{{index "conditional execution", "ternary operator", "?: operator", "conditional operator", "colon character", "question mark"}}
+{{індекс «умовне виконання», «тернарний оператор», «?: оператор», «умовний оператор», «двокрапка», «знак питання»}}
 
-The last logical operator we will look at is not unary, not binary, but _ternary_, operating on three values. It is written with a question mark and a colon, like this:
+Останній логічний оператор, який ми розглянемо, не унарний, не бінарний, а _тернарний_, який оперує трьома значеннями. Він записується зі знаком питання та двокрапкою, ось так:
 
 ```
 console.log(true ? 1 : 2);
@@ -341,48 +343,48 @@ console.log(false ? 1 : 2);
 // → 2
 ```
 
-This one is called the _conditional_ operator (or sometimes just _the ternary operator_ since it is the only such operator in the language). The operator uses the value to the left of the question mark to decide which of the two other values to "pick". If you write `a ? b : c`, the result will be `b` when `a` is true and `c` otherwise.
+Цей оператор називається _умовний_ оператор (або іноді просто _тернарний оператор_, оскільки це єдиний такий оператор у мові). Оператор використовує значення зліва від знаку питання, щоб вирішити, яке з двох інших значень «вибрати». Якщо ви напишете `a ? b : c`, результатом буде `b`, якщо `a` істинно, і `c` в іншому випадку.
 
-## Empty values
+## Порожні значення
 
 {{index undefined, null}}
 
-There are two special values, written `null` and `undefined`, that are used to denote the absence of a _meaningful_ value. They are themselves values, but they carry no information.
+Існує два спеціальних значення, записаних як `null` та `undefined`, які використовуються для позначення відсутності _значущого_ значення. Вони самі є значеннями, але не несуть ніякої інформації.
 
-Many operations in the language that don't produce a meaningful value yield `undefined` simply because they have to yield _some_ value.
+Багато операцій у мові, які не дають осмисленого значення, дають `undefined` просто тому, що вони повинні давати _якесь_ значення.
 
-The difference in meaning between `undefined` and `null` is an accident of JavaScript's design, and it doesn't matter most of the time. In cases where you actually have to concern yourself with these values, I recommend treating them as mostly interchangeable.
+Різниця у значенні між `undefined` та `null` є випадковістю дизайну JavaScript, і здебільшого вона не має значення. У випадках, коли вам дійсно доводиться мати справу з цими значеннями, я рекомендую розглядати їх як взаємозамінні.
 
-## Automatic type conversion
+## Автоматичне перетворення типів
 
-{{index NaN, "type coercion"}}
+{{index NaN, «type coercion»}}
 
-In the [introduction](intro), I mentioned that JavaScript goes out of its way to accept almost any program you give it, even programs that do odd things. This is nicely demonstrated by the following expressions:
+У [вступі](intro) я згадував, що JavaScript намагається прийняти майже будь-яку програму, яку ви йому даєте, навіть програми, які роблять дивні речі. Це добре демонструють наступні вирази:
 
 ```
 console.log(8 * null)
 // → 0
-console.log("5" - 1)
+console.log(«5» - 1)
 // → 4
-console.log("5" + 1)
+console.log(«5» + 1)
 // → 51
-console.log("five" * 2)
+console.log(«5» * 2)
 // → NaN
 console.log(false == 0)
 // → true
 ```
 
-{{index "+ operator", arithmetic, "* operator", "- operator"}}
+{{індекс «+ оператор», арифметика, «* оператор», «- оператор»}}
 
-When an operator is applied to the "wrong" type of value, JavaScript will quietly convert that value to the type it needs, using a set of rules that often aren't what you want or expect. This is called _((type coercion))_. The `null` in the first expression becomes `0` and the `"5"` in the second expression becomes `5` (from string to number). Yet in the third expression, `+` tries string concatenation before numeric addition, so the `1` is converted to `"1"` (from number to string).
+Коли оператор застосовується до «неправильного» типу значення, JavaScript спокійно перетворить це значення до потрібного йому типу, використовуючи набір правил, які часто не є тим, чого ви хочете або очікуєте. Це називається _((примусовий тип))_. У першому виразі `null` стає `0`, а `5` у другому виразі стає `5` (з рядка на число). Однак у третьому виразі `+` намагається виконати конкатенацію рядків перед додаванням чисел, тому `1` перетворюється на `«1»` (з числа на рядок).
 
-{{index "type coercion", [number, "conversion to"]}}
+{{index «примус типу», [число, «перетворення до»]}}
 
-When something that doesn't map to a number in an obvious way (such as `"five"` or `undefined`) is converted to a number, you get the value `NaN`. Further arithmetic operations on `NaN` keep producing `NaN`, so if you find yourself getting one of those in an unexpected place, look for accidental type conversions.
+Коли щось, що не відображається у число очевидним чином (наприклад, `«five»` або `undefined`), перетворюється у число, ви отримуєте значення `NaN`. Подальші арифметичні операції над `NaN` продовжують давати `NaN`, тому якщо ви отримуєте таке значення у несподіваному місці, шукайте випадкові перетворення типів.
 
-{{index null, undefined, [comparison, "of undefined values"], "== operator"}}
+{{index null, undefined, [comparison, «of undefined values»], «== operator»}}
 
-When comparing values of the same type using the `==` operator, the outcome is easy to predict: you should get true when both values are the same, except in the case of `NaN`. But when the types differ, JavaScript uses a complicated and confusing set of rules to determine what to do. In most cases, it just tries to convert one of the values to the other value's type. However, when `null` or `undefined` occurs on either side of the operator, it produces true only if both sides are one of `null` or `undefined`.
+При порівнянні значень одного типу за допомогою оператора `==` результат легко передбачити: ви отримаєте true, якщо обидва значення однакові, за винятком випадку `NaN`. Але коли типи відрізняються, JavaScript використовує складний і заплутаний набір правил, щоб визначити, що робити. У більшості випадків він просто намагається перетворити одне зі значень до типу іншого значення. Однак, коли з обох боків оператора зустрічається `null` або `undefined`, він видає значення true, тільки якщо обидві сторони мають значення `null` або `undefined`.
 
 ```
 console.log(null == undefined);
@@ -391,38 +393,38 @@ console.log(null == 0);
 // → false
 ```
 
-That behavior is often useful. When you want to test whether a value has a real value instead of `null` or `undefined`, you can compare it to `null` with the `==` or `!=` operator.
+Така поведінка часто буває корисною. Якщо ви хочете перевірити, чи значення має дійсне значення замість `null` або `undefined`, ви можете порівняти його з `null` за допомогою оператора `==` або `!=`.
 
-{{index "type coercion", [Boolean, "conversion to"], "=== operator", "!== operator", comparison}}
+{{індекс «примус типу», [Boolean, «перетворення до»], «оператор ===», «!== оператор», порівняння}}
 
-What if you want to test whether something refers to the precise value `false`? Expressions like `0 == false` and `"" == false` are also true because of automatic type conversion. When you do _not_ want any type conversions to happen, there are two additional operators: `===` and `!==`. The first tests whether a value is _precisely_ equal to the other, and the second tests whether it is not precisely equal. Thus `"" === false` is false, as expected.
+Що робити, якщо ви хочете перевірити, чи посилається щось на точне значення `false`? Вирази на кшталт `0 == false` та `«» == false` також є істинними завдяки автоматичному перетворенню типів. Якщо ви  не хочете, щоб відбувалося жодне перетворення типів, є два додаткових оператори: `===` та `!==`. Перший перевіряє, чи одне значення _точно_ дорівнює іншому, а другий - чи не дорівнює. Таким чином, `«» === false` є хибним, як і очікувалося.
 
-I recommend using the three-character comparison operators defensively to prevent unexpected type conversions from tripping you up. But when you're certain the types on both sides will be the same, there is no problem with using the shorter operators.
+Я рекомендую використовувати трисимвольні оператори порівняння обережно, щоб запобігти несподіваним перетворенням типів, які можуть підстерігати вас. Але коли ви впевнені, що типи з обох сторін будуть однаковими, немає жодних проблем з використанням коротших операторів.
 
-### Short-circuiting of logical operators
+### Замикання логічних операторів
 
-{{index "type coercion", [Boolean, "conversion to"], operator}}
+{{індекс «примус типу», [Boolean, «перетворення до»], оператор}}
 
-The logical operators `&&` and `||` handle values of different types in a peculiar way. They will convert the value on their left side to Boolean type in order to decide what to do, but depending on the operator and the result of that conversion, they will return either the _original_ left-hand value or the right-hand value.
+Логічні оператори `&&` та `||` по-особливому обробляють значення різних типів. Вони перетворять значення у лівій частині до булевого типу, щоб вирішити, що робити далі, але залежно від оператора та результату перетворення, вони повернуть або _оригінальне_ ліве значення, або праве значення.
 
-{{index "|| operator"}}
+{{індекс «|| оператор»}}
 
-The `||` operator, for example, will return the value to its left when that value can be converted to true and will return the value on its right otherwise. This has the expected effect when the values are Boolean and does something analogous for values of other types.
+Наприклад, оператор `||` повертатиме значення ліворуч, якщо це значення можна перетворити на істину, і повертатиме значення праворуч в іншому випадку. Це має очікуваний ефект, коли значення є булевими, і робить щось аналогічне для значень інших типів.
 
 ```
-console.log(null || "user")
+console.log(null || «user»)
 // → user
-console.log("Agnes" || "user")
+console.log(«Agnes» || «user»)
 // → Agnes
 ```
 
-{{index "default value"}}
+{{index «значення за замовчуванням»}}
 
-We can use this functionality as a way to fall back on a default value. If you have a value that might be empty, you can put `||` after it with a replacement value. If the initial value can be converted to false, you'll get the replacement instead. The rules for converting strings and numbers to Boolean values state that `0`, `NaN`, and the empty string (`""`) count as false, while all the other values count as true. That means `0 || -1` produces `-1`, and `"" || "!?"` yields `"!?"`.
+Ми можемо використовувати цю функціональність як спосіб повернутися до значення за замовчуванням. Якщо у вас є значення, яке може бути порожнім, ви можете поставити `||` після нього зі значенням заміни. Якщо початкове значення може бути перетворено на false, ви отримаєте заміну замість нього. Правила перетворення рядків і чисел у булеві значення стверджують, що `0`, `NaN` і порожній рядок (`«»`) вважаються хибними, тоді як усі інші значення вважаються істинними. Це означає, що `0 || -1` дає `-1`, а `"» || «!?»` дає `«!?»`.
 
-{{index "?? operator", null, undefined}}
+{{index «?? operator», null, undefined}}
 
-The `??` operator resembles `||` but returns the value on the right only if the one on the left is `null` or `undefined`, not if it is some other value that can be converted to `false`. Often, this is preferable to the behavior of `||`.
+Оператор `??` схожий на `||`, але повертає значення праворуч, тільки якщо значення ліворуч є `null` або `undefined`, а не будь-яке інше значення, яке може бути перетворено у `false`. Часто це краще, ніж поведінка `||`.
 
 ```
 console.log(0 || 100);
@@ -433,20 +435,20 @@ console.log(null ?? 100);
 // → 100
 ```
 
-{{index "&& operator"}}
+{{індекс «&& оператор»}}
 
-The `&&` operator works similarly but the other way around. When the value to its left is something that converts to false, it returns that value, and otherwise it returns the value on its right.
+Оператор `&&` працює аналогічно, але навпаки. Якщо значення зліва від нього є чимось, що перетворюється на false, він повертає це значення, інакше він повертає значення справа від нього.
 
-Another important property of these two operators is that the part to their right is evaluated only when necessary. In the case of `true || X`, no matter what `X` is—even if it's a piece of program that does something _terrible_—the result will be true, and `X` is never evaluated. The same goes for `false && X`, which is false and will ignore `X`. This is called _((short-circuit evaluation))_.
+Ще однією важливою властивістю цих двох операторів є те, що частина праворуч від них обчислюється тільки тоді, коли це необхідно. У випадку `true || X`, незалежно від того, що таке `X` - навіть якщо це частина програми, яка робить щось _жахливе_- результат буде істинним, а `X` ніколи не обчислюється. Те саме стосується `false && X`, який є хибним і ігнорує `X`. Це називається _((оцінка короткого замикання))_.
 
-{{index "ternary operator", "?: operator", "conditional operator"}}
+{{індекс «тернарний оператор», «?: оператор», «умовний оператор»}}
 
-The conditional operator works in a similar way. Of the second and third values, only the one that is selected is evaluated.
+Умовний оператор працює аналогічно. З другого і третього значень обчислюється тільки те, яке вибрано.
 
-## Summary
+## Підсумок
 
-We looked at four types of JavaScript values in this chapter: numbers, strings, Booleans, and undefined values. Such values are created by typing in their name (`true`, `null`) or value (`13`, `"abc"`).
+У цій главі ми розглянули чотири типи значень JavaScript: числа, рядки, булеві функції та невизначені значення. Такі значення створюються шляхом введення їх імені (`true`, `null`) або значення (`13`, `«abc»`).
 
-You can combine and transform values with operators. We saw binary operators for arithmetic (`+`, `-`, `*`, `/`, and `%`), string concatenation (`+`), comparison (`==`, `!=`, `===`, `!==`, `<`, `>`, `<=`, `>=`), and logic (`&&`, `||`, `??`), as well as several unary operators (`-` to negate a number, `!` to negate logically, and `typeof` to find a value's type) and a ternary operator (`?:`) to pick one of two values based on a third value.
+Ви можете комбінувати і перетворювати значення за допомогою операторів. Ми бачили бінарні оператори для арифметики (`+`, `-`, `*`, `/` і `%`), конкатенації рядків (`+`), порівняння (`==`, `!=`, `===`, `!==`, `<`, `>`, `<=`, `>=`) і логіки (`&&`, `||`, `?? `), а також кілька унарних операторів (`-` для заперечення числа, `!` для логічного заперечення і `typeof` для знаходження типу значення) і тернарний оператор (`?:`) для вибору одного з двох значень на основі третього значення.
 
-This gives you enough information to use JavaScript as a pocket calculator but not much more. The [next chapter](program_structure) will start tying these expressions together into basic programs.
+Це дає вам достатньо інформації для використання JavaScript як кишенькового калькулятора, але не більше. У [наступному розділі](структура_програми) ми почнемо об'єднувати ці вирази у базові програми.

@@ -1,30 +1,30 @@
-# Functions
+# Функції
 
-{{quote {author: "Donald Knuth", chapter: true}
+{{quote {author: «Donald Knuth», “глава”: “істина”}}
 
-People think that computer science is the art of geniuses but the actual reality is the opposite, just many people doing things that build on each other, like a wall of mini stones.
+Люди думають, що комп'ютерні науки - це мистецтво геніїв, але насправді все навпаки, просто багато людей роблять речі, які будуються одна на одній, як стіна з міні-камінців.
 
 quote}}
 
-{{index "Knuth, Donald"}}
+{{index «Knuth, Donald»}}
 
-{{figure {url: "img/chapter_picture_3.jpg", alt: "Illustration of fern leaves with a fractal shape, bees in the background", chapter: framed}}}
+{{figure {url: «img/chapter_picture_3.jpg», alt: «Ілюстрація листя папороті з фрактальною формою, бджоли на задньому плані», chapter: framed}}}
 
-{{index function, [code, "structure of"]}}
+{{index function, [code, «структура»]}}
 
-Functions are one of the most central tools in JavaScript programming. The concept of wrapping a piece of program in a value has many uses. It gives us a way to structure larger programs, to reduce repetition, to associate names with subprograms, and to isolate these subprograms from each other.
+Функції є одним з центральних інструментів у програмуванні на JavaScript. Концепція обгортання частини програми у значення має багато застосувань. Вона дає нам спосіб структурувати більші програми, зменшити повторення, пов'язати імена з підпрограмами та ізолювати ці підпрограми одна від одної.
 
-The most obvious application of functions is defining new ((vocabulary)). Creating new words in prose is usually bad style, but in programming, it is indispensable.
+Найбільш очевидним застосуванням функцій є визначення нового ((словникового запасу)). Створення нових слів у прозі зазвичай є поганим стилем, але у програмуванні воно є необхідним.
 
-{{index abstraction, vocabulary}}
+{Абстракція індексів, словниковий запас}}
 
-Typical adult English speakers have some 20,000 words in their vocabulary. Few programming languages come with 20,000 commands built in. And the vocabulary that _is_ available tends to be more precisely defined, and thus less flexible, than in human language. Therefore, we _have_ to introduce new words to avoid excessive verbosity.
+Типовий словниковий запас дорослого носія англійської мови налічує близько 20 000 слів. Небагато мов програмування мають 20 000 вбудованих команд. А словниковий запас, який _є_ в наявності, як правило, більш точно визначений, а отже, менш гнучкий, ніж у людській мові. Тому нам  доводиться вводити нові слова, щоб уникнути надмірної багатослівності.
 
-## Defining a function
+## Визначення функції
 
-{{index "square example", [function, definition], [binding, definition]}}
+{{індекс «квадратний приклад», [функція, визначення], [зв'язування, визначення]}}
 
-A function definition is a regular binding where the value of the binding is a function. For example, this code defines `square` to refer to a function that produces the square of a given number:
+Визначення функції - це звичайне зв'язування, де значенням зв'язування є функція. Наприклад, у цьому коді визначено ``квадрат`` для посилання на функцію, яка виводить квадрат заданого числа:
 
 ```
 const square = function(x) {
@@ -35,18 +35,18 @@ console.log(square(12));
 // → 144
 ```
 
-{{indexsee "curly braces", braces}}
-{{index [braces, "function body"], block, [syntax, function], "function keyword", [function, body], [function, "as value"], [parentheses, arguments]}}
+{{indexsee «фігурні дужки», дужки}}
+{{індекс [дужки, «тіло функції»], блок, [синтаксис, функція], «ключове слово функції», [функція, тіло], [функція, «як значення»], [дужки, аргументи]}}
 
-A function is created with an expression that starts with the keyword `function`. Functions have a set of _((parameter))s_ (in this case, only `x`) and a _body_, which contains the statements that are to be executed when the function is called. The body of a function created this way must always be wrapped in braces, even when it consists of only a single ((statement)).
+Функція створюється за допомогою виразу, який починається з ключового слова `function`. Функції мають набір _((параметрів))s_ (у цьому випадку лише `x`) і _тіло_, яке містить оператори, що мають виконуватися під час виклику функції. Тіло створеної таким чином функції завжди слід брати у фігурні дужки, навіть якщо воно складається з одного ((оператора)).
 
-{{index "roundTo example"}}
+{{index «roundTo example»}}
 
-A function can have multiple parameters or no parameters at all. In the following example, `makeNoise` does not list any parameter names, whereas `roundTo` (which rounds `n` to the nearest multiple of `step`) lists two:
+Функція може мати декілька параметрів або взагалі не мати параметрів. У наступному прикладі `makeNoise` не містить жодного параметра, тоді як `roundTo` (яка округлює `n` до найближчого кратного `step`) містить два параметри:
 
 ```
 const makeNoise = function() {
-  console.log("Pling!");
+  console.log(«Pling!»);
 };
 
 makeNoise();
@@ -61,47 +61,47 @@ console.log(roundTo(23, 10));
 // → 20
 ```
 
-{{index "return value", "return keyword", undefined}}
+{{індекс «значення, що повертається», «ключове слово повернення», undefined}}
 
-Some functions, such as `roundTo` and `square`, produce a value, and some don't, such as `makeNoise`, whose only result is a ((side effect)). A `return` statement determines the value the function returns. When control comes across such a statement, it immediately jumps out of the current function and gives the returned value to the code that called the function. A `return` keyword without an expression after it will cause the function to return `undefined`. Functions that don't have a `return` statement at all, such as `makeNoise`, similarly return `undefined`.
+Деякі функції, такі як `roundTo` і `square`, повертають значення, а деякі ні, наприклад `makeNoise`, єдиним результатом якої є ((побічний ефект)). Оператор `return` визначає значення, яке повертає функція. Коли елемент керування зустрічає такий оператор, він негайно виходить з поточної функції і передає значення, що повертається, коду, який викликав функцію. Ключове слово `return` без виразу після нього призведе до того, що функція поверне значення `undefined`. Функції, які взагалі не мають оператора `return`, такі як `makeNoise`, також повертають значення `undefined`.
 
-{{index parameter, [function, application], [binding, "from parameter"]}}
+{{індекс параметра, [функція, додаток], [прив'язка, «від параметра»]}}
 
-Parameters to a function behave like regular bindings, but their initial values are given by the _caller_ of the function, not the code in the function itself.
+Параметри функції поводяться як звичайні зв'язування, але їх початкові значення задаються _викликачем_ функції, а не кодом у самій функції.
 
-## Bindings and scopes
+## Зв'язування та області видимості
 
-{{indexsee "top-level scope", "global scope"}}
-{{index "var keyword", "global scope", [binding, global], [binding, "scope of"]}}
+{{indexsee «область видимості верхнього рівня», «глобальна область видимості»}}
+{{індекс «ключове слово var», «глобальна область видимості», [прив'язка, глобальна], [прив'язка, «область видимості»]}}
 
-Each binding has a _((scope))_, which is the part of the program in which the binding is visible. For bindings defined outside of any function, block, or module (see [Chapter ?](modules)), the scope is the whole program—you can refer to such bindings wherever you want. These are called _global_.
+Кожне прив'язування має _((область видимості ))_, яка є частиною програми, в якій це прив'язування є видимим. Для прив'язок, визначених поза будь-якою функцією, блоком або модулем (див. [Глава ?](модулі)), областю видимості є вся програма - ви можете посилатися на такі прив'язки де завгодно. Такі прив'язки називаються _глобальними_.
 
-{{index "local scope", [binding, local]}}
+{{index «local scope», [binding, local]}}
 
-Bindings created for function ((parameter))s or declared inside a function can be referenced only in that function, so they are known as _local_ bindings. Every time the function is called, new instances of these bindings are created. This provides some isolation between functions—each function call acts in its own little world (its local environment) and can often be understood without knowing a lot about what's going on in the global environment.
+На прив'язки, створені для функції ((параметра)) або оголошені всередині функції, можна посилатися лише у цій функції, тому вони називаються _локальними_ прив'язками. При кожному виклику функції створюються нові екземпляри цих прив'язок. Це забезпечує певну ізоляцію між функціями - кожен виклик функції діє у власному маленькому світі (локальному оточенні) і часто може бути зрозумілим без знання того, що відбувається у глобальному оточенні.
 
-{{index "let keyword", "const keyword", "var keyword"}}
+{{index «ключове слово let», «ключове слово const», «ключове слово var»}}
 
-Bindings declared with `let` and `const` are in fact local to the _((block))_ in which they are declared, so if you create one of those inside of a loop, the code before and after the loop cannot "see" it. In pre-2015 JavaScript, only functions created new scopes, so old-style bindings, created with the `var` keyword, are visible throughout the whole function in which they appear—or throughout the global scope, if they are not in a function.
+Зв'язки, оголошені за допомогою `let` і `const`, насправді є локальними для _((блоку))_, в якому вони оголошені, тому якщо ви створите одну з них всередині циклу, код до і після циклу не зможе її «побачити». У JavaScript до 2015 року нові області видимості створювали лише функції, тому прив'язки старого стилю, створені за допомогою ключового слова `var`, видимі у всій функції, в якій вони з'являються - або у всій глобальній області видимості, якщо вони не знаходяться у функції.
 
 ```
-let x = 10;   // global
+let x = 10; // global
 if (true) {
-  let y = 20; // local to block
-  var z = 30; // also global
+  let y = 20; // локально для блоку
+  var z = 30; // також глобально
 }
 ```
 
-{{index [binding, visibility]}}
+{{index [зв'язування, видимість]}}
 
-Each ((scope)) can "look out" into the scope around it, so `x` is visible inside the block in the example. The exception is when multiple bindings have the same name—in that case, code can see only the innermost one. For example, when the code inside the `halve` function refers to `n`, it is seeing its _own_ `n`, not the global `n`.
+Кожне ((область видимості)) може «виглядати» в область видимості навколо нього, тому `x` видно всередині блоку у прикладі. Винятком є випадки, коли декілька прив'язок мають однакове ім'я - у такому випадку код може бачити лише внутрішню прив'язку. Наприклад, коли код всередині функції `halve` посилається на `n`, він бачить своє _власне_ `n`, а не глобальне `n`.
 
 ```
 const halve = function(n) {
   return n / 2;
 };
 
-let n = 10;
+нехай n = 10;
 console.log(halve(100));
 // → 50
 console.log(n);
@@ -110,68 +110,68 @@ console.log(n);
 
 {{id scoping}}
 
-## Nested scope
+## Вкладена область видимості
 
-{{index [nesting, "of functions"], [nesting, "of scope"], scope, "inner function", "lexical scoping"}}
+{{index [nesting, «of functions»], [nesting, «of scope»], scope, «internal function», «lexical scoping»}}
 
-JavaScript distinguishes not just global and local bindings. Blocks and functions can be created inside other blocks and functions, producing multiple degrees of locality.
+JavaScript розрізняє не лише глобальні та локальні прив'язки. Блоки та функції можуть бути створені всередині інших блоків та функцій, створюючи декілька ступенів локальності.
 
-{{index "landscape example"}}
+{{index «приклад ландшафту»}}
 
-For example, this function—which outputs the ingredients needed to make a batch of hummus—has another function inside it:
+Наприклад, ця функція, яка виводить інгредієнти, необхідні для приготування хумусу, має всередині іншу функцію:
 
 ```
 const hummus = function(factor) {
-  const ingredient = function(amount, unit, name) {
-    let ingredientAmount = amount * factor;
+  const ingredient = function(кількість, одиниця виміру, назва) {}.
+    нехай ingredientAmount = кількість * фактор;
     if (ingredientAmount > 1) {
-      unit += "s";
+      unit += «s»;
     }
     console.log(`${ingredientAmount} ${unit} ${name}`);
   };
-  ingredient(1, "can", "chickpeas");
-  ingredient(0.25, "cup", "tahini");
-  ingredient(0.25, "cup", "lemon juice");
-  ingredient(1, "clove", "garlic");
-  ingredient(2, "tablespoon", "olive oil");
-  ingredient(0.5, "teaspoon", "cumin");
+  ingredient(1, «банка», «нут»);
+  ingredient(0.25, «cup», «tahini»);
+  ingredient(0.25, «cup», «лимонний сік»);
+  ingredient(1, «зубчик», «часник»);
+  ingredient(2, «столова ложка», «оливкова олія»);
+  ingredient(0.5, «чайна ложка», «кмин»);
 };
 ```
 
 {{index [function, scope], scope}}
 
-The code inside the `ingredient` function can see the `factor` binding from the outer function, but its local bindings, such as `unit` or `ingredientAmount`, are not visible in the outer function.
+Код всередині функції `ingredient` бачить прив'язку `factor` із зовнішньої функції, але її локальні прив'язки, такі як `unit` або `ingredientAmount`, не видно у зовнішній функції.
 
-The set of bindings visible inside a block is determined by the place of that block in the program text. Each local scope can also see all the local scopes that contain it, and all scopes can see the global scope. This approach to binding visibility is called _((lexical scoping))_.
+Набір зв'язувань, видимих всередині блоку, визначається місцем цього блоку в тексті програми. Кожна локальна область видимості також бачить усі локальні області видимості, які її містять, а всі області видимості бачать глобальну область видимості. Такий підхід до зв'язування видимості називається _((лексичне визначення області видимості))_.
 
-## Functions as values
+## Функції як значення
 
-{{index [function, "as value"], [binding, definition]}}
+{{index [функція, «як значення»], [зв'язування, визначення]}}
 
-A function binding usually simply acts as a name for a specific piece of the program. Such a binding is defined once and never changed. This makes it easy to confuse the function and its name.
+Прив'язка функції зазвичай просто діє як ім'я для певного фрагмента програми. Таке зв'язування визначається один раз і ніколи не змінюється. Це дозволяє легко переплутати функцію та її ім'я.
 
-{{index [binding, assignment]}}
+{{index [зв'язування, присвоєння]}}
 
-But the two are different. A function value can do all the things that other values can do—you can use it in arbitrary ((expression))s, not just call it. It is possible to store a function value in a new binding, pass it as an argument to a function, and so on. Similarly, a binding that holds a function is still just a regular binding and can, if not constant, be assigned a new value, like so:
+Але ці два поняття відрізняються. Значення функції може робити все те саме, що й інші значення - ви можете використовувати його у довільних ((виразах)), а не лише викликати. Значення функції можна зберігати у новому зв'язуванні, передавати як аргумент функції тощо. Аналогічно, прив'язка, яка містить функцію, залишається звичайною прив'язкою, і їй можна присвоїти нове значення, якщо вона не є константою, наприклад, таким чином:
 
 ```{test: no}
 let launchMissiles = function() {
-  missileSystem.launch("now");
+  missileSystem.launch(«now»);
 };
 if (safeMode) {
-  launchMissiles = function() {/* do nothing */};
+  launchMissiles = function() {/* нічого не робити */};
 }
 ```
 
-{{index [function, "higher-order"]}}
+{{index [function, «higher-order»]}}
 
-In [Chapter ?](higher_order), we'll discuss the interesting things that we can do by passing function values to other functions.
+У [Главі ?](higher_order) ми обговоримо цікаві речі, які можна робити, передаючи значення функції іншим функціям.
 
-## Declaration notation
+## Нотація оголошення
 
-{{index [syntax, function], "function keyword", "square example", [function, definition], [function, declaration]}}
+{{індекс [синтаксис, функція], «ключове слово функції», «квадратний приклад», [функція, визначення], [функція, оголошення]}}
 
-There is a slightly shorter way to create a function binding. When the `function` keyword is used at the start of a statement, it works differently:
+Існує дещо коротший спосіб створення зв'язування функції. Коли ключове слово `function` використовується на початку оператора, він працює інакше:
 
 ```{test: wrap}
 function square(x) {
@@ -179,27 +179,27 @@ function square(x) {
 }
 ```
 
-{{index future, "execution order"}}
+{{index future, «порядок виконання»}}
 
-This is a function _declaration_. The statement defines the binding `square` and points it at the given function. It is slightly easier to write and doesn't require a semicolon after the function.
+Це _оголошення_ функції . Вона визначає зв'язуючий `квадрат` і вказує його на задану функцію. Він трохи простіший у написанні і не вимагає крапки з комою після функції.
 
-There is one subtlety with this form of function definition.
+У цій формі визначення функції є один нюанс.
 
 ```
-console.log("The future says:", future());
+console.log(«Майбутнє говорить:», future());
 
 function future() {
-  return "You'll never have flying cars";
+  return «У вас ніколи не буде літаючих автомобілів»;
 }
 ```
 
-The preceding code works, even though the function is defined _below_ the code that uses it. Function declarations are not part of the regular top-to-bottom flow of control. They are conceptually moved to the top of their scope and can be used by all the code in that scope. This is sometimes useful because it offers the freedom to order code in a way that seems the clearest, without worrying about having to define all functions before they are used.
+Попередній код працює, навіть якщо функція визначена _нижче_ коду, який її використовує. Оголошення функцій не є частиною звичайного потоку керування зверху вниз. Вони концептуально переміщуються у верхню частину області видимості і можуть бути використані усім кодом у цій області видимості. Іноді це буває корисно, оскільки дає свободу впорядковувати код у спосіб, який здається найзрозумілішим, не турбуючись про необхідність визначення всіх функцій перед їх використанням.
 
-## Arrow functions
+## Функції зі стрілками
 
-{{index function, "arrow function"}}
+{{index-функція, «функція-стрілка»}}
 
-There's a third notation for functions, which looks very different from the others. Instead of the `function` keyword, it uses an arrow (`=>`) made up of an equal sign and a greater-than character (not to be confused with the greater-than-or-equal operator, which is written `>=`):
+Існує третій спосіб позначення функцій, який дуже відрізняється від інших. Замість ключового слова `function` використовується стрілка (`=>`), що складається зі знака рівності та символу більше ніж (не плутати з оператором більше ніж або дорівнює, який записується `>=`):
 
 ```{test: wrap}
 const roundTo = (n, step) => {
@@ -210,73 +210,73 @@ const roundTo = (n, step) => {
 
 {{index [function, body]}}
 
-The arrow comes _after_ the list of parameters and is followed by the function's body. It expresses something like "this input (the ((parameter))s) produces this result (the body)".
+Стрілка стоїть _після_ списку параметрів, а за нею йде тіло функції. Вона виражає щось на кшталт «ці вхідні дані (параметри) дають цей результат (тіло)».
 
-{{index [braces, "function body"], "square example", [parentheses, arguments]}}
+{{індекс [дужки, «тіло функції»], «квадратний приклад», [дужки, аргументи]}}
 
-When there is only one parameter name, you can omit the parentheses around the parameter list. If the body is a single expression rather than a ((block)) in braces, that expression will be returned from the function. So, these two definitions of `square` do the same thing:
+Якщо є лише одне ім'я параметра, ви можете опустити дужки навколо списку параметрів. Якщо тіло є одним виразом, а не ((блоком)) у фігурних дужках, цей вираз буде повернуто з функції. Отже, ці два визначення ``квадрата`` роблять те саме:
 
 ```
 const square1 = (x) => { return x * x; };
 const square2 = x => x * x;
 ```
 
-{{index [parentheses, arguments]}}
+{{індекс [дужки, аргументи]}}
 
-When an arrow function has no parameters at all, its parameter list is just an empty set of parentheses.
+Коли стрілочна функція взагалі не має параметрів, список її параметрів є просто порожнім набором круглих дужок.
 
 ```
 const horn = () => {
-  console.log("Toot");
+  console.log(«Toot»);
 };
 ```
 
-{{index verbosity}}
+{{багатослівність індексів}}
 
-There's no deep reason to have both arrow functions and `function` expressions in the language. Apart from a minor detail, which we'll discuss in [Chapter ?](object), they do the same thing. Arrow functions were added in 2015, mostly to make it possible to write small function expressions in a less verbose way. We'll use them often in [Chapter ?](higher_order).
+Немає жодної глибокої причини для того, щоб мати у мові як функції-стрілки, так і вирази `функції`. За винятком невеликої деталі, яку ми обговоримо у [Розділ ?](об'єкт), вони роблять те саме. Функції зі стрілками було додано у 2015 році, головним чином для того, щоб зробити можливим написання невеликих функціональних виразів у менш багатослівний спосіб. Ми часто використовуватимемо їх у [Розділ ?](вищий_порядок).
 
 {{id stack}}
 
-## The call stack
+## Стек викликів
 
-{{indexsee stack, "call stack"}}
-{{index "call stack", [function, application]}}
+{{indexsee stack, «стек викликів»}}
+{{index «стек викликів», [функція, програма]}}
 
-The way control flows through functions is somewhat involved. Let's take a closer look at it. Here is a simple program that makes a few function calls:
+Спосіб передачі керування через функції є дещо складним. Давайте розглянемо його докладніше. Ось проста програма, яка виконує декілька викликів функцій:
 
 ```
 function greet(who) {
-  console.log("Hello " + who);
+  console.log("Hello » + who);
 }
-greet("Harry");
-console.log("Bye");
+greet(«Гаррі»);
+console.log(«Бувай»);
 ```
 
-{{index ["control flow", functions], "execution order", "console.log"}}
+{{index [«control flow», functions], «execution order», «console.log»}}
 
-A run through this program goes roughly like this: the call to `greet` causes control to jump to the start of that function (line 2). The function calls `console.log`, which takes control, does its job, and then returns control to line 2. There, it reaches the end of the `greet` function, so it returns to the place that called it—line 4. The line after that calls `console.log` again. After that returns, the program reaches its end.
+Виконання цієї програми відбувається приблизно так: виклик `greet` призводить до переходу керування на початок цієї функції (рядок 2). Функція викликає `console.log`, який отримує керування, виконує свою роботу, а потім повертає керування на рядок 2. Там воно досягає кінця функції `greet`, тому повертається до місця, звідки його було викликано - до рядка 4. Наступний за ним рядок знову викликає `console.log`. Після повернення цього рядка програма завершується.
 
-We could show the flow of control schematically like this:
+Схематично потік управління можна зобразити так:
 
 ```{lang: null}
-not in function
+не у функції
+  у greet
+    у console.log
   in greet
-    in console.log
-  in greet
-not in function
-  in console.log
+не у функції
+  у console.log
 not in function
 ```
 
-{{index "return keyword", [memory, call stack]}}
+{{індекс «ключове слово повернення», [пам'ять, стек викликів]}}
 
-Because a function has to jump back to the place that called it when it returns, the computer must remember the context from which the call happened. In one case, `console.log` has to return to the `greet` function when it is done. In the other case, it returns to the end of the program.
+Оскільки функція повинна повертатися до місця, з якого її було викликано, комп'ютер повинен запам'ятати контекст, з якого було здійснено виклик. В одному випадку, `console.log` має повернутися до функції `greet` після завершення роботи. В іншому випадку він повертається у кінець програми.
 
-The place where the computer stores this context is the _((call stack))_. Every time a function is called, the current context is stored on top of this stack. When a function returns, it removes the top context from the stack and uses that context to continue execution.
+Місце, де комп'ютер зберігає цей контекст - це _((стек викликів))_. Кожного разу, коли викликається функція, поточний контекст зберігається на вершині цього стеку. Коли функція повертається, вона видаляє верхній контекст зі стека і використовує його для продовження виконання.
 
-{{index "infinite loop", "stack overflow", recursion}}
+{{index «infinite loop», «stack overflow», recursion}}
 
-Storing this stack requires space in the computer's memory. When the stack grows too big, the computer will fail with a message like "out of stack space" or "too much recursion". The following code illustrates this by asking the computer a really hard question that causes an infinite back-and-forth between two functions. Or rather, it _would_ be infinite, if the computer had an infinite stack. As it is, we will run out of space, or "blow the stack".
+Зберігання цього стеку вимагає місця у пам'яті комп'ютера. Коли стек стає занадто великим, комп'ютер завершить роботу з повідомленням на кшталт «не вистачає місця у стеку» або «занадто багато рекурсії». Наступний код ілюструє це, ставлячи комп'ютеру дуже складне питання, яке викликає нескінченне циклічне перемикання між двома функціями. Точніше, воно _було б_ нескінченним, якби комп'ютер мав нескінченний стек. А так, нам не вистачить місця, або ми «рознесемо стек».
 
 ```{test: no}
 function chicken() {
@@ -285,29 +285,29 @@ function chicken() {
 function egg() {
   return chicken();
 }
-console.log(chicken() + " came first.");
+console.log(chicken() + « came first.»);
 // → ??
 ```
 
-## Optional Arguments
+## Необов'язкові аргументи
 
-{{index argument, [function, application]}}
+{{аргумент індексу, [функція, додаток]}}
 
-The following code is allowed and executes without any problem:
+Наступний код є допустимим і виконується без проблем:
 
 ```
 function square(x) { return x * x; }
-console.log(square(4, true, "hedgehog"));
+console.log(square(4, true, «hedgehog»));
 // → 16
 ```
 
-We defined `square` with only one ((parameter)). Yet when we call it with three, the language doesn't complain. It ignores the extra arguments and computes the square of the first one.
+Ми визначили ``квадрат`` лише з одним ((параметром)). Але коли ми викликаємо його з трьома, мова не скаржиться. Вона ігнорує зайві аргументи і обчислює квадрат першого з них.
 
 {{index undefined}}
 
-JavaScript is extremely broad-minded about the number of arguments you can pass to a function. If you pass too many, the extra ones are ignored. If you pass too few, the missing parameters are assigned the value `undefined`.
+JavaScript надзвичайно широко підходить до кількості аргументів, які ви можете передати у функцію. Якщо ви передасте забагато, зайві аргументи будуть проігноровані. Якщо ви передасте замало, відсутнім параметрам буде присвоєно значення `undefined`.
 
-The downside of this is that it is possible—likely, even—that you'll accidentally pass the wrong number of arguments to functions. And no one will tell you about it. The upside is that you can use this behavior to allow a function to be called with different numbers of arguments. For example, this `minus` function tries to imitate the `-` operator by acting on either one or two arguments:
+Недоліком цього є те, що ви можете випадково передати функціям неправильну кількість аргументів, і це навіть ймовірно. І ніхто вам про це не скаже. Перевагою є те, що ви можете використовувати цю поведінку, щоб дозволити виклик функції з різною кількістю аргументів. Наприклад, ця функція `minus` намагається імітувати оператор `-`, діючи з одним або двома аргументами:
 
 ```
 function minus(a, b) {
@@ -322,9 +322,9 @@ console.log(minus(10, 5));
 ```
 
 {{id roundTo}}
-{{index "optional argument", "default value", parameter, ["= operator", "for default value"] "roundTo example"}}
+{{індекс «необов'язковий аргумент», «значення за замовчуванням», параметр, [«= оператор», «для значення за замовчуванням»] «roundTo приклад»}}
 
-If you write an `=` operator after a parameter, followed by an expression, the value of that expression will replace the argument when it is not given. For example, this version of `roundTo` makes its second argument optional. If you don't provide it or pass the value `undefined`, it will default to one:
+Якщо після параметра написати оператор `=`, а потім вираз, значення цього виразу замінить аргумент, якщо його не вказано. Наприклад, у цій версії `roundTo` другий аргумент є необов'язковим. Якщо ви не вкажете його або передасте значення `undefined`, він буде за замовчуванням дорівнювати одиниці:
 
 ```{test: wrap}
 function roundTo(n, step = 1) {
@@ -338,22 +338,22 @@ console.log(roundTo(4.5, 2));
 // → 4
 ```
 
-{{index "console.log"}}
+{{index «console.log»}}
 
-The [next chapter](data#rest_parameters) will introduce a way in which a function body can get at the whole list of arguments it was passed. This is helpful because it allows a function to accept any number of arguments. For example, `console.log` does this, outputting all the values it is given:
+У [наступному розділі](дані#решта_параметрів) буде описано спосіб, за допомогою якого тіло функції може отримати весь список аргументів, які їй було передано. Це корисно, оскільки дозволяє функції приймати будь-яку кількість аргументів. Наприклад, `console.log` робить це, виводячи усі значення, які їй було передано:
 
 ```
-console.log("C", "O", 2);
+console.log(«C», «O», 2);
 // → C O 2
 ```
 
-## Closure
+## Закриття
 
-{{index "call stack", "local binding", [function, "as value"], scope}}
+{{індекс «стек викликів», «локальне прив'язування», [функція, «як значення»], область видимості}}
 
-The ability to treat functions as values, combined with the fact that local bindings are re-created every time a function is called, brings up an interesting question: What happens to local bindings when the function call that created them is no longer active?
+Можливість поводитися з функціями як зі значеннями у поєднанні з тим, що локальні прив'язки створюються заново при кожному виклику функції, викликає цікаве питання: Що відбувається з локальними зв'язками, коли виклик функції, який їх створив, більше не є активним?
 
-The following code shows an example of this. It defines a function, `wrapValue`, that creates a local binding. It then returns a function that accesses and returns this local binding.
+У наступному коді показано приклад цього. Він визначає функцію `wrapValue`, яка створює локальне прив'язування. Потім повертається функція, яка отримує доступ до цього локального зв'язування і повертає його.
 
 ```
 function wrapValue(n) {
@@ -361,7 +361,7 @@ function wrapValue(n) {
   return () => local;
 }
 
-let wrap1 = wrapValue(1);
+let wrap1 = wrapValue(1)
 let wrap2 = wrapValue(2);
 console.log(wrap1());
 // → 1
@@ -369,44 +369,44 @@ console.log(wrap2());
 // → 2
 ```
 
-This is allowed and works as you'd hope—both instances of the binding can still be accessed. This situation is a good demonstration of the fact that local bindings are created anew for every call, and different calls don't affect each other's local bindings.
+Це дозволено і працює так, як ви сподіваєтесь - до обох екземплярів прив'язки все ще можна отримати доступ. Ця ситуація є гарною демонстрацією того, що локальні прив'язки створюються заново для кожного виклику, і різні виклики не впливають на локальні прив'язки один одного.
 
-This feature—being able to reference a specific instance of a local binding in an enclosing scope—is called _((closure))_. A function that references bindings from local scopes around it is called _a_ closure. This behavior not only frees you from having to worry about the lifetimes of bindings but also makes it possible to use function values in some creative ways.
+Ця можливість - можливість посилатися на конкретний екземпляр локального зв'язування в охоплюючій області видимості - називається _((закриття))_. Функція, яка посилається на зв'язування з локальних областей видимості навколо неї, називається _закриттям_. Така поведінка не тільки звільняє вас від необхідності турбуватися про час життя прив'язок, але й дає можливість використовувати значення функції у творчий спосіб.
 
-{{index "multiplier function"}}
+{{index «multiplier function»}}
 
-With a slight change, we can turn the previous example into a way to create functions that multiply by an arbitrary amount.
+З невеликими змінами ми можемо перетворити попередній приклад на спосіб створення функцій, які множать на довільну кількість.
 
 ```
 function multiplier(factor) {
-  return number => number * factor;
+  return число => число * множник;
 }
 
-let twice = multiplier(2);
+нехай twice = multiplier(2);
 console.log(twice(5));
 // → 10
 ```
 
-{{index [binding, "from parameter"]}}
+{{index [binding, «from parameter»]}}
 
-The explicit `local` binding from the `wrapValue` example isn't really needed since a parameter is itself a local binding.
+Явне `local`-зв'язування з прикладу `wrapValue` насправді не потрібне, оскільки параметр сам по собі є локальним зв'язуванням.
 
-{{index [function, "model of"]}}
+{{index [function, «model of»]}}
 
-Thinking about programs like this takes some practice. A good mental model is to think of function values as containing both the code in their body and the environment in which they are created. When called, the function body sees the environment in which it was created, not the environment in which it is called.
+Щоб думати про такі програми, потрібно трохи потренуватися. Хороша ментальна модель полягає у тому, щоб думати про значення функції як такі, що містять як код у тілі функції, так і середовище, у якому вони створені. Під час виклику тіло функції бачить середовище, у якому її було створено, а не середовище, у якому її викликано.
 
-In the previous example, `multiplier` is called and creates an environment in which its `factor` parameter is bound to 2. The function value it returns, which is stored in `twice`, remembers this environment so that when that is called, it multiplies its argument by 2.
+У попередньому прикладі викликається `multiplier` і створює середовище, в якому його параметр `factor` прив'язується до 2. Значення функції, яке вона повертає, і яке зберігається у `twice`, запам'ятовує це середовище, щоб при наступному виклику помножити свій аргумент на 2.
 
-## Recursion
+## Рекурсія
 
-{{index "power example", "stack overflow", recursion, [function, application]}}
+{{index «power example», «stack overflow», recursion, [function, application]}}
 
-It is perfectly okay for a function to call itself, as long as it doesn't do it so often that it overflows the stack. A function that calls itself is called _recursive_. Recursion allows some functions to be written in a different style. Take, for example, this `power` function, which does the same as the `**` (exponentiation) operator:
+Для функції цілком нормально викликати саму себе, якщо вона не робить це так часто, що переповнює стек. Функція, яка викликає сама себе, називається _рекурсивною_. Рекурсія дозволяє деяким функціям бути написаними в іншому стилі. Візьмемо, наприклад, цю функцію `power`, яка робить те саме, що й оператор `**` (піднесення до степеня):
 
 ```{test: wrap}
 function power(base, exponent) {
   if (exponent == 0) {
-    return 1;
+    повернути 1;
   } else {
     return base * power(base, exponent - 1);
   }
@@ -416,156 +416,156 @@ console.log(power(2, 3));
 // → 8
 ```
 
-{{index loop, readability, mathematics}}
+{{індексний цикл, читабельність, математика}}
 
-This is rather close to the way mathematicians define exponentiation and arguably describes the concept more clearly than the loop we used in [Chapter ?](program_structure). The function calls itself multiple times with ever smaller exponents to achieve the repeated multiplication.
+Це досить близько до того, як математики визначають піднесення до степеня, і, можливо, описує концепцію більш чітко, ніж цикл, який ми використовували у [Глава ?](структура_програми). Функція викликає саму себе декілька разів з дедалі меншими показниками експоненти, щоб досягти повторного множення.
 
-{{index [function, application], efficiency}}
+{{індекс [функція, застосування], ефективність}}
 
-However, this implementation has one problem: in typical JavaScript implementations, it's about three times slower than a version using a `for` loop. Running through a simple loop is generally cheaper than calling a function multiple times.
+Однак ця реалізація має одну проблему: у типових реалізаціях JavaScript вона працює приблизно втричі повільніше, ніж версія з використанням циклу `for`. Виконання простого циклу зазвичай дешевше, ніж багаторазовий виклик функції.
 
-{{index optimization}}
+{Оптимізація індексів
 
-The dilemma of speed versus ((elegance)) is an interesting one. You can see it as a kind of continuum between human-friendliness and machine-friendliness. Almost any program can be made faster by making it bigger and more convoluted. The programmer has to find an appropriate balance.
+Дилема швидкості проти ((елегантності)) є цікавою. Ви можете розглядати її як своєрідний континуум між зручністю для людини та зручністю для машини. Майже будь-яку програму можна зробити швидшою, зробивши її більшою та заплутанішою. Програміст повинен знайти відповідний баланс.
 
-In the case of the `power` function, an inelegant (looping) version is still fairly simple and easy to read. It doesn't make much sense to replace it with a recursive function. Often, though, a program deals with such complex concepts that giving up some efficiency in order to make the program more straightforward is helpful.
+У випадку з функцією `power`, неелегантна (зациклена) версія все ще є досить простою і легкою для читання. Немає сенсу замінювати її рекурсивною функцією. Однак часто програма має справу з такими складними поняттями, що відмова від певної ефективності для того, щоб зробити програму більш простою, є корисною.
 
-{{index profiling}}
+{{Профілювання індексів}}
 
-Worrying about efficiency can be a distraction. It's yet another factor that complicates program design, and when you're doing something that's already difficult, that extra thing to worry about can be paralyzing.
+Турбота про ефективність може відволікати увагу. Це ще один фактор, який ускладнює розробку програми, а коли ви робите щось і без того складне, додаткова турбота про ефективність може паралізувати вас.
 
-{{index "premature optimization"}}
+{{index «передчасна оптимізація»}}
 
-Therefore, you should generally start by writing something that's correct and easy to understand. If you're worried that it's too slow—which it usually isn't since most code simply isn't executed often enough to take any significant amount of time—you can measure afterward and improve it if necessary.
+Тому, як правило, варто починати з написання чогось правильного і зрозумілого. Якщо вас турбує, що це занадто повільно - а зазвичай це не так, оскільки більшість коду просто не виконується достатньо часто, щоб займати значну кількість часу - ви можете виміряти його згодом і покращити, якщо це необхідно.
 
-{{index "branching recursion"}}
+{{index «розгалужена рекурсія»}}
 
-Recursion is not always just an inefficient alternative to looping. Some problems really are easier to solve with recursion than with loops. Most often these are problems that require exploring or processing several "branches", each of which might branch out again into even more branches.
+Рекурсія не завжди є просто неефективною альтернативою циклам. Деякі проблеми дійсно легше розв'язати за допомогою рекурсії, ніж за допомогою циклів. Найчастіше це проблеми, які вимагають дослідження або обробки декількох «гілок», кожна з яких може знову розгалужуватися на ще більше гілок.
 
 {{id recursive_puzzle}}
-{{index recursion, "number puzzle example"}}
+{{index recursion, «приклад числової головоломки»}}
 
-Consider this puzzle: by starting from the number 1 and repeatedly either adding 5 or multiplying by 3, an infinite set of numbers can be produced. How would you write a function that, given a number, tries to find a sequence of such additions and multiplications that produces that number? For example, the number 13 could be reached by first multiplying by 3 and then adding 5 twice, whereas the number 15 cannot be reached at all.
+Розглянемо цю головоломку: починаючи з числа 1 і багаторазово додаючи 5 або множачи на 3, можна отримати нескінченну множину чисел. Як би ви написали функцію, яка за заданим числом намагається знайти послідовність таких додавань і множень, які дають це число? Наприклад, число 13 можна отримати, якщо спочатку помножити на 3, а потім двічі додати 5, тоді як число 15 взагалі неможливо отримати.
 
-Here is a recursive solution:
+Ось рекурсивний розв'язок:
 
 ```
 function findSolution(target) {
   function find(current, history) {
     if (current == target) {
-      return history;
+      повернути історію;
     } else if (current > target) {
-      return null;
+      повернути null;
     } else {
       return find(current + 5, `(${history} + 5)`) ??
              find(current * 3, `(${history} * 3)`);
     }
   }
-  return find(1, "1");
+  return find(1, «1»);
 }
 
 console.log(findSolution(24));
 // → (((1 * 3) + 5) * 3)
 ```
 
-Note that this program doesn't necessarily find the _shortest_ sequence of operations. It is satisfied when it finds any sequence at all.
+Зауважте, що ця програма не обов'язково знаходить _найкоротшу_ послідовність операцій. Вона буде задоволена, якщо знайде будь-яку послідовність.
 
-It's okay if you don't see how this code works right away. Let's work through it since it makes for a great exercise in recursive thinking.
+Нічого страшного, якщо ви не зрозумієте, як працює цей код одразу. Давайте попрацюємо над ним, оскільки це чудова вправа для розвитку рекурсивного мислення.
 
-The inner function `find` does the actual recursing. It takes two ((argument))s: the current number and a string that records how we reached this number. If it finds a solution, it returns a string that shows how to get to the target. If it can find no solution starting from this number, it returns `null`.
+Внутрішня функція `find` виконує власне рекурсію. Вона приймає два ((аргументи)): поточне число і рядок, який записує, як ми дійшли до цього числа. Якщо вона знаходить розв'язок, то повертає рядок, який показує, як дістатися до мети. Якщо не знайдено жодного розв'язку, починаючи з цього числа, повертається `null`.
 
-{{index null, "?? operator", "short-circuit evaluation"}}
+{{індекс null, «?? оператор», «оцінка короткого замикання»}}
 
-To do this, the function performs one of three actions. If the current number is the target number, the current history is a way to reach that target, so it is returned. If the current number is greater than the target, there's no sense in further exploring this branch because both adding and multiplying will only make the number bigger, so it returns `null`. Finally, if we're still below the target number, the function tries both possible paths that start from the current number by calling itself twice, once for addition and once for multiplication. If the first call returns something that is not `null`, it is returned. Otherwise, the second call is returned, regardless of whether it produces a string or `null`.
+Для цього функція виконує одну з трьох дій. Якщо поточне число є цільовим числом, то поточна історія є способом досягнення цієї цілі, тому вона повертається. Якщо поточне число більше за цільове, немає сенсу продовжувати досліджувати цю гілку, оскільки додавання і множення лише збільшить число, тому повертається `null`. Нарешті, якщо ми все ще не досягли цільового числа, функція спробує обидва можливі шляхи, які починаються з поточного числа, викликаючи себе двічі, один раз для додавання і один раз для множення. Якщо перший виклик повертає результат, відмінний від `null`, він повертається. В іншому випадку повертається другий виклик, незалежно від того, що він повертає - рядок чи `null`.
 
-{{index "call stack"}}
+{{index «call stack»}}
 
-To better understand how this function produces the effect we're looking for, let's look at all the calls to `find` that are made when searching for a solution for the number 13:
-
-```{lang: null}
-find(1, "1")
-  find(6, "(1 + 5)")
-    find(11, "((1 + 5) + 5)")
-      find(16, "(((1 + 5) + 5) + 5)")
-        too big
-      find(33, "(((1 + 5) + 5) * 3)")
-        too big
-    find(18, "((1 + 5) * 3)")
-      too big
-  find(3, "(1 * 3)")
-    find(8, "((1 * 3) + 5)")
-      find(13, "(((1 * 3) + 5) + 5)")
-        found!
-```
-
-The indentation indicates the depth of the call stack. The first time `find` is called, the function starts by calling itself to explore the solution that starts with `(1 + 5)`. That call will further recurse to explore _every_ continued solution that yields a number less than or equal to the target number. Since it doesn't find one that hits the target, it returns `null` back to the first call. There the `??` operator causes the call that explores `(1 * 3)` to happen. This search has more luck—its first recursive call, through yet _another_ recursive call, hits upon the target number. That innermost call returns a string, and each of the `??` operators in the intermediate calls passes that string along, ultimately returning the solution.
-
-## Growing functions
-
-{{index [function, definition]}}
-
-There are two more or less natural ways for functions to be introduced into programs.
-
-{{index repetition}}
-
-The first occurs when you find yourself writing similar code multiple times. You'd prefer not to do that, as having more code means more space for mistakes to hide and more material to read for people trying to understand the program. So you take the repeated functionality, find a good name for it, and put it into a function.
-
-The second way is that you find you need some functionality that you haven't written yet and that sounds like it deserves its own function. You start by naming the function, and then write its body. You might even start writing code that uses the function before you actually define the function itself.
-
-{{index [function, naming], [binding, naming]}}
-
-How difficult it is to find a good name for a function is a good indication of how clear a concept it is that you're trying to wrap. Let's go through an example.
-
-{{index "farm example"}}
-
-We want to write a program that prints two numbers: the numbers of cows and chickens on a farm, with the words `Cows` and `Chickens` after them and zeros padded before both numbers so that they are always three digits long:
+Щоб краще зрозуміти, як ця функція дає потрібний нам ефект, давайте подивимося на всі виклики `find`, які здійснюються при пошуку розв'язку для числа 13:
 
 ```{lang: null}
-007 Cows
-011 Chickens
+find(1, «1»)
+  find(6, «(1 + 5)»)
+    find(11, «((1 + 5) + 5)»)
+      find(16, «(((1 + 5) + 5) + 5)»)
+        занадто велике
+      find(33, «(((1 + 5) + 5) * 3)»)
+        занадто велике
+    find(18, «((1 + 5) * 3)»)
+      занадто велике
+  find(3, «(1 * 3)»)
+    find(8, «((1 * 3) + 5)»)
+      find(13, «(((1 * 3) + 5) + 5)»)
+        Знайдено!
 ```
 
-This asks for a function of two arguments—the number of cows and the number of chickens. Let's get coding.
+Відступ вказує на глибину стеку викликів. При першому виклику `find` функція починає з виклику самої себе для пошуку розв'язку, який починається з `(1 + 5)`. Цей виклик буде повторюватися для перебору _кожного_ подальшого розв'язку, який дає число, менше або рівне заданому числу. Оскільки не знайдено жодного розв'язку, який би збігався з заданим, програма повертає `null` назад до першого виклику. Там оператор `??` викликає виклик, який досліджує `(1 * 3)`. Цьому пошуку пощастило більше - його перший рекурсивний виклик, через _ще один_ рекурсивний виклик, натрапляє на цільове число. Цей внутрішній виклик повертає рядок, і кожен з операторів `??` у проміжних викликах передає цей рядок далі, зрештою повертаючи розв'язок.
+
+## Зростаючі функції
+
+{{індекс [функції, визначення]}}
+
+Існує два більш-менш природні способи введення функцій у програми.
+
+{{індекс повторення}}
+
+Перший спосіб виникає, коли ви змушені писати схожий код декілька разів. Ви не хотіли б цього робити, оскільки більша кількість коду означає більше місця для приховування помилок і більше матеріалу для читання людям, які намагаються зрозуміти програму. Тому ви берете повторювану функціональність, знаходите для неї гарну назву і перетворюєте її на функцію.
+
+Другий спосіб - ви виявляєте, що вам потрібна якась функціональність, яку ви ще не написали, і яка звучить так, ніби заслуговує на окрему функцію. Ви починаєте з назви функції, а потім пишете її тіло. Ви можете навіть почати писати код, який використовує функцію, ще до того, як визначите саму функцію.
+
+{{індекс [функція, назва], [зв'язування, назва]}}
+
+Наскільки складно підібрати гарну назву для функції, є гарним показником того, наскільки зрозумілою є концепція, яку ви намагаєтесь обернути. Давайте розглянемо приклад.
+
+{{index «farm example»}}
+
+Ми хочемо написати програму, яка виводить два числа: кількість корів та курей на фермі, зі словами `Cows` та `Chickens` після них та нулями перед обома числами так, щоб вони завжди складалися з трьох цифр:
+
+```{lang: null}
+007 Корови
+011 Кури
+```
+
+Тут запитується функція від двох аргументів - кількості корів та кількості курей. Приступимо до кодування.
 
 ```
 function printFarmInventory(cows, chickens) {
   let cowString = String(cows);
   while (cowString.length < 3) {
-    cowString = "0" + cowString;
+    cowString = «0» + cowString;
   }
-  console.log(`${cowString} Cows`);
-  let chickenString = String(chickens);
+  console.log(`${cowString} Корови`);
+  нехай chickenString = String(кури);
   while (chickenString.length < 3) {
-    chickenString = "0" + chickenString;
+    chickenString = «0» + chickenString;
   }
-  console.log(`${chickenString} Chickens`);
+  console.log(`${chickenString} Кури`);
 }
 printFarmInventory(7, 11);
 ```
 
-{{index ["length property", "for string"], "while loop"}}
+{{index [«властивість length», «for string»], «цикл while»}}
 
-Writing `.length` after a string expression will give us the length of that string. Thus, the `while` loops keep adding zeros in front of the number strings until they are at least three characters long.
+Написання `.length` після рядкового виразу дасть нам довжину цього рядка. Таким чином, цикл `while` продовжує додавати нулі перед числовими рядками до тих пір, поки вони не стануть довжиною не менше трьох символів.
 
-Mission accomplished! But just as we are about to send the farmer the code (along with a hefty invoice), she calls and tells us she's also started keeping pigs, and couldn't we please extend the software to also print pigs?
+Місія виконана! Але коли ми вже збиралися відправити фермеру код (разом з великим рахунком), він зателефонував і сказав, що також почав розводити свиней, і чи не могли б ми розширити програму, щоб вона могла друкувати і свиней?
 
-{{index "copy-paste programming"}}
+{{index «copy-paste programming»}}
 
-We sure can. But just as we're in the process of copying and pasting those four lines one more time, we stop and reconsider. There has to be a better way. Here's a first attempt:
+Звичайно, можемо. Але в процесі копіювання та вставки цих чотирьох рядків ми зупиняємось і передумуємо. Повинен бути кращий спосіб. Ось перша спроба:
 
 ```
 function printZeroPaddedWithLabel(number, label) {
-  let numberString = String(number);
+  нехай numberString = String(number);
   while (numberString.length < 3) {
-    numberString = "0" + numberString;
+    numberString = «0» + numberString;
   }
   console.log(`${numberString} ${label}`);
 }
 
 function printFarmInventory(cows, chickens, pigs) {
-  printZeroPaddedWithLabel(cows, "Cows");
-  printZeroPaddedWithLabel(chickens, "Chickens");
-  printZeroPaddedWithLabel(pigs, "Pigs");
+  printZeroPaddedWithLabel(cows, «Корови»);
+  printZeroPaddedWithLabel(chickens, «Кури»)
+  printZeroPaddedWithLabel(pigs, «Свині»);
 }
 
 printFarmInventory(7, 11, 3);
@@ -573,94 +573,94 @@ printFarmInventory(7, 11, 3);
 
 {{index [function, naming]}}
 
-It works! But that name, `printZeroPaddedWithLabel`, is a little awkward. It conflates three things—printing, zero-padding, and adding a label—into a single function.
+Працює! Але ця назва, `printZeroPaddedWithLabel`, трохи незручна. Вона об'єднує три речі - друк, додавання нульового відступу і додавання мітки - в одну функцію.
 
-{{index "zeroPad function"}}
+{{index «функція zeroPad»}}
 
-Instead of lifting out the repeated part of our program wholesale, let's try to pick out a single _concept_:
+Замість того, щоб масово витягувати повторювану частину нашої програми, давайте спробуємо виокремити одну _концепцію_:
 
 ```
 function zeroPad(number, width) {
   let string = String(number);
   while (string.length < width) {
-    string = "0" + string;
+    string = «0» + string;
   }
   return string;
 }
 
 function printFarmInventory(cows, chickens, pigs) {
-  console.log(`${zeroPad(cows, 3)} Cows`);
-  console.log(`${zeroPad(chickens, 3)} Chickens`);
-  console.log(`${zeroPad(pigs, 3)} Pigs`);
+  console.log(`${zeroPad(cows, 3)} Корови`);
+  console.log(`${zeroPad(chickens, 3)} Кури`);
+  console.log(`${zeroPad(pigs, 3)} Свині`);
 }
 
 printFarmInventory(7, 16, 3);
 ```
 
-{{index readability, "pure function"}}
+{{index readability, «pure function»}}
 
-A function with a nice, obvious name like `zeroPad` makes it easier for someone who reads the code to figure out what it does. Such a function is also useful in more situations than just this specific program. For example, you could use it to help print nicely aligned tables of numbers.
+Функція з гарною, очевидною назвою на кшталт `zeroPad` полегшує розуміння того, що вона робить, тому, хто читає код. Така функція також корисна у більшій кількості ситуацій, ніж просто у цій конкретній програмі. Наприклад, ви можете використовувати її для друку гарно вирівняних таблиць чисел.
 
-{{index [interface, design]}}
+{{index [інтерфейс, дизайн]}}
 
-How smart and versatile _should_ our function be? We could write anything, from a terribly simple function that can only pad a number to be three characters wide to a complicated generalized number-formatting system that handles fractional numbers, negative numbers, alignment of decimal dots, padding with different characters, and so on.
+Наскільки розумною та універсальною _повинна_ бути наша функція? Ми можемо написати що завгодно, від жахливо простої функції, яка може вирівняти число до трьох символів, до складної узагальненої системи форматування чисел, яка обробляє дробові числа, від'ємні числа, вирівнювання десяткових крапок, вирівнювання різними символами і так далі.
 
-A useful principle is to refrain from adding cleverness unless you are absolutely sure you're going to need it. It can be tempting to write general "((framework))s" for every bit of functionality you come across. Resist that urge. You won't get any real work done—you'll be too busy writing code that you never use.
+Корисний принцип полягає в тому, щоб утримуватися від додавання хитрощів, якщо ви не впевнені, що вони вам знадобляться. Може виникнути спокуса писати загальні «((фреймворк))s» для кожного біта функціональності, з яким ви стикаєтесь. Не піддавайтеся цьому бажанню. Ви не зробите жодної реальної роботи - ви будете надто зайняті написанням коду, який ніколи не будете використовувати.
 
 {{id pure}}
-## Functions and side effects
+## Функції та побічні ефекти
 
-{{index "side effect", "pure function", [function, purity]}}
+{{index «side effect», «pure function», [function, purity]}}
 
-Functions can be roughly divided into those that are called for their side effects and those that are called for their return value (though it is also possible to both have side effects and return a value).
+Функції можна умовно поділити на ті, що викликаються для отримання побічних ефектів, і ті, що викликаються для отримання значення, яке вони повертають (хоча можлива ситуація, коли функція і має побічні ефекти, і повертає значення).
 
-{{index reuse}}
+{{повторне використання індексів}}
 
-The first helper function in the ((farm example)), `printZeroPaddedWithLabel`, is called for its side effect: it prints a line. The second version, `zeroPad`, is called for its return value. It is no coincidence that the second is useful in more situations than the first. Functions that create values are easier to combine in new ways than functions that directly perform side effects.
+Першу допоміжну функцію у прикладі ((ферма)), `printZeroPaddedWithLabel`, викликано за її побічним ефектом: вона виводить рядок. Друга версія, `zeroPad`, викликається за значенням, що повертається. Не випадково другий варіант корисний у більшій кількості ситуацій, ніж перший. Функції, які створюють значення, легше комбінувати у нові способи, ніж функції, які безпосередньо виконують побічні ефекти.
 
-{{index substitution}}
+{{підстановка індексу}}
 
-A _pure_ function is a specific kind of value-producing function that not only has no side effects but also doesn't rely on side effects from other code—for example, it doesn't read global bindings whose value might change. A pure function has the pleasant property that, when called with the same arguments, it always produces the same value (and doesn't do anything else). A call to such a function can be substituted by its return value without changing the meaning of the code. When you are not sure that a pure function is working correctly, you can test it by simply calling it and know that if it works in that context, it will work in any context. Nonpure functions tend to require more scaffolding to test.
+Чиста функція - це особливий тип функції, що створює значення, яка не тільки не має побічних ефектів, але й не залежить від побічних ефектів іншого коду - наприклад, вона не читає глобальні прив'язки, значення яких може змінитися. Чиста функція має приємну властивість - при виклику з тими самими аргументами вона завжди видає те саме значення (і не робить нічого іншого). Виклик такої функції можна замінити її значенням, що повертається, без зміни сенсу коду. Якщо ви не впевнені, що чиста функція працює правильно, ви можете перевірити її, просто викликавши її, і знати, що якщо вона працює в цьому контексті, вона буде працювати в будь-якому іншому контексті. Нечисті функції, як правило, вимагають більше риштувань для тестування.
 
-{{index optimization, "console.log"}}
+{{index optimization, «console.log»}}
 
-Still, there's no need to feel bad when writing functions that are not pure. Side effects are often useful. There's no way to write a pure version of `console.log`, for example, and `console.log` is good to have. Some operations are also easier to express in an efficient way when we use side effects.
+Тим не менш, не потрібно відчувати себе погано, коли ви пишете функції, які не є чистими. Побічні ефекти часто бувають корисними. Наприклад, немає можливості написати чисту версію `console.log`, а `console.log` добре мати. Деякі операції також легше виразити ефективним способом, коли ми використовуємо побічні ефекти.
 
-## Summary
+## Підсумок
 
-This chapter taught you how to write your own functions. The `function` keyword, when used as an expression, can create a function value. When used as a statement, it can be used to declare a binding and give it a function as its value. Arrow functions are yet another way to create functions.
+У цій главі ви навчилися писати власні функції. Ключове слово `function`, коли використовується як вираз, може створювати значення функції. Якщо воно використовується як оператор, то може бути використане для оголошення зв'язування і надання йому функції як значення. Функції зі стрілками - це ще один спосіб створення функцій.
 
 ```
-// Define f to hold a function value
+// Описати f для зберігання значення функції
 const f = function(a) {
   console.log(a + 2);
 };
 
-// Declare g to be a function
+// Оголосити функцію g
 function g(a, b) {
   return a * b * 3.5;
 }
 
-// A less verbose function value
+// Менш багатослівне значення функції
 let h = a => a % 3;
 ```
 
-A key part of understanding functions is understanding scopes. Each block creates a new scope. Parameters and bindings declared in a given scope are local and not visible from the outside. Bindings declared with `var` behave differently—they end up in the nearest function scope or the global scope.
+Ключовою частиною розуміння функцій є розуміння областей видимості. Кожен блок створює нову область видимості. Параметри та прив'язки, оголошені в даній області видимості, є локальними і невидимими ззовні. Зв'язки, оголошені з `var`, поводяться інакше - вони потрапляють у найближчу область видимості функції або у глобальну область видимості.
 
-Separating the tasks your program performs into different functions is helpful. You won't have to repeat yourself as much, and functions can help organize a program by grouping code into pieces that do specific things.
+Розділення завдань, які виконує ваша програма, на різні функції є корисним. Вам не доведеться багато повторюватися, а функції допоможуть організувати програму, групуючи код у частини, які виконують певні дії.
 
-## Exercises
+## Вправи
 
-### Minimum
+### Мінімум
 
-{{index "Math object", "minimum (exercise)", "Math.min function", minimum}}
+{{index «Math object», «minimum (exercise)», «Math.min function», minimum}}
 
-The [previous chapter](program_structure#return_values) introduced the standard function `Math.min` that returns its smallest argument. We can write a function like that ourselves now. Define the function `min` that takes two arguments and returns their minimum.
+У [попередньому розділі] (структура_програми#повернення_значень) було описано стандартну функцію `Math.min`, яка повертає найменший аргумент. Тепер ми можемо написати таку функцію самостійно. Опишемо функцію `min`, яка отримує два аргументи і повертає їх мінімальне значення.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
 console.log(min(0, 10));
 // → 0
@@ -671,38 +671,38 @@ if}}
 
 {{hint
 
-{{index "minimum (exercise)"}}
+{{index «minimum (exercise)»}}
 
-If you have trouble putting braces and parentheses in the right place to get a valid function definition, start by copying one of the examples in this chapter and modifying it.
+Якщо у вас виникають труднощі з розстановкою дужок у потрібних місцях для отримання правильного визначення функції, почніть з копіювання одного з прикладів у цій главі і змініть його.
 
-{{index "return keyword"}}
+{{index «ключове слово повернення»}}
 
-A function may contain multiple `return` statements.
+Функція може містити декілька інструкцій `return`.
 
-hint}}
+підказка}}
 
-### Recursion
+### Рекурсія
 
-{{index recursion, "isEven (exercise)", "even number"}}
+{{index recursion, «isEven (вправа)», «парне число»}}
 
-We've seen that we can use `%` (the remainder operator) to test whether a number is even or odd by using `% 2` to see whether it's divisible by two. Here's another way to define whether a positive whole number is even or odd:
+Ми бачили, що можемо використовувати `%` (оператор залишку) для перевірки парності чи непарності числа, використовуючи `% 2` для перевірки, чи ділиться воно на два. Ось ще один спосіб визначити парність або непарність додатного цілого числа:
 
-- Zero is even.
+- Нуль - парне.
 
-- One is odd.
+- Одиниця - непарне.
 
-- For any other number _N_, its evenness is the same as _N_ - 2.
+- Для будь-якого іншого числа _N_, його парність дорівнює _N_ - 2.
 
-Define a recursive function `isEven` corresponding to this description. The function should accept a single parameter (a positive, whole number) and return a Boolean.
+Визначте рекурсивну функцію `isEven`, яка відповідає цьому опису. Функція повинна приймати один параметр (додатне ціле число) і повертати булеве значення.
 
-{{index "stack overflow"}}
+{{index «stack overflow»}}
 
-Test it on 50 and 75. See how it behaves on -1. Why? Can you think of a way to fix this?
+Протестуйте її на 50 і 75. Подивіться, як вона поводиться на -1. Чому? Чи можете ви придумати, як це виправити?
 
-{{if interactive
+{{if інтерактивний
 
-```{test: no}
-// Your code here.
+```{test: no}}
+// Ваш код тут.
 
 console.log(isEven(50));
 // → true
@@ -716,34 +716,34 @@ if}}
 
 {{hint
 
-{{index "isEven (exercise)", ["if keyword", chaining], recursion}}
+{{index «isEven (вправа)», [«ключове слово if», ланцюжок], рекурсія}}
 
-Your function will likely look somewhat similar to the inner `find` function in the recursive `findSolution` [example](functions#recursive_puzzle) in this chapter, with an `if`/`else if`/`else` chain that tests which of the three cases applies. The final `else`, corresponding to the third case, makes the recursive call. Each of the branches should contain a `return` statement or in some other way arrange for a specific value to be returned.
+Ваша функція, ймовірно, буде дещо схожа на внутрішню функцію `find` у рекурсивному прикладі `findSolution` [example](functions#recursive_puzzle) у цій главі, з ланцюжком `if`/`else if`/`else`, який перевіряє, який з трьох випадків застосовний. Останній `else`, що відповідає третьому випадку, виконує рекурсивний виклик. Кожна з гілок повинна містити інструкцію `return` або іншим чином організувати повернення певного значення.
 
-{{index "stack overflow"}}
+{{index «stack overflow»}}
 
-When given a negative number, the function will recurse again and again, passing itself an ever more negative number, thus getting further and further away from returning a result. It will eventually run out of stack space and abort.
+При отриманні від'ємного числа функція рекурсивно виконуватиметься знову і знову, передаючи собі все більш від'ємне число, таким чином віддаляючись все далі і далі від повернення результату. Врешті-решт вона вичерпає місце у стеку і перерветься.
 
-hint}}
+підказка}}
 
-### Bean counting
+### Підрахунок бобів
 
-{{index "bean counting (exercise)", [string, indexing], "zero-based counting", ["length property", "for string"]}}
+{{index «підрахунок бобів (вправа)», [рядок, індексація], «підрахунок з нуля», [«властивість довжини», «для рядка»]}}
 
-You can get the *N*th character, or letter, from a string by writing `[N]` after the string (for example, `string[2]`). The resulting value will be a string containing only one character (for example, `"b"`). The first character has position 0, which causes the last one to be found at position `string.length - 1`. In other words, a two-character string has length 2, and its characters have positions 0 and 1.
+Ви можете отримати *N*-йсимвол або літеру з рядка, дописавши `[N]` після рядка (наприклад, `string[2]`). Результатом буде рядок, що містить лише один символ (наприклад, `«b»`). Перший символ має позицію 0, що призводить до того, що останній символ буде знайдено у позиції `string.length - 1`. Іншими словами, двосимвольний рядок має довжину 2, а його символи мають позиції 0 і 1.
 
-Write a function called `countBs` that takes a string as its only argument and returns a number that indicates how many uppercase B characters there are in the string.
+Напишіть функцію з назвою `countBs`, яка отримує рядок як єдиний аргумент і повертає число, яке вказує на кількість символів верхнього регістру B у рядку.
 
-Next, write a function called `countChar` that behaves like `countBs`, except it takes a second argument that indicates the character that is to be counted (rather than counting only uppercase B characters). Rewrite `countBs` to make use of this new function.
+Далі напишіть функцію `countChar`, яка працює подібно до `countBs`, за винятком того, що вона отримує другий аргумент, який вказує символ, який потрібно порахувати (замість того, щоб рахувати тільки великі літери B). Перепишіть `countBs`, щоб скористатися цією новою функцією.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-// Your code here.
+// Ваш код тут.
 
-console.log(countBs("BOB"));
+console.log(countBs(«BOB»));
 // → 2
-console.log(countChar("kakkerlak", "k"));
+console.log(countChar(«kakkerlak», «k»));
 // → 4
 ```
 
@@ -751,12 +751,12 @@ if}}
 
 {{hint
 
-{{index "bean counting (exercise)", ["length property", "for string"], "counter variable"}}
+{{index «підрахунок бобів (вправа)», [«властивість довжини», «для рядка»], «змінна-лічильник»}}
 
-Your function will need a ((loop)) that looks at every character in the string. It can run an index from zero to one below its length (`< string.length`). If the character at the current position is the same as the one the function is looking for, it adds 1 to a counter variable. Once the loop has finished, the counter can be returned.
+Вашій функції знадобиться ((цикл)), який переглядає кожен символ у рядку. Вона може перебирати індекс від нуля до одиниці нижче довжини рядка (`< string.length`). Якщо символ у поточній позиції збігається з тим, який шукає функція, вона додає 1 до змінної-лічильника. Після завершення циклу лічильник можна повернути.
 
-{{index "local binding"}}
+{{index «local binding»}}
 
-Take care to make all the bindings used in the function _local_ to the function by properly declaring them with the `let` or `const` keyword.
+Переконайтеся, що всі прив'язки, які використовуються у функції, є _локальними_ для функції, правильно оголосивши їх за допомогою ключового слова `let` або `const`.
 
-hint}}
+підказка}}

@@ -1,247 +1,247 @@
-{{meta {load_files: ["code/chapter/08_error.js"]}}}
+{{meta {load_files: [«code/chapter/08_error.js»]}}}
 
-# Bugs and Errors
+# Баги та помилки
 
-{{quote {author: "Brian Kernighan and P.J. Plauger", title: "The Elements of Programming Style", chapter: true}
+{{quote {author: «Brian Kernighan and P.J. Plauger», title: «The Elements of Programming Style», chapter: true}} {{quote {author: “Brian Kernighan and J.J. Pluger”, title: “The Elements of Programming Style”, chapter: true
 
-Debugging is twice as hard as writing the code in the first place. Therefore, if you write the code as cleverly as possible, you are, by definition, not smart enough to debug it.
+Налагоджувати вдвічі важче, ніж писати код. Тому, якщо ви пишете код якомога розумніше, ви, за визначенням, недостатньо розумні, щоб його налагодити.
 
 quote}}
 
-{{figure {url: "img/chapter_picture_8.jpg", alt: "Illustration showing various insects and a centipede", chapter: framed}}}
+{{figure {url: «img/chapter_picture_8.jpg», alt: «Ілюстрація із зображенням різних комах та сороконіжки», image: “Обрамлення” }}}
 
-{{index "Kernighan, Brian", "Plauger, P.J.", debugging, "error handling"}}
+{{індекс «Kernighan, Brian», «Plauger, P.J.», налагодження, «обробка помилок»}}
 
-Flaws in computer programs are usually called _((bug))s_. It makes programmers feel good to imagine them as little things that just happen to crawl into our work. In reality, of course, we put them there ourselves.
+Недоліки у комп'ютерних програмах зазвичай називають _((вадами))s_. Програмістам приємно уявляти їх як дрібнички, що випадково потрапляють у нашу роботу. Насправді, звісно, ми самі їх туди вносимо.
 
-If a program is crystallized thought, we can roughly categorize bugs into those caused by the thoughts being confused and those caused by mistakes introduced while converting a thought to code. The former type is generally harder to diagnose and fix than the latter.
+Якщо програма - це викристалізована думка, ми можемо грубо класифікувати помилки на ті, що викликані плутаниною в думках, і ті, що викликані помилками, допущеними при перетворенні думки в код. Перший тип помилок, як правило, важче діагностувати та виправити, ніж другий.
 
-## Language
+## Мова
 
-{{index parsing, analysis}}
+{Синтаксичний розбір, аналіз
 
-Many mistakes could be pointed out to us automatically by the computer if it knew enough about what we're trying to do. But here, JavaScript's looseness is a hindrance. Its concept of bindings and properties is vague enough that it will rarely catch ((typo))s before actually running the program. Even then, it allows you to do some clearly nonsensical things without complaint, such as computing `true * "monkey"`.
+На багато помилок комп'ютер міг би вказати нам автоматично, якби знав достатньо про те, що ми намагаємося зробити. Але тут на заваді стає нечіткість JavaScript. Його концепція прив'язок і властивостей досить розпливчаста, тому він рідко помічає помилки до того, як програма буде запущена. Але навіть тоді вона дозволяє без нарікань робити деякі явно безглузді речі, наприклад, обчислювати `true * «мавпа»`.
 
-{{index [syntax, error], [property, access]}}
+{{індекс [синтаксис, помилка], [властивість, доступ]}}
 
-There are some things that JavaScript does complain about. Writing a program that does not follow the language's ((grammar)) will immediately make the computer complain. Other things, such as calling something that's not a function or looking up a property on an ((undefined)) value, will cause an error to be reported when the program tries to perform the action.
+Є речі, на які JavaScript скаржиться. Написання програми, яка не дотримується граматики мови, негайно викличе незадоволення комп'ютера. Інші речі, такі як виклик чогось, що не є функцією, або пошук властивості за значенням ((невизначеним)), призведуть до повідомлення про помилку, коли програма спробує виконати дію.
 
-{{index NaN, error}}
+{{індекс NaN, помилка}}
 
-Often, however, your nonsense computation will merely produce `NaN` (not a number) or an undefined value, while the program happily continues, convinced that it's doing something meaningful. The mistake will manifest itself only later, after the bogus value has traveled through several functions. It might not trigger an error at all, but silently cause the program's output to be wrong. Finding the source of such problems can be difficult.
+Однак часто ваші безглузді обчислення просто видають `NaN` (не число) або невизначене значення, а програма щасливо продовжує роботу, переконана, що вона робить щось значуще. Помилка проявиться лише пізніше, після того, як фальшиве значення пройде через кілька функцій. Воно може взагалі не викликати помилку, але непомітно призвести до того, що висновок програми буде хибним. Знайти джерело таких проблем може бути складно.
 
-The process of finding mistakes—bugs—in programs is called _((debugging))_.
+Процес пошуку помилок-багів у програмах називається _((налагодженням))_.
 
-## Strict mode
+## Суворий режим
 
-{{index "strict mode", [syntax, error], function}}
+{{index «строгий режим», [синтаксис, помилка], функція}}
 
-{{indexsee "use strict", "strict mode"}}
+{{indexsee «use strict», «strict mode»}}
 
-JavaScript can be made a _little_ stricter by enabling _strict mode_. This can done by putting the string `"use strict"` at the top of a file or a function body. Here's an example:
+JavaScript можна зробити _трохи_ суворішим, увімкнувши _суворий режим_. Це можна зробити, додавши рядок `«use strict»` на початку файлу або тіла функції. Ось приклад:
 
-```{test: "error \"ReferenceError: counter is not defined\""}
+```{test: «error \«ReferenceError: лічильник не визначено\»"}
 function canYouSpotTheProblem() {
-  "use strict";
+  «use strict»;
   for (counter = 0; counter < 10; counter++) {
-    console.log("Happy happy");
+    console.log(«Happy happy»);
   }
 }
 
 canYouSpotTheProblem();
-// → ReferenceError: counter is not defined
+// → ReferenceError: counter не визначено
 ```
 
-{{index ECMAScript, compatibility}}
+{{індекс ECMAScript, сумісність}}
 
-Code inside classes and modules (which we will discuss in [Chapter ?](modules)) is automatically strict. The old nonstrict behavior still exists only because some old code might depend on it, and the language designers work hard to avoid breaking any existing programs.
+Код всередині класів та модулів (про які ми поговоримо у [Розділ ?](модулі)) автоматично стає строгим. Стара нестрога поведінка все ще існує лише тому, що від неї може залежати деякий старий код, а розробники мови докладають усіх зусиль, щоб не порушити роботу існуючих програм.
 
-{{index "let keyword", [binding, global]}}
+{{index «ключове слово let», [binding, global]}}
 
-Normally, when you forget to put `let` in front of your binding, as with `counter` in the example, JavaScript quietly creates a global binding and uses that. In strict mode, an ((error)) is reported instead. This is very helpful. It should be noted, though, that this doesn't work when the binding in question already exists somewhere in scope. In that case, the loop will still quietly overwrite the value of the binding.
+Зазвичай, коли ви забуваєте поставити `let` перед прив'язкою, як у випадку з `counter` у прикладі, JavaScript спокійно створює глобальну прив'язку і використовує її. У строгому режимі замість цього буде повідомлено про ((помилку)). Це дуже корисно. Однак слід зазначити, що це не працює, коли зв'язування, про яке йде мова, вже існує десь в області видимості. У такому випадку цикл все одно спокійно перезапише значення прив'язки.
 
-{{index "this binding", "global object", undefined, "strict mode"}}
+{{index «this binding», «global object», undefined, «strict mode»}}
 
-Another change in strict mode is that the `this` binding holds the value `undefined` in functions that are not called as ((method))s. When making such a call outside of strict mode, `this` refers to the global scope object, which is an object whose properties are the global bindings. So if you accidentally call a method or constructor incorrectly in strict mode, JavaScript will produce an error as soon as it tries to read something from `this`, rather than happily writing to the global scope.
+Ще одна зміна у строгому режимі полягає в тому, що прив'язка `this` зберігає значення `undefined` у функціях, які не викликаються як ((метод))s. При такому виклику поза строгим режимом, `this` посилається на об'єкт глобальної області видимості, тобто об'єкт, властивостями якого є глобальні зв'язки. Тому, якщо ви випадково викликаєте метод або конструктор некоректно в строгому режимі, JavaScript видасть помилку, як тільки спробує щось прочитати з `this`, замість того, щоб радісно записати в глобальну область видимості.
 
-For example, consider the following code, which calls a ((constructor)) function without the `new` keyword so that its `this` will _not_ refer to a newly constructed object:
+Наприклад, розглянемо наступний код, який викликає функцію ((конструктор)) без ключового слова `new`, так що її `this` буде _не_ посилатися на новостворений об'єкт:
 
 ```
 function Person(name) { this.name = name; }
-let ferdinand = Person("Ferdinand"); // oops
+let ferdinand = Person(«Ferdinand»); // oops
 console.log(name);
-// → Ferdinand
+// → Фердинанд
 ```
 
-{{index error}}
+{{індексна помилка}}
 
-The bogus call to `Person` succeeded, but returned an undefined value and created the global binding `name`. In strict mode, the result is different.
+Фіктивний виклик `Person` пройшов успішно, але повернув невизначене значення і створив глобальну прив'язку `name`. У строгому режимі результат буде іншим.
 
-```{test: "error \"TypeError: Cannot set properties of undefined (setting 'name')\""}
-"use strict";
+```{test: «error \"TypeError: Cannot set properties of undefined (setting 'name')\«»}
+«use strict»;
 function Person(name) { this.name = name; }
-let ferdinand = Person("Ferdinand"); // forgot new
-// → TypeError: Cannot set property 'name' of undefined
+let ferdinand = Person(«Ferdinand»); // забули new
+// → TypeError: Неможливо встановити властивість 'name' невизначеної
 ```
 
-We are immediately told that something is wrong. This is helpful.
+Це одразу говорить нам про те, що щось не так. Це корисно.
 
-Fortunately, constructors created with the `class` notation will always complain if they are called without `new`, making this less of a problem even in nonstrict mode.
+На щастя, конструктори, створені у нотації `class`, завжди будуть скаржитися, якщо їх викликати без `new`, що робить це меншою проблемою навіть у нестрогому режимі.
 
-{{index parameter, [binding, naming], "with statement"}}
+{{параметр індексу, [зв'язування, іменування], «з оператором»}}
 
-Strict mode does a few more things. It disallows giving a function multiple parameters with the same name and removes certain problematic language features entirely (such as the `with` statement, which is so wrong it is not further discussed in this book).
+Суворий режим робить ще декілька речей. Він забороняє передавати функції декілька параметрів з однаковими іменами і повністю усуває деякі проблемні особливості мови (наприклад, інструкцію `with`, яка є настільки неправильною, що не обговорюється далі у цій книзі).
 
-{{index debugging}}
+{Налагодження індексів
 
-In short, putting `"use strict"` at the top of your program rarely hurts and might help you spot a problem.
+Коротше кажучи, розміщення ``використання strict`` на початку вашої програми рідко зашкодить і може допомогти вам виявити проблему.
 
-## Types
+## Типи
 
-Some languages want to know the types of all your bindings and expressions before even running a program. They will tell you right away when a type is used in an inconsistent way. JavaScript considers types only when actually running the program, and even there often tries to implicitly convert values to the type it expects, so it's not much help.
+Деякі мови хочуть знати типи всіх ваших прив'язок і виразів ще до запуску програми. Вони одразу скажуть вам, коли тип використовується неузгоджено. JavaScript враховує типи лише під час виконання програми, і навіть там часто намагається неявно перетворити значення до очікуваного типу, тому це не дуже допомагає.
 
-Still, types provide a useful framework for talking about programs. A lot of mistakes come from being confused about the kind of value that goes into or comes out of a function. If you have that information written down, you're less likely to get confused.
+Тим не менш, типи забезпечують корисну основу для розмови про програми. Багато помилок відбувається через плутанину з типом значення, яке надходить у функцію або виходить з неї. Якщо ви запишете цю інформацію, ви з меншою ймовірністю заплутаєтесь.
 
-You could add a comment like the following before the `findRoute` function from the previous chapter to describe its type:
+Ви можете додати такий коментар перед функцією `findRoute` з попередньої глави, щоб описати її тип:
 
 ```
-// (graph: Object, from: string, to: string) => string[]
+// (graph: Об'єкт, from: рядок, to: рядок) => рядок[]
 function findRoute(graph, from, to) {
   // ...
 }
 ```
 
-There are a number of different conventions for annotating JavaScript programs with types.
+Існує ряд різних угод для коментування JavaScript-програм за допомогою типів.
 
-One thing about types is that they need to introduce their own complexity to be able to describe enough code to be useful. What do you think would be the type of the `randomPick` function that returns a random element from an array? You'd need to introduce a _((type variable))_, _T_, which can stand in for any type, so that you can give `randomPick` a type like `(T[]) → T` (function from an array of *T*s to a *T*).
+Одна з особливостей типів полягає в тому, що вони повинні створювати власну складність, щоб мати можливість описати достатньо коду, щоб бути корисними. Як ви думаєте, який тип буде у функції `randomPick`, яка повертає випадковий елемент з масиву? Вам потрібно ввести _((змінну типу))_, _T_, яка може замінити будь-який тип, щоб ви могли надати `randomPick` тип типу `(T[]) → T` (функція від масиву *T*s до *T*).
 
-{{index "type checking", TypeScript}}
+{{індекс «перевірка типу», TypeScript}}
 
-{{id typing}}
+{{id «типізація»}}
 
-When the types of a program are known, it is possible for the computer to _check_ them for you, pointing out mistakes before the program is run. There are several JavaScript dialects that add types to the language and check them. The most popular one is called [TypeScript](https://www.typescriptlang.org/). If you are interested in adding more rigor to your programs, I recommend you give it a try.
+Коли типи програми відомі, комп'ютер може _перевірити_ їх за вас, вказуючи на помилки ще до запуску програми на виконання. Існує декілька діалектів JavaScript, які додають типи до мови та перевіряють їх. Найпопулярніший з них називається [TypeScript] (https://www.typescriptlang.org/). Якщо ви зацікавлені в тому, щоб додати більше строгості до ваших програм, я рекомендую вам спробувати його.
 
-In this book, we will continue using raw, dangerous, untyped JavaScript code.
+У цій книзі ми продовжимо використовувати сирий, небезпечний, нетипізований JavaScript код.
 
-## Testing
+## Тестування
 
-{{index "test suite", "run-time error", automation, testing}}
+{{index «test suite», «run-time error», automation, testing}}
 
-If the language is not going to do much to help us find mistakes, we'll have to find them the hard way: by running the program and seeing whether it does the right thing.
+Якщо мова не допоможе нам знайти помилки, доведеться шукати їх важким шляхом: запускати програму і дивитися, чи працює вона правильно.
 
-Doing this by hand, again and again, is a really bad idea. Not only is it annoying but it also tends to be ineffective, since it takes too much time to exhaustively test everything every time you make a change.
+Робити це вручну, знову і знову, дуже погана ідея. Це не тільки дратує, але й, як правило, неефективно, оскільки потрібно занадто багато часу, щоб вичерпно протестувати все щоразу, коли ви вносите зміни.
 
-Computers are good at repetitive tasks, and testing is the ideal repetitive task. Automated testing is the process of writing a program that tests another program. Writing tests is a bit more work than testing manually, but once you've done it, you gain a kind of superpower: it takes you only a few seconds to verify that your program still behaves properly in all the situations you wrote tests for. When you break something, you'll immediately notice rather than randomly running into it at some later time.
+Комп'ютери добре справляються з повторюваними завданнями, а тестування - ідеальне повторюване завдання. Автоматизоване тестування - це процес написання програми, яка тестує іншу програму. Написання тестів - це трохи більше роботи, ніж тестування вручну, але коли ви це зробите, ви отримаєте своєрідну суперсилу: вам знадобиться лише кілька секунд, щоб перевірити, що ваша програма все ще поводиться належним чином у всіх ситуаціях, для яких ви написали тести. Якщо ви щось зламаєте, ви одразу це помітите, а не випадково натрапите на це пізніше.
 
-{{index "toUpperCase method"}}
+{{index «toUpperCase method»}}
 
-Tests usually take the form of little labeled programs that verify some aspect of your code. For example, a set of tests for the (standard, probably already tested by someone else) `toUpperCase` method might look like this:
+Тести зазвичай мають вигляд невеликих позначених програм, які перевіряють певний аспект вашого коду. Наприклад, набір тестів для (стандартного, можливо, вже протестованого кимось) методу `toUpperCase` може мати такий вигляд:
 
 ```
 function test(label, body) {
   if (!body()) console.log(`Failed: ${label}`);
 }
 
-test("convert Latin text to uppercase", () => {
-  return "hello".toUpperCase() == "HELLO";
+test(«перетворити латинський текст у верхній регістр», () => { })
+  return «hello».toUpperCase() == «HELLO»;
 });
-test("convert Greek text to uppercase", () => {
-  return "Χαίρετε".toUpperCase() == "ΧΑΊΡΕΤΕ";
+test(«перетворити грецький текст у верхній регістр», () => {
+  return «Χαίρετε».toUpperCase() == «ΧΑΊΡΕΤΕ»;
 });
-test("don't convert case-less characters", () => {
-  return "مرحبا".toUpperCase() == "مرحبا";
+test(«не конвертувати символи без регістру», () => {}); }); test(«не конвертувати символи без регістру», () => {
+  return «مرحبا».toUpperCase() == «مرحبا»;
 });
 ```
 
-{{index "domain-specific language"}}
+{{index «мова домену»}}
 
-Writing tests like this tends to produce rather repetitive, awkward code. Fortunately, there exist pieces of software that help you build and run collections of tests (_((test suites))_) by providing a language (in the form of functions and methods) suited to expressing tests and by outputting informative information when a test fails. These are usually called _((test runners))_.
+Написання подібних тестів призводить до появи досить повторюваного, незручного коду. На щастя, існують програми, які допомагають створювати і запускати набори тестів (_((набори тестів))_), надаючи мову (у вигляді функцій і методів), придатну для вираження тестів, і виводячи інформативну інформацію, коли тест завершується невдачею. Зазвичай вони називаються _((тестові бігуни))_.
 
-{{index "persistent data structure"}}
+{{index «persistent data structure»}}
 
-Some code is easier to test than other code. Generally, the more external objects that the code interacts with, the harder it is to set up the context in which to test it. The style of programming shown in the [previous chapter](robot), which uses self-contained persistent values rather than changing objects, tends to be easy to test.
+Деякий код легше тестувати, ніж інший. Як правило, чим більше зовнішніх об'єктів взаємодіє з кодом, тим складніше налаштувати контекст для його тестування. Стиль програмування, показаний у [попередній главі](robot), який використовує самодостатні постійні значення, а не об'єкти, що змінюються, як правило, легко тестувати.
 
-## Debugging
+## Налагодження
 
-{{index debugging}}
+{Налагодження індексів
 
-Once you notice there is something wrong with your program because it misbehaves or produces errors, the next step is to figure out _what_ the problem is.
+Якщо ви помітили, що з вашою програмою щось не так, оскільки вона поводиться неправильно або видає помилки, наступним кроком буде з'ясування того, у  чому полягає проблема.
 
-Sometimes it is obvious. The ((error)) message will point at a specific line of your program, and if you look at the error description and that line of code, you can often see the problem.
+Іноді це очевидно. Повідомлення ((error)) вказує на певний рядок вашої програми, і якщо ви подивитеся на опис помилки і цей рядок коду, ви часто можете побачити проблему.
 
-{{index "run-time error"}}
+{{index «помилка часу виконання»}}
 
-But not always. Sometimes the line that triggered the problem is simply the first place where a flaky value produced elsewhere gets used in an invalid way. If you have been solving the ((exercises)) in earlier chapters, you will probably have already experienced such situations.
+Але не завжди. Іноді рядок, який спричинив проблему, є просто першим місцем, де хитке значення, створене в іншому місці, використовується невірним чином. Якщо ви розв'язували ((вправи)) у попередніх розділах, ви, ймовірно, вже стикалися з такими ситуаціями.
 
-{{index "decimal number", "binary number"}}
+{{індекс «десяткове число», «двійкове число»}}
 
-The following example program tries to convert a whole number to a string in a given base (decimal, binary, and so on) by repeatedly picking out the last ((digit)) and then dividing the number to get rid of this digit. But the strange output that it currently produces suggests that it has a ((bug)).
+У наступному прикладі програма намагається перетворити ціле число у рядок у заданій системі числення (десятковій, двійковій і т.д.) шляхом багаторазового виділення останньої ((цифри)), а потім ділення числа, щоб позбутися цієї цифри. Але дивний вивід, який вона зараз видає, свідчить про те, що у ній є ((помилка)).
 
 ```
 function numberToString(n, base = 10) {
-  let result = "", sign = "";
+  let result = «», sign = «»;
   if (n < 0) {
-    sign = "-";
+    sign = «-»;
     n = -n;
   }
   do {
     result = String(n % base) + result;
     n /= base;
   } while (n > 0);
-  return sign + result;
+  знак повернення + результат;
 }
 console.log(numberToString(13, 10));
-// → 1.5e-3231.3e-3221.3e-3211.3e-3201.3e-3191.3e-3181.3…
+// → 1.5e-3231.3e-3221.3e-3211.3e-3201.3e-3191.3e-3181.3...
 ```
 
-{{index analysis}}
+{{аналіз індексів}}
 
-Even if you see the problem already, pretend for a moment that you don't. We know that our program is malfunctioning, and we want to find out why.
+Навіть якщо ви вже бачите проблему, уявіть на мить, що ви її не бачите. Ми знаємо, що наша програма не працює, і хочемо з'ясувати чому.
 
-{{index "trial and error"}}
+{{index «спроби і помилки»}}
 
-This is where you must resist the urge to start making random changes to the code to see whether that makes it better. Instead, _think_. Analyze what is happening and come up with a ((theory)) of why it might be happening. Then make additional observations to test this theory—or, if you don't yet have a theory, make additional observations to help you come up with one.
+Саме тут ви повинні протистояти бажанню почати вносити випадкові зміни до коду, щоб перевірити, чи стане від цього краще. Замість цього, _думайте_. Проаналізуйте те, що відбувається, і придумайте ((теорію)), чому це може відбуватися. Потім проведіть додаткові спостереження, щоб перевірити цю теорію - або, якщо у вас ще немає теорії, проведіть додаткові спостереження, які допоможуть вам її придумати.
 
-{{index "console.log", output, debugging, logging}}
+{{index «console.log», вивід, налагодження, ведення журналу}}
 
-Putting a few strategic `console.log` calls into the program is a good way to get additional information about what the program is doing. In this case, we want `n` to take the values `13`, `1`, and then `0`. Let's write out its value at the start of the loop.
+Додавання у програму кількох стратегічних викликів `console.log` є хорошим способом отримати додаткову інформацію про те, що робить програма. У цьому випадку ми хочемо, щоб `n` приймала значення `13`, `1`, а потім `0`. Виведемо його значення на початку циклу.
 
 ```{lang: null}
 13
 1.3
 0.13
 0.013
-…
+...
 1.5e-323
 ```
 
-{{index rounding}}
+{{округлення індексу}}
 
-_Right_. Dividing 13 by 10 does not produce a whole number. Instead of `n /= base`, what we actually want is `n = Math.floor(n / base)` so that the number is properly "shifted" to the right.
+_Право_. Ділення 13 на 10 не дає цілого числа. Замість `n /= base`, насправді нам потрібно `n = Math.floor(n / base)`, щоб число було належним чином «зсунуто» вправо.
 
-{{index "JavaScript console", "debugger statement"}}
+{{індекс «консоль JavaScript», «оператор відладчика»}}
 
-An alternative to using `console.log` to peek into the program's behavior is to use the _debugger_ capabilities of your browser. Browsers come with the ability to set a _((breakpoint))_ on a specific line of your code. When the execution of the program reaches a line with a breakpoint, it is paused, and you can inspect the values of bindings at that point. I won't go into details, as debuggers differ from browser to browser, but look in your browser's ((developer tools)) or search the web for instructions.
+Альтернативою використанню `console.log` для перегляду поведінки програми є використання можливостей _debugger_ вашого браузера. Браузери мають можливість встановлювати _((точку зупинки))_ на певному рядку вашого коду. Коли виконання програми доходить до рядка з точкою зупинки, воно призупиняється, і ви можете переглянути значення прив'язок у цій точці. Я не буду вдаватися в подробиці, оскільки відладчики відрізняються в різних браузерах, але загляньте в інструменти розробника вашого браузера або пошукайте інструкції в Інтернеті.
 
-Another way to set a breakpoint is to include a `debugger` statement (consisting simply of that keyword) in your program. If the ((developer tools)) of your browser are active, the program will pause whenever it reaches such a statement.
+Інший спосіб встановити точку зупинки - включити до програми інструкцію `debugger` (яка складається лише з цього ключового слова). Якщо у вашому браузері активовано ((інструменти розробника)), програма призупинятиметься щоразу, коли досягне такого оператора.
 
-## Error propagation
+## Поширення помилок
 
-{{index input, output, "run-time error", error, validation}}
+{{індекс введення, виведення, «помилка часу виконання», помилка, валідація}}
 
-Not all problems can be prevented by the programmer, unfortunately. If your program communicates with the outside world in any way, it is possible to get malformed input, to become overloaded with work, or to have the network fail.
+На жаль, не всім проблемам програміст може запобігти. Якщо ваша програма якимось чином взаємодіє із зовнішнім світом, вона може отримати невірні вхідні дані, бути перевантажена роботою або збій у мережі.
 
-{{index "error recovery"}}
+{{index «error recovery»}}
 
-If you're programming only for yourself, you can afford to just ignore such problems until they occur. But if you build something that is going to be used by anybody else, you usually want the program to do better than just crash. Sometimes the right thing to do is take the bad input in stride and continue running. In other cases, it is better to report to the user what went wrong and then give up. In either situation the program has to actively do something in response to the problem.
+Якщо ви програмуєте тільки для себе, ви можете дозволити собі просто ігнорувати такі проблеми, поки вони не виникнуть. Але якщо ви створюєте щось, що буде використовуватися кимось іншим, ви зазвичай хочете, щоб програма працювала краще, ніж просто падала. Іноді правильним рішенням буде прийняти погані вхідні дані і продовжити роботу. В інших випадках краще повідомити користувачеві про те, що пішло не так, а потім припинити роботу. В обох випадках програма повинна активно реагувати на проблему.
 
-{{index "promptNumber function", validation}}
+{{index «promptNumber function», validation}}
 
-Say you have a function `promptNumber` that asks the user for a number and returns it. What should it return if the user inputs "orange"?
+Припустимо, у вас є функція `promptNumber`, яка запитує у користувача число і повертає його. Що вона повинна повернути, якщо користувач введе «помаранчевий»?
 
-{{index null, undefined, "return value", "special return value"}}
+{{індекс null, невизначений, «значення, що повертається», «спеціальне значення, що повертається»}}
 
-One option is to make it return a special value. Common choices for such values are `null`, `undefined`, or `-1`.
+Один з варіантів - зробити так, щоб програма повертала спеціальне значення. Типовими варіантами таких значень є `null`, `undefined` або `-1`.
 
 ```{test: no}
 function promptNumber(question) {
@@ -250,14 +250,14 @@ function promptNumber(question) {
   else return result;
 }
 
-console.log(promptNumber("How many trees do you see?"));
+console.log(promptNumber(«Скільки дерев ви бачите?»));
 ```
 
-Now any code that calls `promptNumber` must check whether an actual number was read and, failing that, must somehow recover—maybe by asking again or by filling in a default value. Or it could again return a special value to _its_ caller to indicate that it failed to do what it was asked.
+Тепер будь-який код, який викликає `promptNumber`, повинен перевірити, чи було прочитано дійсне число, і якщо ні, то якось відновити його - можливо, перепитавши ще раз або заповнивши значення за замовчуванням. Або ж він може знову повернути спеціальне значення користувачеві, який  його викликав, щоб вказати, що він не зміг виконати запиту.
 
-{{index "error handling"}}
+{{index «обробка помилок»}}
 
-In many situations, mostly when ((error))s are common and the caller should be explicitly taking them into account, returning a special value is a good way to indicate an error. It does, however, have its downsides. First, what if the function can already return every possible kind of value? In such a function, you'll have to do something like wrap the result in an object to be able to distinguish success from failure, the way the `next` method on the iterator interface does.
+У багатьох ситуаціях, здебільшого коли ((помилки)) є поширеними і користувач повинен явно брати їх до уваги, повернення спеціального значення є гарним способом вказати на помилку. Однак він має свої недоліки. По-перше, що якщо функція вже може повертати всі можливі типи значень? У такій функції вам доведеться зробити щось на кшталт обгортання результату в об'єкт, щоб мати змогу відрізнити успіх від невдачі, як це робить метод `next` в інтерфейсі ітератора.
 
 ```
 function lastElement(array) {
@@ -269,75 +269,75 @@ function lastElement(array) {
 }
 ```
 
-{{index "special return value", readability}}
+{{індекс «спеціальне значення, що повертається», читабельність}}
 
-The second issue with returning special values is that it can lead to awkward code. If a piece of code calls `promptNumber` 10 times, it has to check 10 times whether `null` was returned. If its response to finding `null` is to simply return `null` itself, callers of the function will in turn have to check for it, and so on.
+Друга проблема з поверненням спеціальних значень полягає у тому, що це може призвести до появи незручного коду. Якщо фрагмент коду викликає `promptNumber` 10 разів, він повинен 10 разів перевірити, чи не було повернуто `null`. Якщо у відповідь на знаходження `null` він просто поверне сам `null`, викликувачі функції, у свою чергу, будуть змушені перевіряти його, і так далі.
 
-## Exceptions
+## Винятки
 
-{{index "error handling"}}
+{{index «обробка помилок»}}
 
-When a function cannot proceed normally, what we would often _like_ to do is just stop what we are doing and immediately jump to a place that knows how to handle the problem. This is what _((exception handling))_ does.
+Коли функція не може працювати належним чином, ми часто _хочемо_ просто зупинити її роботу і негайно перейти до місця, яке знає, як вирішити проблему. Це те, що робить _((обробка винятків))_.
 
-{{index ["control flow", exceptions], "raising (exception)", "throw keyword", "call stack"}}
+{{index [«потік керування», винятки], «здіймання (виняток)», «ключове слово throw», «стек викликів»}}
 
-Exceptions are a mechanism that makes it possible for code that runs into a problem to _raise_ (or _throw_) an exception. An exception can be any value. Raising one somewhat resembles a super-charged return from a function: it jumps out of not just the current function but also its callers, all the way down to the first call that started the current execution. This is called _((unwinding the stack))_. You may remember the stack of function calls mentioned in [Chapter ?](functions#stack). An exception zooms down this stack, throwing away all the call contexts it encounters.
+Винятки - це механізм, який дозволяє коду, що зіткнувся з проблемою, _згенерувати_ (або _викинути_) виняток. Виключенням може бути будь-яке значення. Здіймання винятку дещо нагадує повернення з функції: воно вискакує не лише з поточної функції, але й з усіх її викликів, аж до першого виклику, з якого почалося поточне виконання. Це називається _((розмотування стеку))_. Ви можете пам'ятати стек викликів функцій, згаданий у [Глава ?](functions#stack). Виняток зменшує масштаб цього стеку, відкидаючи всі контексти викликів, з якими він стикається.
 
-{{index "error handling", [syntax, statement], "catch keyword"}}
+{{індекс «обробка помилок», [синтаксис, оператор], «ключове слово catch»}}
 
-If exceptions always zoomed right down to the bottom of the stack, they would not be of much use. They'd just provide a novel way to blow up your program. Their power lies in the fact that you can set "obstacles" along the stack to _catch_ the exception as it is zooming down. Once you've caught an exception, you can do something with it to address the problem and then continue to run the program.
+Якби винятки завжди зменшувалися до самого низу стеку, від них не було б великої користі. Вони б просто надавали новий спосіб розвалити вашу програму. Їх сила полягає у тому, що ви можете встановити «перешкоди» вздовж стеку, щоб « перехопити» виняток, коли він зменшується. Після того, як ви перехопили виняток, ви можете зробити з ним щось, щоб вирішити проблему, а потім продовжити виконання програми.
 
-Here's an example:
+Ось приклад:
 
 {{id look}}
 ```
 function promptDirection(question) {
   let result = prompt(question);
-  if (result.toLowerCase() == "left") return "L";
-  if (result.toLowerCase() == "right") return "R";
-  throw new Error("Invalid direction: " + result);
+  if (result.toLowerCase() == «left») return «L»;
+  if (result.toLowerCase() == «right») return «R»;
+  згенерувати нове виведення Error("Неправильний напрямок: » + result);
 }
 
-function look() {
-  if (promptDirection("Which way?") == "L") {
-    return "a house";
+функція look() {
+  if (promptDirection(«В який бік?») == «Л») {
+    return «a house»;
   } else {
-    return "two angry bears";
+    return «два злих ведмеді»;
   }
 }
 
 try {
-  console.log("You see", look());
+  console.log(«Ви бачите», look());
 } catch (error) {
-  console.log("Something went wrong: " + error);
+  console.log("Щось пішло не так: » + error);
 }
 ```
 
-{{index "exception handling", block, "throw keyword", "try keyword", "catch keyword"}}
+{{index «обробка виключень», block, «ключове слово throw», «ключове слово try», «ключове слово catch»}}
 
-The `throw` keyword is used to raise an exception. Catching one is done by wrapping a piece of code in a `try` block, followed by the keyword `catch`. When the code in the `try` block causes an exception to be raised, the `catch` block is evaluated, with the name in parentheses bound to the exception value. After the `catch` block finishes—or if the `try` block finishes without problems—the program proceeds beneath the entire `try/catch` statement.
+Ключове слово `throw` використовується для згенерування виключення. Перехоплення виключення здійснюється шляхом обгортання фрагменту коду у блок `try`, за яким слідує ключове слово `catch`. Коли код у блоці `try` викликає виключення, виконується блок `catch`, а ім'я у круглих дужках прив'язується до значення виключення. Після завершення блоку `catch` - або якщо блок `try` завершується без проблем - програма продовжує роботу за інструкцією `try/catch`.
 
-{{index debugging, "call stack", "Error type"}}
+{{індекс налагодження, «стек викликів», «Тип помилки»}}
 
-In this case, we used the `Error` ((constructor)) to create our exception value. This is a ((standard)) JavaScript constructor that creates an object with a `message` property. Instances of `Error` also gather information about the call stack that existed when the exception was created, a so-called _((stack trace))_. This information is stored in the `stack` property and can be helpful when trying to debug a problem: it tells us the function where the problem occurred and which functions made the failing call.
+У цьому випадку ми використали `Error` ((конструктор)) для створення нашого значення виключення. Це ((стандартний)) конструктор JavaScript, який створює об'єкт з властивістю `message`. Екземпляри `Error` також збирають інформацію про стек викликів, який існував на момент створення виключення, так звану _((трасування стеку))_. Ця інформація зберігається у властивості `stack` і може бути корисною при спробі налагодження проблеми: вона вказує на функцію, в якій виникла проблема, і на те, які функції здійснили невдалий виклик.
 
-{{index "exception handling"}}
+{{index «обробка виключень»}}
 
-Note that the `look` function completely ignores the possibility that `promptDirection` might go wrong. This is the big advantage of exceptions: error-handling code is necessary only at the point where the error occurs and at the point where it is handled. The functions in between can forget all about it.
+Зверніть увагу, що функція `look` повністю ігнорує можливість того, що `promptDirection` може спрацювати неправильно. У цьому полягає велика перевага виключень: код обробки помилок потрібен лише в місці виникнення помилки і в місці її обробки. Функції між ними можуть про це забути.
 
-Well, almost...
+Ну, майже...
 
-## Cleaning up after exceptions
+## Очищення після винятків
 
-{{index "exception handling", "cleaning up", ["control flow", exceptions]}}
+{{index «обробка виключень», «очищення», [«потік управління», exceptions]}}
 
-The effect of an exception is another kind of control flow. Every action that might cause an exception, which is pretty much every function call and property access, might cause control to suddenly leave your code.
+Наслідки винятків - це ще один різновид потоку керування. Кожна дія, яка може спричинити виключення, а це майже кожен виклик функції та доступ до властивостей, може призвести до раптової втрати управління вашим кодом.
 
-This means when code has several side effects, even if its "regular" control flow looks like they'll always all happen, an exception might prevent some of them from taking place.
+Це означає, що коли код має декілька побічних ефектів, навіть якщо його «звичайний» потік керування виглядає так, ніби всі вони відбудуться завжди, виняток може запобігти деяким з них.
 
-{{index "banking example"}}
+{{index «банківський приклад»}}
 
-Here is some really bad banking code:
+Ось дуже поганий банківський код:
 
 ```{includeCode: true}
 const accounts = {
@@ -347,9 +347,9 @@ const accounts = {
 };
 
 function getAccount() {
-  let accountName = prompt("Enter an account name");
+  let accountName = prompt(«Введіть назву облікового запису»);
   if (!Object.hasOwn(accounts, accountName)) {
-    throw new Error(`No such account: ${accountName}`);
+    throw new Error(`Не існує такого облікового запису: ${accountName}`);
   }
   return accountName;
 }
@@ -361,22 +361,22 @@ function transfer(from, amount) {
 }
 ```
 
-The `transfer` function transfers a sum of money from a given account to another, asking for the name of the other account in the process. If given an invalid account name, `getAccount` throws an exception.
+Функція `transfer` переказує суму грошей з одного рахунку на інший, запитуючи при цьому назву іншого рахунку. Якщо задано невірну назву рахунку, `getAccount` згенерує виключення.
 
-But `transfer` _first_ removes the money from the account and _then_ calls `getAccount` before it adds it to another account. If it is broken off by an exception at that point, it'll just make the money disappear.
+Але `transfer`  спочатку видаляє гроші з рахунку, а  потім викликає `getAccount` перед тим, як додати їх на інший рахунок. Якщо в цей момент він буде перерваний винятком, то гроші просто зникнуть.
 
-That code could have been written a little more intelligently, for example by calling `getAccount` before it starts moving money around. But often problems like this occur in more subtle ways. Even functions that don't look like they will throw an exception might do so in exceptional circumstances or when they contain a programmer mistake.
+Цей код можна було б написати трохи розумніше, наприклад, викликати `getAccount` до того, як він почне переміщувати гроші. Але часто подібні проблеми виникають більш приховано. Навіть функції, які не виглядають як такі, що можуть згенерувати виключення, можуть зробити це у виняткових обставинах або коли вони містять помилку програміста.
 
-One way to address this is to use fewer side effects. Again, a programming style that computes new values instead of changing existing data helps. If a piece of code stops running in the middle of creating a new value, no existing data structures were damaged, making it easier to recover.
+Одним із способів вирішення цієї проблеми є використання меншої кількості побічних ефектів. Знову ж таки, допомагає стиль програмування, який обчислює нові значення замість того, щоб змінювати існуючі дані. Якщо фрагмент коду зупиняється посеред створення нового значення, жодні існуючі структури даних не пошкоджуються, що полегшує їх відновлення.
 
-{{index block, "try keyword", "finally keyword"}}
+{{index block, «try keyword», «finally keyword»}}
 
-Since that isn't always practical, `try` statements have another feature: they may be followed by a `finally` block either instead of or in addition to a `catch` block. A `finally` block says "no matter _what_ happens, run this code after trying to run the code in the `try` block."
+Оскільки це не завжди практично, інструкції `try` мають ще одну особливість: вони можуть супроводжуватися блоком `finally` або замість блоку `catch`, або на додаток до нього. Блок `finally` говорить «незалежно від того, _що_ станеться, виконайте цей код після спроби виконати код у блоці `try`».
 
 ```{includeCode: true}
 function transfer(from, amount) {
   if (accounts[from] < amount) return;
-  let progress = 0;
+  нехай progress = 0;
   try {
     accounts[from] -= amount;
     progress = 1;
@@ -390,100 +390,100 @@ function transfer(from, amount) {
 }
 ```
 
-This version of the function tracks its progress, and if, when leaving, it notices that it was aborted at a point where it had created an inconsistent program state, it repairs the damage it did.
+Ця версія функції відстежує свій прогрес, і якщо при виході помічає, що її було перервано в точці, де вона створила неузгоджений стан програми, вона виправляє завдану нею шкоду.
 
-Note that even though the `finally` code is run when an exception is thrown in the `try` block, it does not interfere with the exception. After the `finally` block runs, the stack continues unwinding.
+Зверніть увагу, що хоча код `finally` виконується, коли у блоці `try` згенеровано виключення, він не впливає на виключення. Після виконання блоку `finally` стек продовжує розмотування.
 
-{{index "exception safety"}}
+{{index «exception safety»}}
 
-Writing programs that operate reliably even when exceptions pop up in unexpected places is hard. Many people simply don't bother, and because exceptions are typically reserved for exceptional circumstances, the problem may occur so rarely that it is never even noticed. Whether that is a good thing or a really bad thing depends on how much damage the software will do when it fails.
+Писати програми, які працюють надійно навіть тоді, коли виключення виникають у несподіваних місцях, досить складно. Багато людей просто не переймаються цим питанням, а оскільки винятки зазвичай зарезервовано для виняткових обставин, проблема може виникати настільки рідко, що її навіть не помічають. Чи це добре, чи дуже погано, залежить від того, скільки шкоди завдасть програма, коли вийде з ладу.
 
-## Selective catching
+## Вибіркове перехоплення
 
-{{index "uncaught exception", "exception handling", "JavaScript console", "developer tools", "call stack", error}}
+{{index «uncaught exception», «exception handling», «JavaScript console», «developer tools», «call stack», error}}
 
-When an exception makes it all the way to the bottom of the stack without being caught, it gets handled by the environment. What this means differs between environments. In browsers, a description of the error typically gets written to the JavaScript console (reachable through the browser's Tools or Developer menu). Node.js, the browserless JavaScript environment we will discuss in [Chapter ?](node), is more careful about data corruption. It aborts the whole process when an unhandled exception occurs.
+Коли виняток доходить до самого низу стеку, не будучи перехопленим, він обробляється оточенням. Що це означає, залежить від середовища. У браузерах опис помилки зазвичай записується в консоль JavaScript (доступну через меню «Інструменти» або «Розробник» браузера). Node.js, безбраузерне середовище JavaScript, про яке ми поговоримо в [Розділ ?](node), більш обережно ставиться до пошкодження даних. Воно перериває весь процес, коли виникає необроблене виключення.
 
-{{index crash, "error handling"}}
+{{index crash, «обробка помилок»}}
 
-For programmer mistakes, just letting the error go through is often the best you can do. An unhandled exception is a reasonable way to signal a broken program, and the JavaScript console will, on modern browsers, provide you with some information about which function calls were on the stack when the problem occurred.
+Для програмних помилок часто найкраще, що ви можете зробити, це просто пропустити помилку. Необроблене виключення - це розумний спосіб сигналізувати про несправність програми, а консоль JavaScript у сучасних браузерах надасть вам деяку інформацію про те, які виклики функцій були у стеку, коли виникла проблема.
 
-{{index "user interface"}}
+{{index «user interface»}}
 
-For problems that are _expected_ to happen during routine use, crashing with an unhandled exception is a terrible strategy.
+Для проблем, які _очікувано_ трапляються під час рутинного використання, аварійне завершення з необробленим винятком є жахливою стратегією.
 
-{{index [function, application], "exception handling", "Error type", [binding, undefined]}}
+{{index [функція, програма], «обробка винятків», «Тип помилки», [прив'язка, невизначений]}}
 
-Invalid uses of the language, such as referencing a nonexistent binding, looking up a property on `null`, or calling something that's not a function, will also result in exceptions being raised. Such exceptions can also be caught.
+Неправильне використання мови, наприклад, посилання на неіснуюче зв'язування, пошук властивості за значенням `null` або виклик чогось, що не є функцією, також призведе до генерування винятків. Такі винятки також можна перехоплювати.
 
-{{index "catch keyword"}}
+{{index «catch keyword»}}
 
-When a `catch` body is entered, all we know is that _something_ in our `try` body caused an exception. But we don't know _what_ did or _which_ exception it caused.
+Коли вводиться тіло `catch`, все, що ми знаємо, це те, що _щось_ у нашому тілі `try` викликало виключення. Але ми не знаємо, _що_ зробило або _який_ виняток воно викликало.
 
-{{index "exception handling"}}
+{{index «обробка винятків»}}
 
-JavaScript (in a rather glaring omission) doesn't provide direct support for selectively catching exceptions: either you catch them all or you don't catch any. This makes it tempting to _assume_ that the exception you get is the one you were thinking about when you wrote the `catch` block.
+JavaScript (що є досить кричущим упущенням) не надає прямої підтримки для вибіркового перехоплення винятків: або ви перехоплюєте всі винятки, або не перехоплюєте жодного. Це робить спокусливим _припустити_, що ви отримаєте саме той виняток, про який ви думали, коли писали блок `catch`.
 
-{{index "promptDirection function"}}
+{{index «promptDirection function»}}
 
-But it might not be. Some other ((assumption)) might be violated, or you might have introduced a bug that is causing an exception. Here is an example that _attempts_ to keep on calling `promptDirection` until it gets a valid answer:
+Але це може бути не так. Може бути порушено якесь інше ((припущення)), або ви могли внести помилку, яка викликає виняток. Ось приклад, який _намагається_ продовжувати викликати `promptDirection` доти, доки не отримає коректної відповіді:
 
 ```{test: no}
 for (;;) {
   try {
-    let dir = promtDirection("Where?"); // ← typo!
-    console.log("You chose ", dir);
+    let dir = promtDirection(«Where?»); // ← помилка!
+    console.log("Ви вибрали », dir);
     break;
   } catch (e) {
-    console.log("Not a valid direction. Try again.");
+    console.log(«Неправильний напрямок. Спробуйте ще раз.»)
   }
 }
 ```
 
-{{index "infinite loop", "for loop", "catch keyword", debugging}}
+{{індекс «нескінченний цикл», «цикл for», «ключове слово catch», налагодження}}
 
-The `for (;;)` construct is a way to intentionally create a loop that doesn't terminate on its own. We break out of the loop only when a valid direction is given. Unfortunately, we misspelled `promptDirection`, which will result in an "undefined variable" error. Because the `catch` block completely ignores its exception value (`e`), assuming it knows what the problem is, it wrongly treats the binding error as indicating bad input. Not only does this cause an infinite loop but it also "buries" the useful error message about the misspelled binding.
+Конструкція `for (;;)` - це спосіб навмисного створення циклу, який не завершується самостійно. Ми виходимо з циклу тільки тоді, коли дається правильний напрямок. На жаль, ми неправильно написали `promptDirection`, що призведе до помилки «невизначена змінна». Оскільки блок `catch` повністю ігнорує значення виключення (`e`), припускаючи, що він знає, в чому проблема, він помилково трактує помилку зв'язування як таку, що вказує на неправильне введення. Це не тільки призводить до нескінченного циклу, але й «ховає» корисне повідомлення про помилку зв'язування.
 
-As a general rule, don't blanket-catch exceptions unless it is for the purpose of "routing" them somewhere—for example, over the network to tell another system that our program crashed. And even then, think carefully about how you might be hiding information.
+Як правило, не перехоплюйте всі винятки, якщо тільки це не має на меті їх «перенаправлення» кудись - наприклад, через мережу, щоб повідомити іншій системі про те, що наша програма впала. І навіть у цьому випадку добре подумайте про те, як ви можете приховати інформацію.
 
-{{index "exception handling"}}
+{{index «обробка винятків»}}
 
-We want to catch a _specific_ kind of exception. We can do this by checking in the `catch` block whether the exception we got is the one we are interested in, and if not, rethrow it. But how do we recognize an exception?
+Ми хочемо перехопити _конкретний_ тип винятку. Ми можемо зробити це, перевіривши у блоці `catch`, чи виняток, який ми отримали, є саме тим, що нас цікавить, і якщо ні, то перегенерувати його. Але як розпізнати виключення?
 
-We could compare its `message` property against the ((error)) message we happen to expect. But that's a shaky way to write code—we'd be using information that's intended for human consumption (the message) to make a programmatic decision. As soon as someone changes (or translates) the message, the code will stop working.
+Ми могли б порівняти його властивість `message` з повідомленням ((error)), яке ми випадково очікуємо. Але це хиткий спосіб написання коду - ми б використовували інформацію, призначену для споживання людиною (повідомлення), для прийняття програмного рішення. Як тільки хтось змінить (або перекладе) повідомлення, код перестане працювати.
 
-{{index "Error type", "instanceof operator", "promptDirection function"}}
+{{index «Тип помилки», «екземпляр оператора», «функція promptDirection»}}
 
-Rather, let's define a new type of error and use `instanceof` to identify it.
+Натомість, давайте визначимо новий тип помилки і використовуватимемо `instanceof` для її ідентифікації.
 
 ```{includeCode: true}
 class InputError extends Error {}
 
 function promptDirection(question) {
   let result = prompt(question);
-  if (result.toLowerCase() == "left") return "L";
-  if (result.toLowerCase() == "right") return "R";
-  throw new InputError("Invalid direction: " + result);
+  if (result.toLowerCase() == «left») return «L»;
+  if (result.toLowerCase() == «right») return «R»;
+  згенерувати нове InputError("Неправильний напрямок: » + result);
 }
 ```
 
-{{index "throw keyword", inheritance}}
+{{індекс «ключове слово throw», успадкування}}
 
-The new error class extends `Error`. It doesn't define its own constructor, which means that it inherits the `Error` constructor, which expects a string message as argument. In fact, it doesn't define anything at all—the class is empty. `InputError` objects behave like `Error` objects, except that they have a different class by which we can recognize them.
+Новий клас помилок розширює клас `Error`. Він не має власного конструктора, а це означає, що він успадковує конструктор `Error`, який очікує в якості аргументу рядкове повідомлення. Фактично, він взагалі нічого не визначає - клас порожній. Об'єкти `InputError` поводяться подібно до об'єктів `Error`, за винятком того, що вони мають інший клас, за яким ми можемо їх розпізнати.
 
-{{index "exception handling"}}
+{{index «обробка виключень»}}
 
-Now the loop can catch these more carefully.
+Тепер цикл може перехоплювати їх більш обережно.
 
 ```{test: no}
 for (;;) {
   try {
-    let dir = promptDirection("Where?");
-    console.log("You chose ", dir);
+    let dir = promptDirection(«Де?»);
+    console.log("Ви вибрали », dir);
     break;
   } catch (e) {
     if (e instanceof InputError) {
-      console.log("Not a valid direction. Try again.");
+      console.log(«Неправильний напрямок. Спробуйте ще раз.»)
     } else {
       throw e;
     }
@@ -491,68 +491,68 @@ for (;;) {
 }
 ```
 
-{{index debugging}}
+{{налагодження індексів}}
 
-This will catch only instances of `InputError` and let unrelated exceptions through. If you reintroduce the typo, the undefined binding error will be properly reported.
+Це перехоплює лише екземпляри `InputError` і пропускає винятки, не пов'язані з ним. Якщо ви повторно введете помилку, буде належним чином повідомлено про помилку невизначеного зв'язування.
 
-## Assertions
+## Твердження
 
-{{index "assert function", assertion, debugging}}
+{{index «assert function», assertion, debugging}}
 
-_Assertions_ are checks inside a program that verify that something is the way it is supposed to be. They are used not to handle situations that can come up in normal operation but to find programmer mistakes.
+Твердження - це перевірки всередині програми, які перевіряють, що щось відбувається саме так, як передбачається. Вони використовуються не для обробки ситуацій, які можуть виникнути під час нормальної роботи, а для пошуку помилок програмістів.
 
-If, for example, `firstElement` is described as a function that should never be called on empty arrays, we might write it like this:
+Якщо, наприклад, `firstElement` описано як функцію, яку ніколи не слід викликати на порожніх масивах, ми можемо написати її так
 
 ```
 function firstElement(array) {
   if (array.length == 0) {
-    throw new Error("firstElement called with []");
+    згенерувати нове виключення Error(«firstElement викликано з []»);
   }
   return array[0];
 }
 ```
 
-{{index validation, "run-time error", crash, assumption}}
+{{перевірка індексів, «помилка часу виконання», збій, припущення}}
 
-Now, instead of silently returning undefined (which you get when reading an array property that does not exist), this will loudly blow up your program as soon as you misuse it. This makes it less likely for such mistakes to go unnoticed and easier to find their cause when they occur.
+Тепер, замість того, щоб мовчки повернути undefined (що ви отримуєте при читанні неіснуючої властивості масиву), це голосно підірве вашу програму, як тільки ви неправильно її використаєте. Це зменшує ймовірність того, що такі помилки залишаться непоміченими, і полегшує пошук їх причини, коли вони трапляються.
 
-I do not recommend trying to write assertions for every possible kind of bad input. That'd be a lot of work and would lead to very noisy code. You'll want to reserve them for mistakes that are easy to make (or that you find yourself making).
+Я не рекомендую намагатися писати твердження для кожного можливого типу поганих вхідних даних. Це займе багато часу і призведе до дуже шумного коду. Краще зарезервуйте їх для помилок, які легко зробити (або які ви самі можете зробити).
 
-## Summary
+## Підсумок
 
-An important part of programming is finding, diagnosing, and fixing bugs. Problems can become easier to notice if you have an automated test suite or add assertions to your programs.
+Важливою частиною програмування є пошук, діагностика та виправлення помилок. Проблеми буде легше помітити, якщо у вас є автоматизований набір тестів або якщо ви додасте твердження до ваших програм.
 
-Problems caused by factors outside the program's control should usually be actively planned for. Sometimes, when the problem can be handled locally, special return values are a good way to track them. Otherwise, exceptions may be preferable.
+Проблеми, спричинені факторами, що не залежать від програми, зазвичай слід активно планувати. Іноді, коли проблему можна вирішити локально, спеціальне значення, що повертається, є гарним способом відстежити їх. В інших випадках краще використовувати винятки.
 
-Throwing an exception causes the call stack to be unwound until the next enclosing `try/catch` block or until the bottom of the stack. The exception value will be given to the `catch` block that catches it, which should verify that it is actually the expected kind of exception and then do something with it. To help address the unpredictable control flow caused by exceptions, `finally` blocks can be used to ensure that a piece of code _always_ runs when a block finishes.
+Згенероване виключення призводить до розгортання стеку викликів до наступного блоку `try/catch` або до кінця стеку. Значення винятку буде передано блоку `catch`, який його перехоплює, що має перевірити, чи це дійсно очікуваний тип винятку, а потім щось з ним зробити. Щоб допомогти вирішити проблему непередбачуваного потоку керування, спричиненого винятками, можна використовувати блоки `finally`, які гарантують, що фрагмент коду _завжди_ виконується після завершення блоку.
 
-## Exercises
+## Вправи
 
-### Retry
+### Повторна спроба
 
-{{index "primitiveMultiply (exercise)", "exception handling", "throw keyword"}}
+{{index «primitiveMultiply (вправа)», «обробка виключень», «ключове слово throw»}}
 
-Say you have a function `primitiveMultiply` that in 20 percent of cases multiplies two numbers and in the other 80 percent of cases raises an exception of type `MultiplicatorUnitFailure`. Write a function that wraps this clunky function and just keeps trying until a call succeeds, after which it returns the result.
+Нехай у вас є функція `primitiveMultiply`, яка у 20 відсотках випадків перемножує два числа, а в інших 80 відсотках випадків генерує виключення типу `MultiplicatorUnitFailure`. Напишіть функцію, яка обгортає цю незграбну функцію і просто продовжує спроби до тих пір, поки виклик не буде успішним, після чого повертає результат.
 
-{{index "catch keyword"}}
+{{index «catch keyword»}}
 
-Make sure you handle only the exceptions you are trying to handle.
+Переконайтеся, що ви обробляєте тільки ті винятки, які намагаєтеся обробити.
 
-{{if interactive
+{{if інтерактивний
 
-```{test: no}
+```{test: no}}
 class MultiplicatorUnitFailure extends Error {}
 
 function primitiveMultiply(a, b) {
   if (Math.random() < 0.2) {
-    return a * b;
+    повернути a * b;
   } else {
-    throw new MultiplicatorUnitFailure("Klunk");
+    throw new MultiplicatorUnitFailure(«Klunk»);
   }
 }
 
 function reliableMultiply(a, b) {
-  // Your code here.
+  // Ваш код тут.
 }
 
 console.log(reliableMultiply(8, 8));
@@ -562,43 +562,43 @@ if}}
 
 {{hint
 
-{{index "primitiveMultiply (exercise)", "try keyword", "catch keyword", "throw keyword"}}
+{{index «primitiveMultiply (exercise)», «try keyword», «catch keyword», «throw keyword»}}
 
-The call to `primitiveMultiply` should definitely happen in a `try` block. The corresponding `catch` block should rethrow the exception when it is not an instance of `MultiplicatorUnitFailure` and ensure the call is retried when it is.
+Виклик `primitiveMultiply` обов'язково має відбуватися у блоці `try`. Відповідний блок `catch` повинен перегенерувати виключення, якщо воно не є екземпляром `MultiplicatorUnitFailure`, і забезпечити повторну спробу виклику, якщо є.
 
-To do the retrying, you can either use a loop that stops only when a call succeeds—as in the [`look` example](error#look) earlier in this chapter—or use ((recursion)) and hope you don't get a string of failures so long that it overflows the stack (which is a pretty safe bet).
+Для виконання повторної спроби ви можете використати цикл, який зупиняється лише тоді, коли виклик є успішним - як у прикладі [`look`](error#look) раніше у цій главі - або використати ((рекурсію)) і сподіватися, що ви не отримаєте настільки довгий рядок невдач, що він переповнить стек (що є доволі безпечним варіантом).
 
-hint}}
+підказка}}
 
-### The locked box
+### Замкнена скринька
 
-{{index "locked box (exercise)"}}
+{{index «замкнений ящик (вправа)»}}
 
-Consider the following (rather contrived) object:
+Розглянемо наступний (досить надуманий) об'єкт:
 
 ```
 const box = new class {
-  locked = true;
+  locked = true
   #content = [];
 
   unlock() { this.locked = false; }
-  lock() { this.locked = true;  }
+  lock() { this.locked = true; }
   get content() {
-    if (this.locked) throw new Error("Locked!");
+    if (this.locked) throw new Error(«Заблоковано!»);
     return this.#content;
   }
 };
 ```
 
-{{index "private property", "access control"}}
+{{index «private property», «access control»}}
 
-It is a ((box)) with a lock. There is an array in the box, but you can get at it only when the box is unlocked.
+Це ((box)) з замком. У ящику знаходиться масив, але ви можете отримати доступ до нього лише тоді, коли ящик розблоковано.
 
-{{index "finally keyword", "exception handling"}}
+{{index «ключове слово finally», «обробка виключень»}}
 
-Write a function called `withBoxUnlocked` that takes a function value as argument, unlocks the box, runs the function, and then ensures that the box is locked again before returning, regardless of whether the argument function returned normally or threw an exception.
+Напишіть функцію з назвою `withBoxUnlocked`, яка отримує значення функції як аргумент, розблоковує скриньку, виконує функцію, а потім гарантує, що скриньку буде знову заблоковано перед поверненням, незалежно від того, чи повернула функція аргумент нормально, чи згенерувала виключення.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```
 const box = new class {
@@ -606,27 +606,27 @@ const box = new class {
   #content = [];
 
   unlock() { this.locked = false; }
-  lock() { this.locked = true;  }
+  lock() { this.locked = true; }
   get content() {
-    if (this.locked) throw new Error("Locked!");
+    if (this.locked) throw new Error(«Заблоковано!»);
     return this.#content;
   }
 };
 
 function withBoxUnlocked(body) {
-  // Your code here.
+  // Ваш код тут.
 }
 
-withBoxUnlocked(() => {
-  box.content.push("gold piece");
+withBoxUnlocked(() => { // Ваш код тут.
+  box.content.push(«gold piece»);
 });
 
 try {
   withBoxUnlocked(() => {
-    throw new Error("Pirates on the horizon! Abort!");
+    throw new Error(«Пірати на горизонті! Відбій!»);
   });
 } catch (e) {
-  console.log("Error raised: " + e);
+  console.log("Виникла помилка: » + e);
 }
 console.log(box.locked);
 // → true
@@ -634,14 +634,14 @@ console.log(box.locked);
 
 if}}
 
-For extra points, make sure that if you call `withBoxUnlocked` when the box is already unlocked, the box stays unlocked.
+Для отримання додаткових балів переконайтеся, що якщо ви викликаєте `withBoxUnlocked`, коли коробку вже розблоковано, то вона залишається розблокованою.
 
 {{hint
 
-{{index "locked box (exercise)", "finally keyword", "try keyword"}}
+{{index «замкнена коробка (вправа)», «finally ключове слово», «try ключове слово»}}
 
-This exercise calls for a `finally` block. Your function should first unlock the box and then call the argument function from inside a `try` body. The `finally` block after it should lock the box again.
+У цій вправі використовується блок `finally`. Ваша функція повинна спочатку розблокувати скриньку, а потім викликати функцію-аргумент з тіла `try`. Блок `finally`, який слідує за ним, повинен знову заблокувати скриньку.
 
-To make sure we don't lock the box when it wasn't already locked, check its lock at the start of the function and unlock and lock it only when it started out locked.
+Щоб переконатися, що ми не заблокуємо скриньку, коли вона ще не була заблокована, перевірте її блокування на початку функції і розблокуйте та заблокуйте її тільки тоді, коли вона була заблокована.
 
-hint}}
+підказка}}

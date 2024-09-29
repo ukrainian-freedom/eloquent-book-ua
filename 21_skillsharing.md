@@ -1,192 +1,192 @@
-{{meta {code_links: ["code/skillsharing.zip"]}}}
+{{meta {code_links: [«code/skillsharing.zip»]}}}
 
-# Project: Skill-Sharing Website
+# Проект: Веб-сайт для обміну навичками
 
-{{quote {author: "Margaret Fuller", chapter: true}
+{{quote {author: 
 
-If you have knowledge, let others light their candles at it.
+Якщо ви володієте знаннями, дозвольте іншим запалити свої свічки.
 
 quote}}
 
-{{index "skill-sharing project", meetup, "project chapter"}}
+{{index «skill-sharing project», meetup, «project chapter»}}
 
-{{figure {url: "img/chapter_picture_21.jpg", alt: "Illustration showing two unicycles leaned against a mailbox", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_21.jpg», alt: «Ілюстрація із зображенням двох одноколісних велосипедів, притулених до поштової скриньки», »chapter: «Обрамлення"}}}.
 
-A _((skill-sharing))_ meeting is an event where people with a shared interest come together and give small, informal presentations about things they know. At a ((gardening)) skill-sharing meeting, someone might explain how to cultivate ((celery)). Or in a programming skill-sharing group, you could drop by and tell people about Node.js.
+Зустріч _((обмін навичками))_ - це захід, на якому люди зі спільними інтересами збираються разом і роблять невеликі, неформальні презентації про те, що вони знають. На зустрічі з обміну навичками в садівництві хтось може пояснити, як вирощувати селеру. Або в групі з обміну навичками програмування ви можете зайти і розповісти людям про Node.js.
 
-In this final project chapter, our goal is to set up a ((website)) for managing ((talk))s given at a skill-sharing meeting. Imagine a small group of people meeting up regularly in the office of one of the members to talk about ((unicycling)). The previous organizer of the meetings moved to another town, and nobody stepped forward to take over this task. We want a system that will let the participants propose and discuss talks among themselves without an active organizer.
+У цьому останньому розділі проекту наша мета - створити ((веб-сайт)) для управління ((розмовами)), що відбуваються на зустрічах з обміну навичками. Уявіть собі невелику групу людей, які регулярно зустрічаються в офісі одного з учасників, щоб поговорити про ((одноколісний велосипед)). Попередній організатор зустрічей переїхав до іншого міста, і ніхто не зголосився взяти на себе це завдання. Ми хочемо систему, яка дозволить учасникам пропонувати та обговорювати теми для розмов між собою без активного організатора.
 
-[Just like in the [previous chapter](node), some of the code in this chapter is written for Node.js, and running it directly in the HTML page that you are looking at is unlikely to work.]{if interactive} The full code for the project can be ((download))ed from [_https://eloquentjavascript.net/code/skillsharing.zip_](https://eloquentjavascript.net/code/skillsharing.zip).
+[Як і в [попередньому розділі](node), частина коду в цьому розділі написана для Node.js, і запустити його безпосередньо на HTML-сторінці, яку ви переглядаєте, навряд чи вийде]{якщо інтерактивний}. Повний код проекту можна ((завантажити))отримати з [_https://eloquentjavascript.net/code/skillsharing.zip_](https://eloquentjavascript.net/code/skillsharing.zip).
 
-## Design
+## Дизайн
 
-{{index "skill-sharing project", persistence}}
+{{index «skill-sharing project», persistence}}
 
-There is a _((server))_ part to this project, written for ((Node.js)), and a _((client))_ part, written for the ((browser)). The server stores the system's data and provides it to the client. It also serves the files that implement the client-side system.
+Цей проект складається з _((серверної))_ частини, написаної для ((Node.js)), та _((клієнтської))_ частини, написаної для ((браузера)). Сервер зберігає дані системи і надає їх клієнту. Він також обслуговує файли, які реалізують систему на стороні клієнта.
 
 {{index [HTTP, client]}}
 
-The server keeps the list of ((talk))s proposed for the next meeting, and the client shows this list. Each talk has a presenter name, a title, a summary, and an array of ((comment))s associated with it. The client allows users to propose new talks (adding them to the list), delete talks, and comment on existing talks. Whenever the user makes such a change, the client makes an HTTP ((request)) to tell the server about it.
+Сервер зберігає список ((доповідей)), запропонованих для наступної зустрічі, а клієнт показує цей список. Кожна доповідь має ім'я доповідача, назву, короткий зміст і масив ((коментарів)), пов'язаних з нею. Клієнт дозволяє користувачам пропонувати нові доповіді (додаючи їх до списку), видаляти доповіді та коментувати існуючі. Кожного разу, коли користувач вносить такі зміни, клієнт робить HTTP-запит, щоб повідомити про це серверу.
 
-{{figure {url: "img/skillsharing.png", alt: "Screenshot of the skill-sharing website", width: "10cm"}}}
+{{figure {url: «img/skillsharing.png», alt: «Скріншот веб-сайту обміну навичками», width: “10cm”}}}}
 
-{{index "live view", "user experience", "pushing data", connection}}
+{{index «live view», «user experience», «pushing data», connection}}
 
-The ((application)) will be set up to show a _live_ view of the current proposed talks and their comments. Whenever someone, somewhere, submits a new talk or adds a comment, all people who have the page open in their browsers should immediately see the change. This poses a bit of a challenge—there is no way for a web server to open a connection to a client, nor is there a good way to know which clients are currently looking at a given website.
+((додаток)) буде налаштовано так, щоб показувати _живий_ перегляд поточних запропонованих доповідей і коментарів до них. Щоразу, коли хтось, десь, подає нове обговорення або додає коментар, всі люди, у яких відкрита сторінка в браузері, повинні негайно побачити зміни. Це створює певні труднощі - веб-сервер не може відкрити з'єднання з клієнтом, а також не існує надійного способу дізнатися, які саме клієнти в даний момент переглядають даний вебсайт.
 
-{{index "Node.js"}}
+{{index «Node.js»}}
 
-A common solution to this problem is called _((long polling))_, which happens to be one of the motivations for Node's design.
+Загальне рішення цієї проблеми називається _((довге опитування))_, що стало одним з мотивів для розробки Node.
 
-## Long polling
+## Довге опитування
 
-{{index notification, "long polling", network, [browser, security]}}
+{{сповіщення про індекс, «довге опитування», мережа, [браузер, безпека]}}
 
-To be able to immediately notify a client that something changed, we need a ((connection)) to that client. Since web browsers do not traditionally accept connections and clients are often behind ((router))s that would block such connections anyway, having the server initiate this connection is not practical.
+Щоб мати змогу негайно сповістити клієнта про те, що щось змінилося, нам потрібне ((з'єднання)) з цим клієнтом. Оскільки веб-браузери традиційно не приймають з'єднання, а клієнти часто знаходяться за ((маршрутизатором)), який у будь-якому випадку блокує такі з'єднання, використання сервера для ініціювання такого з'єднання не є практичним.
 
-{{index socket}}
+{{індексний сокет}}
 
-We can arrange for the client to open the connection and keep it around so that the server can use it to send information when it needs to do so. But an ((HTTP)) request allows only a simple flow of information: the client sends a request, the server comes back with a single response, and that's it. A technology called _((WebSockets))_ makes it possible to open ((connection))s for arbitrary data exchange, but using such sockets properly is somewhat tricky.
+Ми можемо зробити так, щоб клієнт відкривав з'єднання і підтримував його, щоб сервер міг використовувати його для надсилання інформації, коли йому це потрібно. Але запит ((HTTP)) дозволяє лише простий потік інформації: клієнт надсилає запит, сервер повертається з єдиною відповіддю, і це все. Технологія під назвою _((WebSockets))_ дозволяє відкривати ((з'єднання)) _ для довільного обміну даними, але правильно використовувати такі сокети дещо складно.
 
-In this chapter, we use a simpler technique, ((long polling)), where clients continuously ask the server for new information using regular HTTP requests, and the server stalls its answer when it has nothing new to report.
+У цій главі ми використовуємо простішу техніку, ((довге опитування)), де клієнти постійно запитують у сервера нову інформацію за допомогою звичайних HTTP-запитів, а сервер призупиняє відповідь, коли не має що повідомити нового.
 
-{{index "live view"}}
+{{index «live view»}}
 
-As long as the client makes sure it constantly has a polling request open, it will receive information from the server quickly after it becomes available. For example, if Fatma has our skill-sharing application open in her browser, that browser will have made a request for updates and will be waiting for a response to that request. When Iman submits a talk on Extreme Downhill Unicycling, the server will notice that Fatma is waiting for updates and send a response containing the new talk to her pending request. Fatma's browser will receive the data and update the screen to show the talk.
+Якщо клієнт постійно тримає запит на опитування відкритим, він отримуватиме інформацію від сервера швидко, як тільки вона стане доступною. Наприклад, якщо у Фатми в браузері відкритий наш додаток для обміну навичками, цей браузер зробить запит на оновлення і буде чекати на відповідь на цей запит. Коли Іман надішле доповідь на тему «Екстремальний спуск на одноколісному велосипеді», сервер помітить, що Фатма чекає на оновлення, і надішле відповідь з новою доповіддю на її запит, що очікує на відповідь. Браузер Фатми отримає дані і оновить екран, щоб показати доповідь.
 
-{{index robustness, timeout}}
+{{надійність індексу, таймаут}}
 
-To prevent connections from timing out (being aborted because of a lack of activity), ((long polling)) techniques usually set a maximum time for each request, after which the server will respond anyway, even though it has nothing to report. The client can then start a new request. Periodically restarting the request also makes the technique more robust, allowing clients to recover from temporary ((connection)) failures or server problems.
+Щоб запобігти тайм-ауту з'єднання (перериванню через відсутність активності), методи ((тривалого опитування)) зазвичай встановлюють максимальний час для кожного запиту, після якого сервер все одно відповість, навіть якщо йому нічого повідомити. Після цього клієнт може почати новий запит. Періодичний перезапуск запиту також робить метод більш надійним, дозволяючи клієнтам відновлюватися після тимчасових ((з'єднання)) збоїв або проблем з сервером.
 
-{{index "Node.js"}}
+{{index «Node.js»}}
 
-A busy server that is using long polling may have thousands of waiting requests, and thus ((TCP)) connections, open. Node, which makes it easy to manage many connections without creating a separate thread of control for each one, is a good fit for such a system.
+На завантаженому сервері, який використовує довгі опитування, можуть бути тисячі запитів, що очікують на відповідь, і, відповідно, відкритих ((TCP)) з'єднань. Node, який дозволяє легко керувати багатьма з'єднаннями без створення окремого потоку управління для кожного з них, добре підходить для такої системи.
 
-## HTTP interface
+## Інтерфейс HTTP
 
-{{index "skill-sharing project", [interface, HTTP]}}
+{{index «skill-sharing project», [interface, HTTP]}}
 
-Before we start designing either the server or the client, let's think about the point where they touch: the ((HTTP)) interface over which they communicate.
+Перш ніж ми почнемо проектувати сервер або клієнт, давайте подумаємо про точку, де вони стикаються: інтерфейс ((HTTP)), через який вони спілкуються.
 
-{{index [path, URL], [method, HTTP]}}
+{{index [шлях, URL], [метод, HTTP]}}
 
-We will use ((JSON)) as the format of our request and response body. Like in the file server from [Chapter ?](node#file_server), we'll try to make good use of HTTP methods and ((header))s. The interface is centered around the `/talks` path. Paths that do not start with `/talks` will be used for serving ((static file))s—the HTML and JavaScript code for the client-side system.
+Ми будемо використовувати ((JSON)) як формат нашого запиту і тіла відповіді. Як і у файловому сервері з [Глава ?](node#file_server), ми спробуємо добре використовувати методи HTTP і ((header))s. Інтерфейс зосереджено навколо шляху `/talks`. Шляхи, які не починаються з `/talks`, будуть використовуватися для обслуговування ((статичного файлу))s - HTML та JavaScript коду для клієнтської частини системи.
 
-{{index "GET method"}}
+{{index «Метод GET»}}
 
-A `GET` request to `/talks` returns a JSON document like this:
+Запит `GET` до `/talks` повертає такий JSON-документ:
 
-```{lang: "json"}
-[{"title": "Unituning",
-  "presenter": "Jamal",
-  "summary": "Modifying your cycle for extra style",
-  "comments": []}]
+```{lang: «json"}
+[{{«title»: «Unituning»,
+  «presenter": «Jamal»,
+  «summary": «Модифікація вашого циклу для додаткового стилю»,
+  «comments": []}]
 ```
 
-{{index "PUT method", URL}}
+{{index «PUT method», URL}}
 
-Creating a new talk is done by making a `PUT` request to a URL like `/talks/Unituning`, where the part after the second slash is the title of the talk. The `PUT` request's body should contain a ((JSON)) object that has `presenter` and `summary` properties.
+Створення нової теки виконується за допомогою запиту `PUT` до URL на кшталт `/talks/Unituning`, де частина після другої косої риски - це назва теки. Тіло запиту `PUT` має містити об'єкт ((JSON)), який має властивості `presenter` та `summary`.
 
-{{index "encodeURIComponent function", [escaping, "in URLs"], [whitespace, "in URLs"]}}
+{{index «encodeURIComponent function», [escaping, «in URLs»], [whitespace, «in URLs»]}}
 
-Since talk titles may contain spaces and other characters that may not appear normally in a URL, title strings must be encoded with the `encodeURIComponent` function when building up such a URL.
+Оскільки заголовки розмов можуть містити пробіли та інші символи, які можуть не відображатися у звичайній URL-адресі, при створенні такої URL-адреси рядки заголовків слід кодувати за допомогою функції `encodeURIComponent`.
 
 ```
-console.log("/talks/" + encodeURIComponent("How to Idle"));
+console.log(«/talks/» + encodeURIComponent(«How to Idle»));
 // → /talks/How%20to%20Idle
 ```
 
-A request to create a talk about idling might look something like this:
+Запит на створення тейлу про байдикування може виглядати приблизно так:
 
 ```{lang: http}
 PUT /talks/How%20to%20Idle HTTP/1.1
 Content-Type: application/json
 Content-Length: 92
 
-{"presenter": "Maureen",
- "summary": "Standing still on a unicycle"}
+{«ведучий»: «Maureen»,
+ «summary": «Стоячи на місці на одноколісному велосипеді"}
 ```
 
-Such URLs also support `GET` requests to retrieve the JSON representation of a talk and `DELETE` requests to delete a talk.
+Такі URL-адреси також підтримують запити `GET` для отримання JSON-представлення бесіди та запити `DELETE` для видалення бесіди.
 
-{{index "POST method"}}
+{{index «POST метод»}}
 
-Adding a ((comment)) to a talk is done with a `POST` request to a URL like `/talks/Unituning/comments`, with a JSON body that has `author` and `message` properties.
+Додавання ((коментаря)) до теки виконується за допомогою `POST`-запиту на URL типу `/talks/Unituning/comments`, з тілом JSON, що має властивості `author` та `message`.
 
 ```{lang: http}
 POST /talks/Unituning/comments HTTP/1.1
 Content-Type: application/json
 Content-Length: 72
 
-{"author": "Iman",
- "message": "Will you talk about raising a cycle?"}
+{«author»: «Iman»,
+ «message": «Чи будете ви говорити про підняття циклу?"}
 ```
 
-{{index "query string", timeout, "ETag header", "If-None-Match header"}}
+{{index «рядок запиту», timeout, «заголовок ETag», «заголовок If-None-Match»}}
 
-To support ((long polling)), `GET` requests to `/talks` may include extra headers that inform the server to delay the response if no new information is available. We'll use a pair of headers normally intended to manage caching: `ETag` and `If-None-Match`.
+Для підтримки ((довгого опитування)), `GET` запити до `/talks` можуть містити додаткові заголовки, які інформують сервер про затримку відповіді у разі відсутності нової інформації. Ми використаємо пару заголовків, які зазвичай призначені для керування кешуванням: `ETag` та `If-None-Match`.
 
-{{index "304 (HTTP status code)"}}
+{{index «304 (код стану HTTP)»}}
 
-Servers may include an `ETag` ("entity tag") header in a response. Its value is a string that identifies the current version of the resource. Clients, when they later request that resource again, may make a _((conditional request))_ by including an `If-None-Match` header whose value holds that same string. If the resource hasn't changed, the server will respond with status code 304, which means "not modified", telling the client that its cached version is still current. When the tag does not match, the server responds as normal.
+Сервери можуть включати у відповідь заголовок `ETag` («тег сутності»). Його значенням є рядок, який ідентифікує поточну версію ресурсу. Клієнти, коли вони пізніше знову запитують цей ресурс, можуть зробити _((умовний запит))_, включивши заголовок `If-None-Match`, значенням якого є той самий рядок. Якщо ресурс не змінився, сервер відповість кодом стану 304, що означає «не змінено», повідомляючи клієнту, що його кешована версія все ще актуальна. Якщо тег не збігається, сервер відповідає як зазвичай.
 
-{{index "Prefer header"}}
+{{index «Prefer header»}}
 
-We need something like this, where the client can tell the server which version of the list of talks it has, and the server responds only when that list has changed. But instead of immediately returning a 304 response, the server should stall the response and return only when something new is available or a given amount of time has elapsed. To distinguish long polling requests from normal conditional requests, we give them another header, `Prefer: wait=90`, which tells the server that the client is willing to wait up to 90 seconds for the response.
+Нам потрібно щось подібне, де клієнт може повідомити серверу, яку версію списку розмов він має, а сервер відповідатиме лише тоді, коли цей список зміниться. Але замість того, щоб негайно повертати відповідь 304, сервер повинен затримати відповідь і повернутися лише тоді, коли з'явиться щось нове або пройде певний проміжок часу. Щоб відрізнити довгі запити-опитування від звичайних умовних запитів, ми додамо їм ще один заголовок, `Prefer: wait=90`, який повідомляє серверу, що клієнт готовий почекати на відповідь до 90 секунд.
 
-The server will keep a version number that it updates every time the talks change and will use that as the `ETag` value. Clients can make requests like this to be notified when the talks change:
+Сервер зберігатиме номер версії, який він оновлюватиме щоразу, коли змінюються переговори, і використовуватиме його як значення `ETag`. Клієнти можуть робити подібні запити, щоб отримувати сповіщення про зміну переговорів:
 
 ```{lang: null}
 GET /talks HTTP/1.1
-If-None-Match: "4"
-Prefer: wait=90
+If-None-Match: «4»
+Бажано: wait=90
 
-(time passes)
+(минає час)
 
 HTTP/1.1 200 OK
 Content-Type: application/json
-ETag: "5"
+ETag: «5»
 Content-Length: 295
 
 [...]
 ```
 
-{{index security}}
+{{індекс безпеки}}
 
-The protocol described here doesn't do any ((access control)). Everybody can comment, modify talks, and even delete them. (Since the internet is full of ((hooligan))s, putting such a system online without further protection probably wouldn't end well.)
+Описаний тут протокол не робить ніякого ((контролю доступу)). Кожен може коментувати, змінювати бесіди і навіть видаляти їх. (Оскільки в інтернеті повно ((хуліганів)), розміщення такої системи у мережі без додаткового захисту, ймовірно, нічим добрим не закінчиться).
 
-## The server
+## Сервер
 
-{{index "skill-sharing project"}}
+{{index «skill-sharing project»}}
 
-Let's start by building the ((server))-side part of the program. The code in this section runs on ((Node.js)).
+Почнемо зі створення ((серверної))-частини програми. Код у цьому розділі виконується на ((Node.js)).
 
-### Routing
+### Маршрутизація
 
-{{index "createServer function", [path, URL], [method, HTTP]}}
+{{index «createServer function», [шлях, URL], [метод, HTTP]}}
 
-Our server will use Node's `createServer` to start an HTTP server. In the function that handles a new request, we must distinguish between the various kinds of requests (as determined by the method and the path) that we support. This can be done with a long chain of `if` statements, but there's a nicer way.
+Наш сервер буде використовувати функцію `createServer` Node для запуску HTTP-сервера. У функції, яка обробляє новий запит, ми повинні розрізняти різні типи запитів (визначені методом і шляхом), які ми підтримуємо. Це можна зробити за допомогою довгого ланцюжка операторів `if`, але є і більш простий спосіб.
 
 {{index dispatch}}
 
-A _((router))_ is a component that helps dispatch a request to the function that can handle it. You can tell the router, for example, that `PUT` requests with a path that matches the regular expression `/^\/talks\/([^\/]+)$/` (`/talks/` followed by a talk title) can be handled by a given function. In addition, it can help extract the meaningful parts of the path (in this case the talk title), wrapped in parentheses in the ((regular expression)), and pass them to the handler function.
+Маршрутизатор _((router))_ - це компонент, який допомагає надіслати запит до функції, яка може його обробити. Наприклад, ви можете вказати маршрутизатору, що запити `PUT` зі шляхом, який відповідає регулярному виразу `/^\/talks\/([^\/]+)$/` (`/talks/` з наступною назвою розмови) можуть бути оброблені даною функцією. Крім того, вона може допомогти витягти значущі частини шляху (у цьому випадку назву теки), загорнуті у круглі дужки у ((регулярний вираз)), і передати їх до функції-обробника.
 
-There are a number of good router packages on ((NPM)), but here we'll write one ourselves to illustrate the principle.
+Існує декілька хороших пакунків маршрутизаторів на ((NPM)), але тут ми напишемо один з них самі, щоб проілюструвати принцип.
 
-{{index "import keyword", "Router class", module}}
+{{index «import keyword», «Router class», module}}
 
-This is `router.mjs`, which we will later `import` from our server module:
+Це `router.mjs, який ми пізніше «імпортуємо» з нашого серверного модуля:
 
-```{includeCode: ">code/skillsharing/router.mjs"}
+```{includeCode: «>code/skillsharing/router.mjs"}}
 export class Router {
   constructor() {
     this.routes = [];
   }
-  add(method, url, handler) {
-    this.routes.push({method, url, handler});
+  add(метод, url, обробник) {
+    this.routes.push({метод, url, обробник});
   }
   async resolve(request, context) {
-    let {pathname} = new URL(request.url, "http://d");
+    let {pathname} = new URL(request.url, «http://d»);
     for (let {method, url, handler} of this.routes) {
       let match = url.exec(pathname);
       if (!match || request.method != method) continue;
@@ -197,42 +197,42 @@ export class Router {
 }
 ```
 
-{{index "Router class"}}
+{{index «Router class»}}
 
-The module exports the `Router` class. A router object allows you to register handlers for specific methods and URL patterns with its `add` method. When a request is resolved with the `resolve` method, the router calls the handler whose method and URL match the request and return its result.
+Модуль експортує клас `Router`. Об'єкт router дозволяє реєструвати обробники для певних методів та шаблонів URL за допомогою методу `add`. Коли запит обробляється методом `resolve`, маршрутизатор викликає обробник, метод і URL якого відповідають запиту, і повертає його результат.
 
-{{index "capture group", "decodeURIComponent function", [escaping, "in URLs"]}}
+{{index «група захоплення», «функція декодуванняURIComponent», [екранування, «в URL-адресах»]}}
 
-Handler functions are called with the `context` value given to `resolve`. We will use this to give them access to our server state. Additionally, they receive the match strings for any groups they defined in their ((regular expression)), and the request object. The strings have to be URL-decoded, since the raw URL may contain `%20`-style codes.
+Функції-обробники викликаються зі значенням `context`, переданим `resolve`. Ми використаємо це, щоб надати їм доступ до стану нашого сервера. Крім того, вони отримують рядки відповідності для всіх груп, які вони визначили у своєму ((регулярному виразі)), і об'єкт запиту. Рядки мають бути URL-декодовані, оскільки сирий URL може містити коди у стилі `%20`.
 
-### Serving files
+### Обслуговування файлів
 
-When a request matches none of the request types defined in our router, the server must interpret it as a request for a file in the `public` directory. It would be possible to use the file server defined in [Chapter ?](node#file_server) to serve such files, but we neither need nor want to support `PUT` and `DELETE` requests on files, and we would like to have advanced features such as support for caching. Let's use a solid, well-tested ((static file)) server from ((NPM)) instead.
+Коли запит не відповідає жодному з типів запитів, визначених у нашому маршрутизаторі, сервер повинен інтерпретувати його як запит до файлу в каталозі `public`. Для обслуговування таких файлів можна було б використати файловий сервер, визначений у [Глава ?](node#file_server), але нам не потрібно і не хочеться підтримувати запити `PUT` і `DELETE` до файлів, і ми хотіли б мати розширені можливості, такі як підтримка кешування. Давайте скористаємося надійним, добре протестованим ((статичним файловим)) сервером з ((NPM)).
 
-{{index "createServer function", "serve-static package"}}
+{{index «createServer function», «serve-static package»}}
 
-I opted for `serve-static`. This isn't the only such server on NPM, but it works well and fits our purposes. The `serve-static` package exports a function that can be called with a root directory to produce a request handler function. The handler function accepts the `request` and `response` arguments provided by the server from `"node:http"`, and a third argument, a function that it will call if no file matches the request. We want our server to first check for requests we should handle specially, as defined in the router, so we wrap it in another function.
+Я вибрав `serve-static`. Це не єдиний такий сервер на NPM, але він добре працює і підходить для наших цілей. Пакет `serve-static` експортує функцію, яку можна викликати з кореневого каталогу для створення функції-обробника запитів. Функція-обробник приймає аргументи `запит` і `відповідь`, надані сервером з `node:http`, і третій аргумент - функцію, яку буде викликано, якщо не буде знайдено жодного файлу, що відповідає запиту. Ми хочемо, щоб наш сервер спочатку перевіряв запити, які ми повинні обробляти спеціально, як визначено у маршрутизаторі, тому ми обертаємо його в іншу функцію.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-import {createServer} from "node:http";
-import serveStatic from "serve-static";
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
+імпортуємо {createServer} з «node:http»;
+import serveStatic from «serve-static»;
 
 function notFound(request, response) {
-  response.writeHead(404, "Not found");
-  response.end("<h1>Not found</h1>");
+  response.writeHead(404, «Не знайдено»);
+  response.end(«<h1>Не знайдено</h1>»);
 }
 
 class SkillShareServer {
   constructor(talks) {
     this.talks = talks;
-    this.version = 0;
+    this.version = 0
     this.waiting = [];
 
-    let fileServer = serveStatic("./public");
-    this.server = createServer((request, response) => {
-      serveFromRouter(this, request, response, () => {
-        fileServer(request, response,
-                   () => notFound(request, response));
+    let fileServer = serveStatic(«./public»);
+    this.server = createServer((request, response) => {}; }; this.server = createServer((request, response) => {
+      serveFromRouter(this, request, response, () => {})
+        fileServer(запит, відповідь,
+                   () => notFound(запит, відповідь));
       });
     });
   }
@@ -245,18 +245,18 @@ class SkillShareServer {
 }
 ```
 
-The `serveFromRouter` function has the same interface as `fileServer`, taking `(request, response, next)` arguments. We can use this to “chain” several request handlers, allowing each to either handle the request or pass responsibility for that on to the next handler. The final handler, `notFound`, simply responds with a “not found” error.
+Функція `erveFromRouter` має такий самий інтерфейс, як і `fileServer`, і приймає аргументи `(запит, відповідь, наступний)`. Ми можемо використовувати її для «ланцюжка» з декількох обробників запитів, дозволяючи кожному з них або обробляти запит, або передавати відповідальність за нього наступному обробнику. Останній обробник, `notFound`, просто повертає помилку «не знайдено».
 
-Our `serveFromRouter` function uses a similar convention to the file server from the [previous chapter](node) for responses—handlers in the router return promises that resolve to objects describing the response.
+Наша функція ``erveFromRouter`` використовує аналогічну угоду з файловим сервером з [попереднього розділу](node) для відповідей-обробників у обіцянках повернення маршрутизатора, які перетворюються на об'єкти, що описують відповідь.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-import {Router} from "./router.mjs";
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
+імпортуємо {Router} з «./router.mjs»;
 
 const router = new Router();
-const defaultHeaders = {"Content-Type": "text/plain"};
+const defaultHeaders = {«Content-Type»: «text/plain"};
 
-async function serveFromRouter(server, request,
-                               response, next) {
+async-функція serveFromRouter(server, request,
+                               відповідь, наступний) {
   let resolved = await router.resolve(request, server)
     .catch(error => {
       if (error.status != null) return error;
@@ -264,73 +264,73 @@ async function serveFromRouter(server, request,
     });
   if (!resolved) return next();
   let {body, status = 200, headers = defaultHeaders} =
-    await resolved;
+    очікуємо на вирішення;
   response.writeHead(status, headers);
   response.end(body);
 }
 ```
 
-### Talks as resources
+### Розмови як ресурси
 
-The ((talk))s that have been proposed are stored in the `talks` property of the server, an object whose property names are the talk titles. We'll add some handlers to our router that expose these as HTTP ((resource))s under `/talks/<title>`.
+Запропоновані ((talk))и зберігаються у властивості `talks` на сервері, об'єкті, іменами властивостей якого є заголовки розмов. Ми додамо кілька обробників до нашого маршрутизатора, які відкриють їх як HTTP ((ресурс))и у `/talks/<title>`.
 
-{{index "GET method", "404 (HTTP status code)" "hasOwn function"}}
+{{index «метод GET», «404 (код стану HTTP)» «hasOwn function»}}
 
-The handler for requests that `GET` a single talk must look up the talk and respond either with the talk's JSON data or with a 404 error response.
+Обробник для запитів, що `GET` окрему теку, повинен шукати цю теку і відповідати або JSON-даними теки, або відповіддю про помилку 404.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
 const talkPath = /^\/talks\/([^\/]+)$/;
 
-router.add("GET", talkPath, async (server, title) => {
-  if (Object.hasOwn(server.talks, title)) {
+router.add(«GET», talkPath, async (server, title) => { })
+  if (Object.hasOwn(server.talks, title)) { } }
     return {body: JSON.stringify(server.talks[title]),
-            headers: {"Content-Type": "application/json"}};
+            headers: {«Content-Type»: «application/json"}};
   } else {
-    return {status: 404, body: `No talk '${title}' found`};
+    return {status: 404, body: `Не знайдено розмови '${title}'`};
   }
 });
 ```
 
-{{index "DELETE method"}}
+{{index «метод DELETE»}}
 
-Deleting a talk is done by removing it from the `talks` object.
+Видалення толки відбувається шляхом видалення її з об'єкта `talks`.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-router.add("DELETE", talkPath, async (server, title) => {
-  if (Object.hasOwn(server.talks, title)) {
-    delete server.talks[title];
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}}
+router.add(«DELETE», talkPath, async (server, title) => {})
+  if (Object.hasOwn(server.talks, title)) { {})
+    видаляємо server.talks[title];
     server.updated();
   }
   return {status: 204};
 });
 ```
 
-{{index "long polling", "updated method"}}
+{{index «long polling», «updated method»}}
 
-The `updated` method, which we will define [later](skillsharing#updated), notifies waiting long polling requests about the change.
+Метод `updated`, який ми визначимо [пізніше](skillsharing#updated), сповіщає про зміни запити з довгим опитуванням, що очікують на них.
 
-{{index validation, input, "PUT method"}}
+{{index validation, input, «PUT method»}}
 
-One handler that needs to read request bodies is the `PUT` handler, which is used to create new ((talk))s. It has to check whether the data it was given has `presenter` and `summary` properties, which are strings. Any data coming from outside the system might be nonsense, and we don't want to corrupt our internal data model or ((crash)) when bad requests come in.
+Одним з обробників, який має читати тіла запитів, є обробник `PUT`, який використовується для створення нових ((talk))s. Він має перевірити, чи дані, які йому передано, мають властивості `presenter` та `ummary`, які є рядками. Будь-які дані, що надходять ззовні системи, можуть бути нісенітницею, а ми не хочемо пошкодити нашу внутрішню модель даних або ((крах)), коли надходять погані запити.
 
-{{index "updated method"}}
+{{index «updated method»}}
 
-If the data looks valid, the handler stores an object that represents the new talk in the `talks` object, possibly ((overwriting)) an existing talk with this title, and again calls `updated`.
+Якщо дані виглядають коректними, обробник зберігає об'єкт, який представляє нову розмову в об'єкті `talks`, можливо ((перезаписує)) існуючу розмову з такою назвою, і знову викликає `updated`.
 
-{{index "node:stream/consumers package", JSON, "readable stream"}}
+{{index «node:stream/consumers package», JSON, «readable stream»}}
 
-To read the body from the request stream, we will use the `json` function from `"node:stream/consumers"`, which collects the data in the stream and then parses it as JSON. There are similar exports called `text` (to read the content as a string) and `buffer` (to read it as binary data) in this package. Since `json` is a very generic name, the import renames it to `readJSON` to avoid confusion.
+Щоб прочитати тіло з потоку запиту, ми використаємо функцію `json` з `«node:stream/consumers»`, яка збирає дані в потоці, а потім розбирає їх як JSON. У цьому пакунку є аналогічні експортні функції `text` (для зчитування вмісту у вигляді рядка) та `buffer` (для зчитування у вигляді двійкових даних). Оскільки `json` є дуже загальною назвою, імпорт перейменовує її на `readJSON`, щоб уникнути плутанини.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-import {json as readJSON} from "node:stream/consumers";
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
+import {json as readJSON} from «node:stream/consumers»;
 
-router.add("PUT", talkPath,
-           async (server, title, request) => {
+router.add(«PUT», talkPath,
+           async (server, title, request) => {})
   let talk = await readJSON(request);
-  if (!talk ||
-      typeof talk.presenter != "string" ||
-      typeof talk.summary != "string") {
-    return {status: 400, body: "Bad talk data"};
+  if (!talk || typeof talk.presenter !typeof talk.presenter !typeof talk.presenter !
+      typeof talk.presenter != «string» ||)
+      typeof talk.summary != «string») { })
+    return {status: 400, body: «Bad talk data"};
   }
   server.talks[title] = {
     title,
@@ -343,61 +343,61 @@ router.add("PUT", talkPath,
 });
 ```
 
-Adding a ((comment)) to a ((talk)) works similarly. We use `readJSON` to get the content of the request, validate the resulting data, and store it as a comment when it looks valid.
+Додавання ((comment)) до ((talk)) працює аналогічно. Ми використовуємо `readJSON` для отримання вмісту запиту, перевіряємо отримані дані і зберігаємо їх як коментар, якщо вони виглядають коректно.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-router.add("POST", /^\/talks\/([^\/]+)\/comments$/,
-           async (server, title, request) => {
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
+router.add(«POST», /^\/talks\/([^\/]+)\/comments$/,
+           async (server, title, request) => { })
   let comment = await readJSON(request);
-  if (!comment ||
-      typeof comment.author != "string" ||
-      typeof comment.message != "string") {
-    return {status: 400, body: "Bad comment data"};
-  } else if (Object.hasOwn(server.talks, title)) {
+  if (!comment ||)
+      typeof comment.author != «string» ||)
+      typeof comment.message != «string») { })
+    return {status: 400, body: «Погані дані коментаря"};
+  } else if (Object.hasOwn(server.talks, title)) { {
     server.talks[title].comments.push(comment);
     server.updated();
     return {status: 204};
   } else {
-    return {status: 404, body: `No talk '${title}' found`};
+    return {status: 404, body: `Не знайдено жодного толку '${title}'`};
   }
 });
 ```
 
-{{index "404 (HTTP status code)"}}
+{{index «404 (код статусу HTTP)»}}
 
-Trying to add a comment to a nonexistent talk returns a 404 error.
+Спроба додати коментар до неіснуючого обговорення повертає помилку 404.
 
-### Long polling support
+### Підтримка довгих опитувань
 
-The most interesting aspect of the server is the part that handles ((long polling)). When a `GET` request comes in for `/talks`, it may be either a regular request or a long polling request.
+Найцікавішим аспектом сервера є частина, яка обробляє ((довгі опитування)). Коли надходить запит `GET` для `/talks`, це може бути як звичайний запит, так і запит з довгим опитуванням.
 
-{{index "talkResponse method", "ETag header"}}
+{{index «talkResponse method», «ETag header»}}
 
-There will be multiple places in which we have to send an array of talks to the client, so we first define a helper method that builds up such an array and includes an `ETag` header in the response.
+Буде багато місць, в яких нам доведеться надсилати клієнту масив розмов, тому спочатку ми визначимо допоміжний метод, який створить такий масив і включить заголовок `ETag` у відповідь.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
 SkillShareServer.prototype.talkResponse = function() {
   let talks = Object.keys(this.talks)
     .map(title => this.talks[title]);
-  return {
-    body: JSON.stringify(talks),
-    headers: {"Content-Type": "application/json",
-              "ETag": `"${this.version}"`,
-              "Cache-Control": "no-store"}
+  return { { body: body
+    тіло: JSON.stringify(talks),
+    headers: { «Content-Type»: «application/json»,
+              «ETag": `«${this.version}»`,
+              «Cache-Control": «no-store"}
   };
 };
 ```
 
-{{index "query string", "url package", parsing}}
+{{index «query string», «url package», parsing}}
 
-The handler itself needs to look at the request headers to see whether `If-None-Match` and `Prefer` headers are present. Node stores headers, whose names are specified to be case insensitive, under their lowercase names.
+Оброблювач повинен сам переглянути заголовки запиту, щоб побачити, чи присутні заголовки `If-None-Match` і `Prefer`. Node зберігає заголовки, імена яких визначено як нечутливі до регістру, під їхніми малими літерами.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
-router.add("GET", /^\/talks$/, async (server, request) => {
-  let tag = /"(.*)"/.exec(request.headers["if-none-match"]);
-  let wait = /\bwait=(\d+)/.exec(request.headers["prefer"]);
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
+router.add(«GET», /^\/talks$/, async (server, request) => {})
+  let tag = /«(.*)»/.exec(request.headers[«if-none-match»]);
+  let wait = /\bwait=(\d+)/.exec(request.headers[«prefer»]);
   if (!tag || tag[1] != server.version) {
-    return server.talkResponse();
+    повернути server.talkResponse();
   } else if (!wait) {
     return {status: 304};
   } else {
@@ -406,19 +406,19 @@ router.add("GET", /^\/talks$/, async (server, request) => {
 });
 ```
 
-{{index "long polling", "waitForChanges method", "If-None-Match header", "Prefer header"}}
+{{index «long polling», «waitForChanges method», «If-None-Match header», «Prefer header»}}
 
-If no tag was given or a tag was given that doesn't match the server's current version, the handler responds with the list of talks. If the request is conditional and the talks did not change, we consult the `Prefer` header to see whether we should delay the response or respond right away.
+Якщо тег не було вказано або було вказано тег, який не відповідає поточній версії сервера, обробник відповідає списком розмов. Якщо запит є умовним і розмови не змінилися, ми звертаємося до заголовка `Prefer`, щоб побачити, чи слід відкласти відповідь або відповісти негайно.
 
-{{index "304 (HTTP status code)", "setTimeout function", timeout, "callback function"}}
+{{index «304 (код статусу HTTP)», «setTimeout function», timeout, «callback function»}}
 
-Callback functions for delayed requests are stored in the server's `waiting` array so that they can be notified when something happens. The `waitForChanges` method also immediately sets a timer to respond with a 304 status when the request has waited long enough.
+Функції зворотного виклику для відкладених запитів зберігаються в масиві `waiting` на сервері, щоб їх можна було сповістити, коли щось станеться. Метод `waitForChanges` також негайно встановлює таймер для відповіді зі статусом 304, коли запит чекає досить довго.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
 SkillShareServer.prototype.waitForChanges = function(time) {
   return new Promise(resolve => {
     this.waiting.push(resolve);
-    setTimeout(() => {
+    setTimeout(() => {})
       if (!this.waiting.includes(resolve)) return;
       this.waiting = this.waiting.filter(r => r != resolve);
       resolve({status: 304});
@@ -427,13 +427,13 @@ SkillShareServer.prototype.waitForChanges = function(time) {
 };
 ```
 
-{{index "updated method"}}
+{{index «updated method»}}
 
 {{id updated}}
 
-Registering a change with `updated` increases the `version` property and wakes up all waiting requests.
+Реєстрація зміни за допомогою `updated` збільшує властивість `version` і пробуджує всі запити, що очікують.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}}
 SkillShareServer.prototype.updated = function() {
   this.version++;
   let response = this.talkResponse();
@@ -444,91 +444,91 @@ SkillShareServer.prototype.updated = function() {
 
 {{index [HTTP, server]}}
 
-That concludes the server code. If we create an instance of `SkillShareServer` and start it on port 8000, the resulting HTTP server serves files from the `public` subdirectory alongside a talk-managing interface under the `/talks` URL.
+На цьому код сервера завершується. Якщо ми створимо екземпляр `SkillShareServer` і запустимо його на порту 8000, отриманий HTTP-сервер обслуговуватиме файли з підкаталогу `public` разом з інтерфейсом керування бесідами за адресою `/talks`.
 
-```{includeCode: ">code/skillsharing/skillsharing_server.mjs"}
+```{includeCode: «>code/skillsharing/skillsharing_server.mjs"}
 new SkillShareServer({}).start(8000);
 ```
 
-## The client
+## Клієнт
 
-{{index "skill-sharing project"}}
+{{index «skill-sharing project»}}
 
-The ((client))-side part of the skill-sharing website consists of three files: a tiny HTML page, a style sheet, and a JavaScript file.
+((клієнтська)) частина веб-сайту обміну навичками складається з трьох файлів: маленької HTML-сторінки, таблиці стилів та JavaScript-файлу.
 
 ### HTML
 
-{{index "index.html"}}
+{{index «index.html»}}
 
-It is a widely used convention for web servers to try to serve a file named `index.html` when a request is made directly to a path that corresponds to a directory. The ((file server)) module we use, `serve-static`, supports this convention. When a request is made to the path `/`, the server looks for the file `./public/index.html` (`./public` being the root we gave it) and returns that file if found.
+Це широко розповсюджена угода для веб-серверів - намагатися обслуговувати файл з ім'ям `index.html`, коли запит робиться безпосередньо до шляху, який відповідає каталогу. Модуль ((файловий сервер)), який ми використовуємо, `erve-static`, підтримує цю домовленість. Коли запит виконується до шляху `/`, сервер шукає файл `./public/index.html` (`./public` - це корінь, який ми йому дали) і повертає цей файл, якщо він знайдений.
 
-Thus, if we want a page to show up when a browser is pointed at our server, we should put it in `public/index.html`. This is our index file:
+Таким чином, якщо ми хочемо, щоб сторінка відображалася, коли браузер вказує на наш сервер, ми повинні помістити її в `public/index.html`. Це наш індексний файл:
 
-```{lang: "html", includeCode: ">code/skillsharing/public/index.html"}
+```{lang: «html», includeCode: «>code/skillsharing/public/index.html"}
 <!doctype html>
-<meta charset="utf-8">
-<title>Skill Sharing</title>
-<link rel="stylesheet" href="skillsharing.css">
+<meta charset=«utf-8»>
+<title>Обмін навичками</title>
+<link rel=«stylesheet» href=«skillsharing.css»>
 
-<h1>Skill Sharing</h1>
+<h1>Обмін навичками</h1>
 
-<script src="skillsharing_client.js"></script>
+<script src=«skillsharing_client.js»></script></script
 ```
 
 {{index CSS}}
 
-It defines the document ((title)) and includes a style sheet, which defines a few styles to, among other things, make sure there is some space between talks. It then adds a heading at the top of the page and loads the script that contains the ((client))-side application.
+Він визначає документ ((заголовок)) і включає таблицю стилів, яка визначає кілька стилів, щоб, серед іншого, переконатися, що між розмовами є певний пробіл. Потім він додає заголовок у верхній частині сторінки і завантажує скрипт, який містить програму на стороні ((клієнта)).
 
-### Actions
+### Дії
 
-The application state consists of the list of talks and the name of the user, and we'll store it in a `{talks, user}` object. We don't allow the user interface to directly manipulate the state or send off HTTP requests. Rather, it may emit _actions_ that describe what the user is trying to do.
+Стан додатку складається зі списку бесід та імені користувача, і ми зберігатимемо його в об'єкті `{talks, user}`. Ми не дозволяємо користувацькому інтерфейсу безпосередньо маніпулювати станом або надсилати HTTP-запити. Натомість, він може випромінювати _дії_, які описують, що користувач намагається зробити.
 
-{{index "handleAction function"}}
+{{index «handleAction function»}}
 
-The `handleAction` function takes such an action and makes it happen. Because our state updates are so simple, state changes are handled in the same function.
+Функція `handleAction` приймає таку дію і виконує її. Оскільки наші оновлення станів дуже прості, зміни станів обробляються у тій самій функції.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function handleAction(state, action) {
-  if (action.type == "setUser") {
-    localStorage.setItem("userName", action.user);
+  if (action.type == «setUser») {
+    localStorage.setItem(«userName», action.user);
     return {...state, user: action.user};
-  } else if (action.type == "setTalks") {
+  } else if (action.type == «setTalks») { { localStorage.setTalks()
     return {...state, talks: action.talks};
-  } else if (action.type == "newTalk") {
+  } else if (action.type == «newTalk») { return {...
     fetchOK(talkURL(action.title), {
-      method: "PUT",
-      headers: {"Content-Type": "application/json"},
+      метод: «PUT»,
+      headers: { «Content-Type»: «application/json"},
       body: JSON.stringify({
         presenter: state.user,
         summary: action.summary
       })
     }).catch(reportError);
-  } else if (action.type == "deleteTalk") {
-    fetchOK(talkURL(action.talk), {method: "DELETE"})
+  } else if (action.type == «deleteTalk») {
+    fetchOK(talkURL(action.talk), {method: «DELETE"})
       .catch(reportError);
-  } else if (action.type == "newComment") {
-    fetchOK(talkURL(action.talk) + "/comments", {
-      method: "POST",
-      headers: {"Content-Type": "application/json"},
+  } else if (action.type == «newComment») { {fetchOK(talkURL(action.talk), {метод: «deleteTalk»})
+    fetchOK(talkURL(action.talk) + «/comments», {
+      метод: «POST»,
+      headers: { «Content-Type»: «application/json"},
       body: JSON.stringify({
         author: state.user,
         message: action.message
       })
     }).catch(reportError);
   }
-  return state;
+  повернути state;
 }
 ```
 
-{{index "localStorage object"}}
+{{index «localStorage object»}}
 
-We'll store the user's name in `localStorage` so that it can be restored when the page is loaded.
+Ми збережемо ім'я користувача в `localStorage`, щоб його можна було відновити при завантаженні сторінки.
 
-{{index "fetch function", "status property"}}
+{{index «fetch function», «status property»}}
 
-The actions that need to involve the server make network requests, using `fetch`, to the HTTP interface described earlier. We use a wrapper function, `fetchOK`, which makes sure the returned promise is rejected when the server returns an error code.
+Дії, які потребують залучення сервера, роблять мережеві запити, використовуючи `fetch`, до інтерфейсу HTTP, описаного раніше. Ми використовуємо функцію-обгортку `fetchOK`, яка гарантує, що повернута обіцянка буде відхилена, коли сервер поверне код помилки.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function fetchOK(url, options) {
   return fetch(url, options).then(response => {
     if (response.status < 400) return response;
@@ -537,192 +537,192 @@ function fetchOK(url, options) {
 }
 ```
 
-{{index "talkURL function", "encodeURIComponent function"}}
+{{index «talkURL-функція», «encodeURIComponent-функція»}}
 
-This helper function is used to build up a ((URL)) for a talk with a given title.
+Ця допоміжна функція використовується для побудови ((URL)) для розмови із заданим заголовком.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}}
 function talkURL(title) {
-  return "talks/" + encodeURIComponent(title);
+  return «talks/» + encodeURIComponent(title);
 }
 ```
 
-{{index "error handling", "user experience", "reportError function"}}
+{{index «error handling», «user experience», «reportError function»}}
 
-When the request fails, we don't want our page to just sit there doing nothing without explanation. The function called `reportError`, which we used as the `catch` handler, shows the user a crude dialog to tell them something went wrong.
+Коли запит зазнає невдачі, ми не хочемо, щоб наша сторінка просто сиділа і нічого не робила без пояснень. Функція `reportError`, яку ми використали як обробник `catch`, показує користувачеві грубий діалог, щоб повідомити йому, що щось пішло не так.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function reportError(error) {
   alert(String(error));
 }
 ```
 
-### Rendering components
+### Рендеринг компонентів
 
-{{index "renderUserField function"}}
+{{index «renderUserField function»}}
 
-We'll use an approach similar to the one we saw in [Chapter ?](paint), splitting the application into components. However, since some of the components either never need to update or are always fully redrawn when updated, we'll define those not as classes but as functions that directly return a DOM node. For example, here is a component that shows the field where the user can enter their name:
+Ми використаємо підхід, подібний до того, який ми бачили у [Розділ ?](paint), розбиваючи програму на компоненти. Однак, оскільки деякі компоненти або ніколи не потребують оновлення, або завжди повністю перемальовуються при оновленні, ми визначимо їх не як класи, а як функції, що безпосередньо повертають DOM-вузол. Наприклад, ось компонент, який показує поле, де користувач може ввести своє ім'я:
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function renderUserField(name, dispatch) {
-  return elt("label", {}, "Your name: ", elt("input", {
-    type: "text",
+  return elt(«label», {}, «Ваше ім'я: “, elt(”input», {
+    тип: «text»,
     value: name,
-    onchange(event) {
-      dispatch({type: "setUser", user: event.target.value});
+    onchange(подія) { }), onchange(подія) {
+      dispatch({type: «setUser», user: event.target.value});
     }
   }));
 }
 ```
 
-{{index "elt function"}}
+{{index «elt function»}}
 
-The `elt` function used to construct DOM elements is the one we used in [Chapter ?](paint).
+Для побудови елементів DOM використовується функція `elt`, яку ми використовували у [Главі ?](paint).
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no, hidden: true}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no, hidden: true}
 function elt(type, props, ...children) {
   let dom = document.createElement(type);
   if (props) Object.assign(dom, props);
   for (let child of children) {
-    if (typeof child != "string") dom.appendChild(child);
+    if (typeof child != «string») dom.appendChild(child);
     else dom.appendChild(document.createTextNode(child));
   }
   return dom;
 }
 ```
 
-{{index "renderTalk function"}}
+{{index «renderTalk function»}}
 
-A similar function is used to render talks, which include a list of comments and a form for adding a new ((comment)).
+Аналогічна функція використовується для рендерингу бесід, які містять список коментарів та форму для додавання нового ((comment)).
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}}
 function renderTalk(talk, dispatch) {
   return elt(
-    "section", {className: "talk"},
-    elt("h2", null, talk.title, " ", elt("button", {
-      type: "button",
+    «section», {className: «talk"},
+    elt(«h2», null, talk.title, « “, elt(”button», {
+      type: «button»,
       onclick() {
-        dispatch({type: "deleteTalk", talk: talk.title});
+        dispatch({type: «deleteTalk», talk: talk.title});
       }
-    }, "Delete")),
-    elt("div", null, "by ",
-        elt("strong", null, talk.presenter)),
-    elt("p", null, talk.summary),
+    }, «Видалити»)),
+    elt(«div», null, «by »,
+        elt(«strong», null, talk.presenter)),
+    elt(«p», null, talk.summary),
     ...talk.comments.map(renderComment),
-    elt("form", {
+    elt(«form», {
       onsubmit(event) {
         event.preventDefault();
         let form = event.target;
-        dispatch({type: "newComment",
+        dispatch({type: «newComment»,
                   talk: talk.title,
                   message: form.elements.comment.value});
         form.reset();
       }
-    }, elt("input", {type: "text", name: "comment"}), " ",
-       elt("button", {type: "submit"}, "Add comment")));
+    }, elt(«input», {type: «text», name: «comment»}), « »,
+       elt(«button», {type: «submit»}, «Додати коментар»)));
 }
 ```
 
-{{index "submit event"}}
+{{index «submit event»}}
 
-The `"submit"` event handler calls `form.reset` to clear the form's content after creating a `"newComment"` action.
+Обробник події `«submit»` викликає `form.reset` для очищення вмісту форми після створення дії `«newComment»`.
 
-When creating moderately complex pieces of DOM, this style of programming starts to look rather messy. To avoid this, people often use a _((templating language))_, which allows you to write your interface as an HTML file with some special markers to indicate where dynamic elements go. Or they use _((JSX))_, a nonstandard JavaScript dialect that allows you to write something very close to HTML tags in your program as if they are JavaScript expressions. Both of these approaches use additional tools to preprocess the code before it can be run, which we will avoid in this chapter.
+При створенні помірно складних фрагментів DOM такий стиль програмування починає виглядати досить безладно. Щоб уникнути цього, люди часто використовують _((мову шаблонів))_, яка дозволяє написати інтерфейс у вигляді HTML-файлу з деякими спеціальними маркерами, щоб вказати, куди йдуть динамічні елементи. Або використовують _((JSX))_, нестандартний діалект JavaScript, який дозволяє писати щось дуже близьке до тегів HTML у вашій програмі так, ніби це вирази JavaScript. Обидва ці підходи використовують додаткові інструменти для попередньої обробки коду перед виконанням, чого ми будемо уникати в цій главі.
 
-Comments are simple to render.
+Коментарі просто відображати.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function renderComment(comment) {
-  return elt("p", {className: "comment"},
-             elt("strong", null, comment.author),
-             ": ", comment.message);
+  return elt(«p», {className: «comment"},
+             elt(«strong», null, comment.author),
+             «: », comment.message);
 }
 ```
 
-{{index "form (HTML tag)", "renderTalkForm function"}}
+{{index «форма (HTML-тег)», «функція renderTalkForm»}}
 
-Finally, the form that the user can use to create a new talk is rendered like this:
+Нарешті, форма, яку користувач може використати для створення нового толку, рендериться таким чином:
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}}
 function renderTalkForm(dispatch) {
-  let title = elt("input", {type: "text"});
-  let summary = elt("input", {type: "text"});
-  return elt("form", {
+  let title = elt(«input», {type: «text»});
+  let summary = elt(«input», {type: «text»});
+  return elt(«form», {
     onsubmit(event) {
       event.preventDefault();
-      dispatch({type: "newTalk",
+      dispatch({type: «newTalk»,
                 title: title.value,
                 summary: summary.value});
       event.target.reset();
     }
-  }, elt("h3", null, "Submit a Talk"),
-     elt("label", null, "Title: ", title),
-     elt("label", null, "Summary: ", summary),
-     elt("button", {type: "submit"}, "Submit"));
+  }, elt(«h3», null, «Подати доповідь»),
+     elt(«label», null, «Назва: », title),
+     elt(«label», null, «Резюме: », summary),
+     elt(«button», {type: «submit»}, «Submit»));
 }
 ```
 
-### Polling
+### Опитування
 
-{{index "pollTalks function", "long polling", "If-None-Match header", "Prefer header", "fetch function"}}
+{{index «pollTalks function», «long polling», «If-None-Match header», «Prefer header», «fetch function»}}
 
-To start the app, we need the current list of talks. Since the initial load is closely related to the long polling process—the `ETag` from the load must be used when polling—we'll write a function that keeps polling the server for `/talks` and calls a ((callback function)) when a new set of talks is available.
+Для запуску програми нам потрібен поточний список токенів. Оскільки початкове завантаження тісно пов'язане з довгим процесом опитування - `ETag` з завантаження повинен використовуватися при опитуванні - ми напишемо функцію, яка продовжує опитувати сервер на предмет `/talks` і викликає ((функцію зворотного виклику)), коли з'являється новий набір розмов.
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}}
 async function pollTalks(update) {
   let tag = undefined;
   for (;;) {
     let response;
     try {
-      response = await fetchOK("/talks", {
-        headers: tag && {"If-None-Match": tag,
-                         "Prefer": "wait=90"}
+      response = await fetchOK(«/talks», {
+        headers: tag && {«If-None-Match»: tag,
+                         «Prefer": «wait=90"}
       });
     } catch (e) {
-      console.log("Request failed: " + e);
-      await new Promise(resolve => setTimeout(resolve, 500));
+      console.log("Запит не виконано: » + e);
+      wait new Promise(resolve => setTimeout(resolve, 500));
       continue;
     }
     if (response.status == 304) continue;
-    tag = response.headers.get("ETag");
+    tag = response.headers.get(«ETag»);
     update(await response.json());
   }
 }
 ```
 
-{{index "async function"}}
+{{index «async function»}}
 
-This is an `async` function so that looping and waiting for the request is easier. It runs an infinite loop that, on each iteration, retrieves the list of talks—either normally or, if this isn't the first request, with the headers included that make it a long polling request.
+Це `async`-функція, щоб спростити циклічне виконання та очікування запиту. Вона запускає нескінченний цикл, який на кожній ітерації отримує список розмов - або у звичайному вигляді, або, якщо це не перший запит, із заголовками, які роблять його довгим запитом на опитування.
 
-{{index "error handling", "Promise class", "setTimeout function"}}
+{{index «обробка помилок», «клас обіцянки», «функція setTimeout»}}
 
-When a request fails, the function waits a moment and then tries again. This way, if your network connection goes away for a while and then comes back, the application can recover and continue updating. The promise resolved via `setTimeout` is a way to force the `async` function to wait.
+Коли запит завершується невдало, функція чекає деякий час, а потім повторює спробу. Таким чином, якщо ваше мережеве з'єднання пропадає на деякий час, а потім повертається, програма може відновитися і продовжити оновлення. Обіцянка, оброблена за допомогою `setTimeout`, є способом змусити функцію `async` чекати.
 
-{{index "304 (HTTP status code)", "ETag header"}}
+{{index «304 (код стану HTTP)», «заголовок ETag»}}
 
-When the server gives back a 304 response, that means a long polling request timed out, so the function should just immediately start the next request. If the response is a normal 200 response, its body is read as ((JSON)) and passed to the callback, and its `ETag` header value is stored for the next iteration.
+Коли сервер повертає відповідь 304, це означає, що тривалий запит на опитування вичерпано, тому функція повинна просто негайно почати наступний запит. Якщо відповідь є звичайною 200 відповіддю, її тіло зчитується як ((JSON)) і передається у функцію зворотного виклику, а значення заголовка `ETag` зберігається для наступної ітерації.
 
-### The application
+### Додаток
 
-{{index "SkillShareApp class"}}
+{{index «SkillShareApp class»}}
 
-The following component ties the whole user interface together:
+Наступний компонент пов'язує весь інтерфейс користувача разом:
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}}
 class SkillShareApp {
   constructor(state, dispatch) {
     this.dispatch = dispatch;
-    this.talkDOM = elt("div", {className: "talks"});
-    this.dom = elt("div", null,
+    this.talkDOM = elt(«div», {className: «talks»});
+    this.dom = elt(«div», null,
                    renderUserField(state.user, dispatch),
                    this.talkDOM,
                    renderTalkForm(dispatch));
     this.syncState(state);
   }
 
-  syncState(state) {
+  syncState(state) { } }
     if (state.talks != this.talks) {
-      this.talkDOM.textContent = "";
+      this.talkDOM.textContent = «»;
       for (let talk of state.talks) {
         this.talkDOM.appendChild(
           renderTalk(talk, this.dispatch));
@@ -733,15 +733,15 @@ class SkillShareApp {
 }
 ```
 
-{{index synchronization, "live view"}}
+{{index synchronization, «live view»}}
 
-When the talks change, this component redraws all of them. This is simple but also wasteful. We'll get back to that in the exercises.
+Коли розмови змінюються, цей компонент перемальовує їх усі. Це просто, але водночас марнотратно. Ми повернемося до цього у вправах.
 
-We can start the application like this:
+Ми можемо запустити програму таким чином:
 
-```{includeCode: ">code/skillsharing/public/skillsharing_client.js", test: no}
+```{includeCode: «>code/skillsharing/public/skillsharing_client.js», test: no}
 function runApp() {
-  let user = localStorage.getItem("userName") || "Anon";
+  let user = localStorage.getItem(«userName») || «Anon»;
   let state, app;
   function dispatch(action) {
     state = handleAction(state, action);
@@ -754,7 +754,7 @@ function runApp() {
       app = new SkillShareApp(state, dispatch);
       document.body.appendChild(app.dom);
     } else {
-      dispatch({type: "setTalks", talks});
+      dispatch({type: «setTalks», talks});
     }
   }).catch(reportError);
 }
@@ -762,54 +762,54 @@ function runApp() {
 runApp();
 ```
 
-If you run the server and open two browser windows for [_http://localhost:8000_](http://localhost:8000/) next to each other, you can see that the actions you perform in one window are immediately visible in the other.
+Якщо запустити сервер і відкрити поруч два вікна браузера для [http://localhost:8000_](http://localhost:8000/), то можна побачити, що дії, які ви виконуєте в одному вікні, одразу видно в іншому.
 
-## Exercises
+## Вправи
 
-{{index "Node.js", NPM}}
+{{index «Node.js», NPM}}
 
-The following exercises will involve modifying the system defined in this chapter. To work on them, make sure you've ((download))ed the code ([_https://eloquentjavascript.net/code/skillsharing.zip_](https://eloquentjavascript.net/code/skillsharing.zip)), installed Node ([_https://nodejs.org_](https://nodejs.org)), and installed the project's dependency with `npm install`.
+Наступні вправи передбачають модифікацію системи, описаної у цій главі. Щоб працювати над ними, переконайтеся, що ви ((завантажили)) код ([https://eloquentjavascript.net/code/skillsharing.zip_](https://eloquentjavascript.net/code/skillsharing.zip)), встановили Node ([https://nodejs.org_](https://nodejs.org)) та встановили залежність проекту за допомогою `npm install`.
 
-### Disk persistence
+### Збереженість даних на диску
 
-{{index "data loss", persistence, [memory, persistence]}}
+{{index «data loss», persistence, [memory, persistence]}}
 
-The skill-sharing server keeps its data purely in memory. This means that when it ((crash))es or is restarted for any reason, all talks and comments are lost.
+Сервер обміну навичками зберігає свої дані виключно у пам'яті. Це означає, що коли він ((аварійно)) завершує роботу або перезапускається з будь-якої причини, всі бесіди та коментарі втрачаються.
 
-{{index "hard drive"}}
+{{index «жорсткий диск»}}
 
-Extend the server so that it stores the talk data to disk and automatically reloads the data when it is restarted. Don't worry about efficiency—do the simplest thing that works.
-
-{{hint
-
-{{index "filesystem", "writeFile function", "updated method", persistence}}
-
-The simplest solution I can come up with is to encode the whole `talks` object as ((JSON)) and dump it to a file with `writeFile`. There is already a method (`updated`) that is called every time the server's data changes. It can be extended to write the new data to disk.
-
-{{index "readFile function", "JSON.parse function"}}
-
-Pick a ((file))name, for example `./talks.json`. When the server starts, it can try to read that file with `readFile`, and if that succeeds, the server can use the file's contents as its starting data.
-
-hint}}
-
-### Comment field resets
-
-{{index "comment field reset (exercise)", template, [state, "of application"]}}
-
-The wholesale redrawing of talks works pretty well because you usually can't tell the difference between a DOM node and its identical replacement. But there are exceptions. If you start typing something in the comment ((field)) for a talk in one browser window and then, in another, add a comment to that talk, the field in the first window will be redrawn, removing both its content and its ((focus)).
-
-When multiple people are adding comments at the same time, this would be annoying. Can you come up with a way to solve it?
+Розширте сервер так, щоб він зберігав дані розмов на диску і автоматично перезавантажував їх при перезапуску. Не турбуйтеся про ефективність - зробіть найпростіше, що працює.
 
 {{hint
 
-{{index "comment field reset (exercise)", template, "syncState method"}}
+{{index «файлова система», «функція writeFile», «оновлений метод», persistence}}
 
-The best way to do this is probably to make the talk component an object, with a `syncState` method, so that they can be updated to show a modified version of the talk. During normal operation, the only way a talk can be changed is by adding more comments, so the `syncState` method can be relatively simple.
+Найпростіше рішення, яке я можу запропонувати, це кодувати весь об'єкт `talks` як ((JSON)) і скидати його у файл за допомогою `writeFile`. Вже існує метод (`updated`), який викликається кожного разу, коли дані на сервері змінюються. Його можна розширити для запису нових даних на диск.
 
-The difficult part is that when a changed list of talks comes in, we have to reconcile the existing list of DOM components with the talks on the new list—deleting components whose talk was deleted and updating components whose talk changed.
+{{index «readFile function», «JSON.parse function»}}
 
-{{index synchronization, "live view"}}
+Виберіть ім'я ((файлу)), наприклад `./talks.json`. Коли сервер запуститься, він може спробувати прочитати цей файл за допомогою `readFile`, і якщо це вдасться, сервер може використовувати вміст файлу як свої початкові дані.
 
-To do this, it might be helpful to keep a data structure that stores the talk components under the talk titles so that you can easily figure out whether a component exists for a given talk. You can then loop over the new array of talks, and for each of them, either synchronize an existing component or create a new one. To delete components for deleted talks, you'll have to also loop over the components and check whether the corresponding talks still exist.
+підказка}}
 
-hint}}
+### Скидання поля коментаря
+
+{{index «скидання поля коментаря (вправа)», template, [state, «of application»]}}
+
+Повне перемальовування бесід працює досить добре, оскільки зазвичай ви не можете відрізнити DOM-вузол від його ідентичної заміни. Але бувають винятки. Якщо ви почнете вводити щось у полі ((поле)) для коментаря в одному вікні браузера, а потім в іншому вікні додасте коментар до цієї теки, поле у першому вікні буде перемальовано, видаливши як його вміст, так і його ((фокус)).
+
+Коли кілька людей додають коментарі одночасно, це може дратувати. Чи можете ви придумати спосіб вирішити цю проблему?
+
+{{hint
+
+{{index «скидання поля коментаря (вправа)», template, «метод syncState»}}
+
+Найкращий спосіб зробити це, ймовірно, полягає у тому, щоб зробити компонент обговорення об'єктом з методом syncState, щоб його можна було оновити, щоб показати змінену версію обговорення. Під час звичайної роботи, єдиний спосіб, у який можна змінити тек - це додати більше коментарів, тому метод `syncState` може бути відносно простим.
+
+Складність полягає у тому, що коли надходить змінений список токенів, ми повинні узгодити існуючий список DOM-компонентів з токенами у новому списку - видалити компоненти, чиї токени було видалено, і оновити компоненти, чиї токени було змінено.
+
+{{index synchronization, «live view»}}
+
+Для цього може бути корисним зберігати структуру даних, яка зберігає компоненти під назвами теки, щоб ви могли легко з'ясувати, чи існує компонент для даної теки. Після цього ви можете циклічно переглядати новий масив розмов і для кожної з них синхронізувати наявний компонент або створювати новий. Щоб видалити компоненти для видалених розмов, вам доведеться також пройтись по компонентах і перевірити, чи існують ще відповідні розмови.
+
+підказка}}

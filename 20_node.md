@@ -1,70 +1,70 @@
-{{meta {code_links: ["code/file_server.mjs"]}}}
+{{meta {code_links: [«code/file_server.mjs»]}}}
 
 # Node.js
 
-{{quote {author: "Master Yuan-Ma", title: "The Book of Programming", chapter: true}
+{{quote {author: «Master Yuan-Ma», title: «The Book of Programming», chapter: true}}} {{quote {author: “Master Yuan-Ma”, title.
 
-A student asked, 'The programmers of old used only simple machines and no programming languages, yet they made beautiful programs. Why do we use complicated machines and programming languages?' Fu-Tzu replied, 'The builders of old used only sticks and clay, yet they made beautiful huts.'
+Учень запитав: «Старі програмісти використовували лише прості машини і не знали мов програмування, але вони створювали прекрасні програми. Чому ми використовуємо складні машини і мови програмування? Фу-Цзи відповів: «Стародавні будівельники використовували лише палиці та глину, але будували прекрасні хатини».
 
 quote}}
 
-{{index "Yuan-Ma", "Book of Programming"}}
+{{index «Yuan-Ma», «Книга про програмування»}}
 
-{{figure {url: "img/chapter_picture_20.jpg", alt: "Illustration showing a telephone pole with a tangle of wires going in all directions", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_20.jpg», alt: «Ілюстрація із зображенням телефонного стовпа з клубком дротів, що розходяться на всі боки», »chapter: «Обрамлення"}}}
 
-{{index "command line"}}
+{{index «командний рядок»}}
 
-So far, we've used the JavaScript language in a single environment: the browser. This chapter and the [next one](skillsharing) will briefly introduce ((Node.js)), a program that allows you to apply your JavaScript skills outside of the browser. With it, you can build anything from small command line tools to HTTP ((server))s that power dynamic ((website))s.
+Досі ми використовували мову JavaScript у єдиному середовищі: у браузері. У цій главі та [наступній] (обмін навичками) ми коротко познайомимося з ((Node.js)), програмою, яка дозволяє застосовувати ваші навички JavaScript за межами браузера. З її допомогою ви можете створювати що завгодно - від невеликих інструментів командного рядка до HTTP-серверів, які забезпечують роботу динамічних веб-сайтів.
 
-These chapters aim to teach you the main concepts that Node.js uses and to give you enough information to write useful programs for it. They do not try to be a complete, or even a thorough, treatment of the platform.
+Ці розділи мають на меті навчити вас основним концепціям, які використовує Node.js, і дати вам достатньо інформації для написання корисних програм на цій мові. Вони не намагаються бути повним або навіть ґрунтовним описом платформи.
 
-{{if interactive
+{{якщо інтерактивний
 
-Whereas you could run the code in previous chapters directly on these pages, because it was either raw JavaScript or written for the browser, the code samples in this chapter are written for Node and often won't run in the browser.
+Якщо код у попередніх розділах можна було запускати безпосередньо на цих сторінках, оскільки він був або сирим JavaScript, або написаний для браузера, то приклади коду в цій главі написані для Node і часто не будуть виконуватися в браузері.
 
 if}}
 
-If you want to follow along and run the code in this chapter, you'll need to install Node.js version 18 or higher. To do so, go to [_https://nodejs.org_](https://nodejs.org) and follow the installation instructions for your operating system. You can also find further ((documentation)) for Node.js there.
+Якщо ви хочете продовжити і запустити код у цій главі, вам потрібно встановити Node.js версії 18 або вище. Для цього перейдіть на [_https://nodejs.org_](https://nodejs.org) і дотримуйтесь інструкцій по встановленню для вашої операційної системи. Там же ви можете знайти додаткову ((документацію)) для Node.js.
 
-## Background
+## Передумови
 
-{{index responsiveness, input, [network, speed]}}
+{{індекс відгуку, введення, [мережа, швидкість]}}
 
-When building systems that communicate over the network, the way you manage input and ((output))—that is, the reading and writing of data to and from the network and ((hard drive))—can make a big difference in how quickly a system responds to the user or to network requests.
+При створенні систем, які взаємодіють через мережу, те, як ви керуєте вводом і ((виводом)) - тобто читанням і записом даних у мережу і з мережі та ((жорсткого диска)) - може мати велике значення для того, як швидко система реагує на запити користувача або на запити мережі.
 
-{{index ["asynchronous programming", "in Node.js"]}}
+{{index [«асинхронне програмування», «у Node.js»]}}
 
-In such programs, asynchronous programming is often helpful. It allows the program to send and receive data from and to multiple devices at the same time without complicated thread management and synchronization.
+У таких програмах асинхронне програмування часто буває корисним. Воно дозволяє програмі надсилати та отримувати дані з та на декілька пристроїв одночасно без складного управління потоками та синхронізації.
 
-{{index "programming language", "Node.js", standard}}
+{{index «мова програмування», «Node.js», standard}}
 
-Node was initially conceived for the purpose of making asynchronous programming easy and convenient. JavaScript lends itself well to a system like Node. It is one of the few programming languages that does not have a built-in way to do input and output. Thus, JavaScript could be fit onto Node's rather eccentric approach to network and filesystem programming without ending up with two inconsistent interfaces. In 2009, when Node was being designed, people were already doing callback-based programming in the browser, so the ((community)) around the language was used to an asynchronous programming style.
+Node спочатку був задуманий з метою зробити асинхронне програмування простим і зручним. JavaScript добре підходить для такої системи, як Node. Це одна з небагатьох мов програмування, яка не має вбудованого способу вводу-виводу. Таким чином, JavaScript можна вписати в досить ексцентричний підхід Node до програмування мережі та файлової системи, не отримуючи в результаті два неузгоджених інтерфейси. У 2009 році, коли розроблявся Node, люди вже виконували програмування на основі зворотного виклику в браузері, тому ((спільнота)) навколо мови звикла до асинхронного стилю програмування.
 
-## The node command
+## Команда node
 
-{{index "node program"}}
+{{index «node program»}}
 
-When ((Node.js)) is installed on a system, it provides a program called `node`, which is used to run JavaScript files. Say you have a file `hello.js`, containing this code:
+Коли ((Node.js)) встановлюється в системі, він надає програму під назвою `node`, яка використовується для запуску файлів JavaScript. Скажімо, у вас є файл `hello.js`, що містить такий код:
 
 ```
-let message = "Hello world";
+let message = «Hello world»;
 console.log(message);
 ```
 
-You can then run `node` from the ((command line)) like this to execute the program:
+Потім ви можете запустити `node` з командного рядка ось так, щоб виконати програму:
 
 ```{lang: null}
 $ node hello.js
-Hello world
+Привіт, світе
 ```
 
-{{index "console.log"}}
+{{index «console.log»}}
 
-The `console.log` method in Node does something similar to what it does in the browser. It prints out a piece of text. But in Node, the text will go to the process's ((standard output)) stream rather than to a browser's ((JavaScript console)). When running `node` from the command line, that means you see the logged values in your ((terminal)).
+Метод `console.log` у Node робить щось подібне до того, що він робить у браузері. Він виводить фрагмент тексту. Але в Node текст потрапляє в потік процесу ((стандартний вивід)), а не в браузер ((консоль JavaScript)). При запуску `node` з командного рядка це означає, що ви побачите записані значення у вашому ((терміналі)).
 
-{{index "node program", "read-eval-print loop"}}
+{{index «node program», «read-eval-print loop»}}
 
-If you run `node` without giving it a file, it provides you with a prompt at which you can type JavaScript code and immediately see the result.
+Якщо ви запустите `node` без передачі йому файлу, він надасть вам підказку, в якій ви можете ввести код JavaScript і одразу побачити результат.
 
 ```{lang: null}
 $ node
@@ -76,360 +76,360 @@ $ node
 $
 ```
 
-{{index "process object", "global scope", [binding, global], "exit method", "status code"}}
+{{індекс «об'єкт процесу», «глобальна область видимості», [прив'язка, глобальна], «метод виходу», «код стану»}}
 
-The `process` binding, just like the `console` binding, is available globally in Node. It provides various ways to inspect and manipulate the current program. The `exit` method ends the process and can be given an exit status code, which tells the program that started `node` (in this case, the command line shell) whether the program completed successfully (code zero) or encountered an error (any other code).
+Прив'язка `process`, як і прив'язка `console`, доступна у Node глобально. Вона надає різні способи перевірки та маніпулювання поточною програмою. Метод `exit` завершує процес і може отримати код статусу виходу, який повідомляє програмі, що запустила `node` (у даному випадку, оболонку командного рядка), чи програма завершилася успішно (код нуль), чи зіткнулася з помилкою (будь-який інший код).
 
-{{index "command line", "argv property"}}
+{{index «command line», «argv property»}}
 
-To find the command line arguments given to your script, you can read `process.argv`, which is an array of strings. Note that it also includes the name of the `node` command and your script name, so the actual arguments start at index 2. If `showargv.js` contains the statement `console.log(process.argv)`, you could run it like this:
+Щоб дізнатися аргументи командного рядка, передані вашому скрипту, ви можете прочитати файл `process.argv`, який являє собою масив рядків. Зверніть увагу, що він також містить назву команди `node` і назву вашого скрипта, тому фактичні аргументи починаються з індексу 2. Якщо `showargv.js` містить оператор `console.log(process.argv)`, ви можете запустити його так:
 
 ```{lang: null}
 $ node showargv.js one --and two
-["node", "/tmp/showargv.js", "one", "--and", "two"]
+[«node», «/tmp/showargv.js», «one», «--and», «two»]
 ```
 
 {{index [binding, global]}}
 
-All the ((standard)) JavaScript global bindings, such as `Array`, `Math`, and `JSON`, are also present in Node's environment. Browser-related functionality, such as `document` or `prompt`, is not.
+Усі ((стандартні)) глобальні прив'язки JavaScript, такі як `Array`, `Math` та `JSON`, також присутні у середовищі Node. Функціональність, пов'язана з браузером, наприклад, `document` або `prompt`, відсутня.
 
-## Modules
+## Модулі
 
-{{index "Node.js", "global scope", "module loader"}}
+{{index «Node.js», «global scope», «module loader»}}
 
-Beyond the bindings I mentioned, such as `console` and `process`, Node puts few additional bindings in the global scope. If you want to access built-in functionality, you have to ask the module system for it.
+Окрім згаданих мною прив'язок, таких як `console` та `process`, Node має ще декілька додаткових прив'язок у глобальній області видимості. Якщо ви хочете отримати доступ до вбудованої функціональності, вам слід звернутися до системи модулів.
 
-{{index "require function"}}
+{{index «require function»}}
 
-Node started out using the ((CommonJS)) module system, based on the `require` function, which we saw in [Chapter ?](modules#commonjs). It will still use this system by default when you load a `.js` file.
+Node спочатку використовував систему модулів ((CommonJS)), засновану на функції `require`, яку ми бачили в [Глава ?](modules#commonjs). Він і надалі використовуватиме цю систему за замовчуванням, коли ви завантажуватимете файл `.js`.
 
-{{index "import keyword", "ES modules"}}
+{{index «import keyword», «ES modules»}}
 
-But today, Node also supports the more modern ES module system. When a script's filename ends in `.mjs`, it is considered to be such a module, and you can use `import` and `export` in it (but not `require`). We will use ES modules in this chapter.
+Але сьогодні Node також підтримує більш сучасну систему модулів ES. Коли ім'я файлу скрипта закінчується на `.mjs`, він вважається таким модулем, і в ньому можна використовувати `import` і `export` (але не `require`). У цій главі ми будемо використовувати ES-модулі.
 
-{{index [path, "filesystem"], "relative path", resolution}}
+{{index [шлях, «файлова система»], «відносний шлях», роздільна здатність}}
 
-When importing a module—whether with `require` or `import`—Node has to resolve the given string to an actual ((file)) that it can load. Names that start with `/`, `./`, or `../` are resolved as files, relative to the current module's path. Here, `.` stands for the current directory, `../` for one directory up, and `/` for the root of the filesystem. If you ask for `"./graph.mjs"` from the file `/tmp/robot/robot.mjs`, Node will try to load the file `/tmp/robot/graph.mjs`.
+При імпорті модуля - чи то за допомогою `require` чи `import` - вузол має перетворити заданий рядок у реальний ((файл)), який він може завантажити. Імена, що починаються з `/`, `./` або `../`, розпізнаються як файли, відносно шляху до поточного модуля. Тут `.` означає поточний каталог, `../` - каталог на один вище, а `/` - корінь файлової системи. Якщо ви запитаєте `«./graph.mjs»` з файлу `/tmp/robot/robot.mjs`, Node спробує завантажити файл `/tmp/robot/graph.mjs`.
 
-{{index "node_modules directory", directory}}
+{{index «каталог_модулів_нода», каталог}}
 
-When a string that does not look like a relative or absolute path is imported, it is assumed to refer to either a built-in ((module)) or a module installed in a `node_modules` directory. For example, importing from `"node:fs"` will give you Node's built-in filesystem module. Importing `"robot"` might try to load the library found in `node_modules/robot/`. It's common to install such libraries using ((NPM)), which we'll return to in a moment.
+Коли імпортується рядок, який не виглядає як відносний або абсолютний шлях, вважається, що він посилається або на вбудований ((модуль)), або на модуль, встановлений у каталозі `node_modules`. Наприклад, імпорт з `«node:fs»` дасть вам вбудований модуль файлової системи Node. Імпорт з `«robot»` може спробувати завантажити бібліотеку з каталогу `node_modules/robot/`. Зазвичай такі бібліотеки встановлюють за допомогою ((NPM)), до якого ми повернемося пізніше.
 
-{{index "import keyword", "Node.js", "garble example"}}
+{{index «import keyword», «Node.js», «garble example»}}
 
-Let's set up a small project consisting of two files. The first one, called `main.mjs`, defines a script that can be called from the ((command line)) to reverse a string.
+Давайте створимо невеликий проект, що складається з двох файлів. Перший, який називається `main.mjs`, визначає скрипт, який можна викликати з ((командного рядка)) для реверсування рядка.
 
 ```
-import {reverse} from "./reverse.mjs";
+import {reverse} from «./reverse.mjs»;
 
-// Index 2 holds the first actual command line argument
+// Індекс 2 містить перший фактичний аргумент командного рядка
 let argument = process.argv[2];
 
 console.log(reverse(argument));
 ```
 
-{{index reuse, "Array.from function", "join method"}}
+{{повторне використання індексу, «функція Array.from», «метод приєднання»}}
 
-The file `reverse.mjs` defines a library for reversing strings, which can be used both by this command line tool and by other scripts that need direct access to a string-reversing function.
+Файл `reverse.mjs` визначає бібліотеку для реверсування рядків, яка може бути використана як цим інструментом командного рядка, так і іншими скриптами, яким потрібен прямий доступ до функції реверсування рядків.
 
 ```
 export function reverse(string) {
-  return Array.from(string).reverse().join("");
+  return Array.from(string).reverse().join(«»);
 }
 ```
 
-{{index "export keyword", "ES modules", [interface, module]}}
+{{index «ключове слово export», «Модулі ES», [інтерфейс, модуль]}}
 
-Remember that `export` is used to declare that a binding is part of the module's interface. That allows `main.mjs` to import and use the function.
+Пам'ятайте, що `export` використовується для оголошення того, що зв'язування є частиною інтерфейсу модуля. Це дозволяє `main.mjs` імпортувати та використовувати функцію.
 
-We can now call our tool like this:
+Тепер ми можемо викликати наш інструмент так:
 
 ```{lang: null}
-$ node main.mjs JavaScript
+$ вузол main.mjs JavaScript
 tpircSavaJ
 ```
 
-## Installing with NPM
+## Встановлення за допомогою NPM
 
-{{index NPM, "Node.js", "npm program", library}}
+{{index NPM, «Node.js», «npm program», library}}
 
-NPM, introduced in [Chapter ?](modules#modules_npm), is an online repository of JavaScript ((module))s, many of which are specifically written for Node. When you install Node on your computer, you also get the `npm` command, which you can use to interact with this repository.
+NPM, представлений у [Розділі ?](модулі#модулі_npm), є онлайн сховищем JavaScript ((модулів)), багато з яких написано спеціально для Node. Коли ви встановлюєте Node на свій комп'ютер, ви також отримуєте команду `npm`, за допомогою якої ви можете взаємодіяти з цим репозиторієм.
 
-{{index "ini package"}}
+{{index «ini package»}}
 
-NPM's main use is ((download))ing packages. We saw the `ini` package in [Chapter ?](modules#modules_ini). We can use NPM to fetch and install that package on our computer.
+Основне використання NPM - це завантаження пакунків. Ми розглядали пакунок `ini` у [Глава ?](modules#modules_ini). Ми можемо скористатися NPM для отримання та встановлення цього пакунка на наш комп'ютер.
 
 ```{lang: null}
 $ npm install ini
-added 1 package in 723ms
+додано 1 пакунок за 723 мс
 
 $ node
-> const {parse} = require("ini");
-> parse("x = 1\ny = 2");
+> const {parse} = require(«ini»);
+> parse(«x = 1\ny = 2»);
 { x: '1', y: '2' }
 ```
 
-{{index "require function", "node_modules directory", "npm program"}}
+{{index «require function», «node_modules directory», «npm program»}}
 
-After running `npm install`, ((NPM)) will have created a directory called `node_modules`. Inside that directory will be an `ini` directory that contains the ((library)). You can open it and look at the code. When we import `"ini"`, this library is loaded, and we can call its `parse` property to parse a configuration file.
+Після запуску `npm install`, ((NPM)) створить каталог з назвою `node_modules`. Усередині цього каталогу буде створено каталог `ini`, який міститиме ((бібліотеку)). Ви можете відкрити його і подивитися на код. Коли ми імпортуємо `«ini»`, ця бібліотека завантажується, і ми можемо викликати її властивість `parse` для розбору конфігураційного файлу.
 
-By default, NPM installs packages under the current directory rather than in a central place. If you are used to other package managers, this may seem unusual, but it has advantages—it puts each application in full control of the packages it installs and makes it easier to manage versions and clean up when removing an application.
+За замовчуванням NPM встановлює пакунки до поточного каталогу, а не у центральне місце. Якщо ви звикли до інших менеджерів пакунків, це може здатися незвичним, але це має свої переваги - це дає кожній програмі повний контроль над пакунками, які вона встановлює, а також полегшує керування версіями та очищення при видаленні програми.
 
-### Package files
+### Файли пакунків
 
-{{index "package.json", dependency}}
+{{index «package.json», dependency}}
 
-After running `npm install` to install some package, you will find not only a `node_modules` directory but also a file called `package.json` in your current directory. It is recommended to have such a file for each project. You can create it manually or run `npm init`. This file contains information about the project, such as its name and ((version)), and lists its dependencies.
+Після запуску `npm install` для встановлення якогось пакунка, ви знайдете у вашому поточному каталозі не лише каталог `node_modules`, але й файл з назвою `package.json. Рекомендується мати такий файл для кожного проекту. Ви можете створити його вручну або запустити `npm init`. Цей файл містить інформацію про проект, зокрема його назву та ((версію)), а також список його залежностей.
 
-The robot simulation from [Chapter ?](robot), as modularized in the exercise in [Chapter ?](modules#modular_robot), might have a `package.json` file like this:
+Симуляція робота з [Розділ ?](robot), модульована у вправі з [Розділ ?](modules#modular_robot), може мати такий файл `package.json`:
 
-```{lang: "json"}
+```{lang: «json"}
 {
-  "author": "Marijn Haverbeke",
-  "name": "eloquent-javascript-robot",
-  "description": "Simulation of a package-delivery robot",
-  "version": "1.0.0",
-  "main": "run.mjs",
-  "dependencies": {
-    "dijkstrajs": "^1.0.1",
-    "random-item": "^1.0.0"
+  «author": «Marijn Haverbeke»,
+  «name": «eloquent-javascript-robot»,
+  «description": «Моделювання робота з доставки пакунків»,
+  «version": «1.0.0»,
+  «main": «run.mjs»,
+  «dependencies": {
+    «dijkstrajs": «^1.0.1»,
+    «random-item": «^1.0.0»
   },
-  "license": "ISC"
+  «license": «ISC»
 }
 ```
 
-{{index "npm program", tool}}
+{{index «npm program», tool}}
 
-When you run `npm install` without naming a package to install, NPM will install the dependencies listed in `package.json`. When you install a specific package that is not already listed as a dependency, NPM will add it to `package.json`.
+Коли ви запускаєте `npm install` без назви пакунка для встановлення, NPM встановить залежності, перелічені у `package.json`. Коли ви встановлюєте певний пакунок, якого ще не вказано як залежність, NPM додасть його до `package.json`.
 
-### Versions
+### Версії
 
-{{index "package.json", dependency, evolution}}
+{{index «package.json», dependency, evolution}}
 
-A `package.json` file lists both the program's own ((version)) and versions for its dependencies. Versions are a way to deal with the fact that ((package))s evolve separately, and code written to work with a package as it existed at one point may not work with a later, modified version of the package.
+Файл `package.json` містить список версій як самої програми ((версія)), так і версій її залежностей. Версії - це спосіб врахувати той факт, що ((пакунки)) розвиваються окремо, і код, написаний для роботи з пакунком у тому вигляді, у якому він існував у певний момент, може не працювати з пізнішою, зміненою версією пакунка.
 
-{{index compatibility}}
+{Сумісність з індексами
 
-NPM demands that its packages follow a schema called _((semantic versioning))_, which encodes some information about which versions are _compatible_ (don't break the old interface) in the version number. A semantic version consists of three numbers separated by periods, such as `2.3.0`. Every time new functionality is added, the middle number has to be incremented. Every time compatibility is broken, so that existing code that uses the package might not work with the new version, the first number has to be incremented.
+NPM вимагає, щоб пакунки слідували схемі, яка називається _((семантична версійність))_, яка кодує деяку інформацію про те, які версії є _сумісними_ (не порушують старий інтерфейс) у номері версії. Семантична версія складається з трьох чисел, розділених крапками, наприклад `2.3.0`. Кожного разу, коли додається нова функціональність, середнє число має бути збільшено. Щоразу, коли порушується сумісність, так що існуючий код, який використовує пакунок, може не працювати з новою версією, перше число має бути збільшено.
 
-{{index "caret character"}}
+{{index «символ лапок»}}
 
-A caret character (`^`) in front of the version number for a dependency in `package.json` indicates that any version compatible with the given number may be installed. For example, `"^2.3.0"` would mean that any version greater than or equal to 2.3.0 and less than 3.0.0 is allowed.
+Символ лапок (`^`) перед номером версії для залежності у `package.json` вказує на те, що можна встановити будь-яку версію, сумісну з цим номером. Наприклад, `«^2.3.0»` означатиме, що дозволено встановлювати будь-яку версію, більшу або рівну 2.3.0 і меншу за 3.0.0.
 
-{{index publishing}}
+{{публікація індексів}}
 
-The `npm` command is also used to publish new packages or new versions of packages. If you run `npm publish` in a ((directory)) that has a `package.json` file, it will publish a package with the name and version listed in the JSON file to the registry. Anyone can publish packages to NPM—though only under a package name that isn't in use yet, since it wouldn't be good if random people could update existing packages.
+Команда `npm` також використовується для публікації нових пакунків або нових версій пакунків. Якщо ви запустите `npm publish` у ((каталозі)), який містить файл `package.json`, вона опублікує до реєстру пакунок з назвою і версією, вказаними у файлі JSON. Будь-хто може публікувати пакунки до NPM, але лише під назвою пакунка, який ще не використовується, оскільки не хотілося б, щоб випадкові люди могли оновлювати існуючі пакунки.
 
-This book won't delve further into the details of ((NPM)) usage. Refer to [_https://npmjs.com_](https://npmjs.com) for further documentation and a way to search for packages.
+У цій книзі ми не будемо заглиблюватися у деталі використання ((NPM)). Зверніться до [https://npmjs.com_](https://npmjs.com) для отримання додаткової документації та способу пошуку пакунків.
 
-## The filesystem module
+## Модуль файлової системи
 
-{{index directory, "node:fs package", "Node.js", [file, access]}}
+{{index directory, «node:fs package», «Node.js», [file, access]}}
 
-One of the most commonly used built-in modules in Node is the `node:fs` module, which stands for _((filesystem))_. It exports functions for working with files and directories.
+Одним з найпоширеніших вбудованих модулів у Node є модуль `node:fs`, що розшифровується як _((файлова система))_. Він експортує функції для роботи з файлами та каталогами.
 
-{{index "readFile function", "callback function"}}
+{{index «функція readFile», «функція зворотного виклику»}}
 
-For example, the function called `readFile` reads a file and then calls a callback with the file's contents.
+Наприклад, функція з назвою `readFile` читає файл, а потім викликає функцію зворотного виклику з вмістом файлу.
 
 ```
-import {readFile} from "node:fs";
-readFile("file.txt", "utf8", (error, text) => {
+import {readFile} from «node:fs»;
+readFile(«file.txt», «utf8», (error, text) => {
   if (error) throw error;
-  console.log("The file contains:", text);
+  console.log(«Файл містить:», text);
 });
 ```
 
-{{index "Buffer class"}}
+{{index «Buffer class»}}
 
-The second argument to `readFile` indicates the _((character encoding))_ used to decode the file into a string. There are several ways in which ((text)) can be encoded to ((binary data)), but most modern systems use ((UTF-8)). Unless you have reasons to believe another encoding is used, pass `"utf8"` when reading a text file. If you do not pass an encoding, Node will assume you are interested in the binary data and will give you a `Buffer` object instead of a string. This is an ((array-like object)) that contains numbers representing the bytes (8-bit chunks of data) in the files.
+Другий аргумент `readFile` вказує на _((кодування символів))_, що використовується для декодування файлу у рядок. Існує декілька способів кодування ((текст)) у ((двійкові дані)), але більшість сучасних систем використовують ((UTF-8)). Якщо у вас немає причин вважати, що використовується інше кодування, передавайте `«utf8»` при читанні текстового файлу. Якщо ви не вкажете кодування, Node вважатиме, що вас цікавлять двійкові дані, і надасть вам об'єкт `Buffer` замість рядка. Це об'єкт типу масив, який містить числа, що відповідають байтам (8-бітним фрагментам даних) у файлах.
 
 ```
-import {readFile} from "node:fs";
-readFile("file.txt", (error, buffer) => {
+import {readFile} from «node:fs»;
+readFile(«file.txt», (error, buffer) => {
   if (error) throw error;
-  console.log("The file contained", buffer.length, "bytes.",
-              "The first byte is:", buffer[0]);
+  console.log(«Файл містить», buffer.length, «bytes.»,
+              «Перший байт:», buffer[0]);
 });
 ```
 
-{{index "writeFile function", "filesystem", [file, access]}}
+{{index «writeFile function», «filesystem», [file, access]}}
 
-A similar function, `writeFile`, is used to write a file to disk.
+Аналогічна функція, `writeFile`, використовується для запису файлу на диск.
 
 ```
-import {writeFile} from "node:fs";
-writeFile("graffiti.txt", "Node was here", err => {
-  if (err) console.log(`Failed to write file: ${err}`);
-  else console.log("File written.");
+import {writeFile} from «node:fs»;
+writeFile(«graffiti.txt», «Node was here», err => {
+  if (err) console.log(`Не вдалося записати файл: ${err}`);
+  else console.log(«Файл записано.»);
 });
 ```
 
-{{index "Buffer class", "character encoding"}}
+{{index «Клас буфера», «кодування символів»}}
 
-Here it was not necessary to specify the encoding—`writeFile` will assume that when it is given a string to write, rather than a `Buffer` object, it should write it out as text using its default character encoding, which is ((UTF-8)).
+Тут не потрібно було вказувати кодування - `writeFile` вважатиме, що коли йому передається рядок для запису, а не об'єкт `Buffer`, він повинен вивести його як текст, використовуючи своє кодування символів за замовчуванням, тобто ((UTF-8)).
 
-{{index "node:fs package", "readdir function", "stat function", "rename function", "unlink function"}}
+{{index «node:fs package», «readdir function», «stat function», «rename function», «unlink function»}}
 
-The `node:fs` module contains many other useful functions: `readdir` will give you the files in a ((directory)) as an array of strings, `stat` will retrieve information about a file, `rename` will rename a file, `unlink` will remove one, and so on. See the documentation at [_https://nodejs.org_](https://nodejs.org) for specifics.
+Модуль `node:fs` містить багато інших корисних функцій: `readdir` надасть вам файли у ((каталозі)) у вигляді масиву рядків, `stat` отримає інформацію про файл, `rename` перейменує файл, `unlink` вилучить файл, і так далі. Докладнішу інформацію можна знайти у документації за адресою [https://nodejs.org_](https://nodejs.org).
 
-{{index ["asynchronous programming", "in Node.js"], "Node.js", "error handling", "callback function"}}
+{{index [«асинхронне програмування», «у Node.js»], «Node.js», «обробка помилок», «функція зворотного виклику»}}
 
-Most of these take a callback function as the last parameter, which they call either with an error (the first argument) or with a successful result (the second). As we saw in [Chapter ?](async), there are downsides to this style of programming—the biggest one being that error handling becomes verbose and error prone.
+Більшість з них приймають функцію зворотного виклику як останній параметр, яку вони викликають або при помилці (перший аргумент), або при успішному результаті (другий). Як ми бачили у [Розділ ?](async), у такого стилю програмування є недоліки, найбільшим з яких є те, що обробка помилок стає багатослівною і схильною до помилок.
 
-{{index "Promise class", "node:fs/promises package"}}
+{{index «Promise class», «node:fs/promises package»}}
 
-The `node:fs/promises` module exports most of the same functions as the old `node:fs` module but uses promises rather than callback functions.
-
-```
-import {readFile} from "node:fs/promises";
-readFile("file.txt", "utf8")
-  .then(text => console.log("The file contains:", text));
-```
-
-{{index "synchronous programming", "node:fs package", "readFileSync function"}}
-
-Sometimes you don't need asynchronicity and it just gets in the way. Many of the functions in `node:fs` also have a synchronous variant, which has the same name with `Sync` added to the end. For example, the synchronous version of `readFile` is called `readFileSync`.
+Модуль `node:fs/promises` експортує більшість тих самих функцій, що і старий модуль `node:fs`, але використовує обіцянки замість функцій зворотного виклику.
 
 ```
-import {readFileSync} from "node:fs";
-console.log("The file contains:",
-            readFileSync("file.txt", "utf8"));
+імпортує {readFile} з «node:fs/promises»;
+readFile(«file.txt», «utf8»)
+  .then(text => console.log(«Файл містить:», text));
 ```
 
-{{index optimization, performance, blocking}}
+{{index «синхронне програмування», «node:fs package», «функція readFileSync»}}
 
-Note that while such a synchronous operation is being performed, your program is stopped entirely. If it should be responding to the user or to other machines on the network, being stuck on a synchronous action might produce annoying delays.
-
-## The HTTP module
-
-{{index "Node.js", "node:http package", [HTTP, server]}}
-
-Another central module is called `node:http`. It provides functionality for running an HTTP ((server)).
-
-{{index "listening (TCP)", "listen method", "createServer function"}}
-
-This is all it takes to start an HTTP server:
+Іноді асинхронність не потрібна, і вона просто заважає. Багато функцій у `node:fs` також мають синхронний варіант, який має ту саму назву з додаванням `Sync` у кінці. Наприклад, синхронна версія функції `readFile` називається `readFileSync`.
 
 ```
-import {createServer} from "node:http";
+import {readFileSync} from «node:fs»;
+console.log(«Файл містить:»,
+            readFileSync(«file.txt», «utf8»));
+```
+
+{{Оптимізація індексів, продуктивність, блокування}}
+
+Зверніть увагу, що під час виконання такої синхронної операції ваша програма повністю зупиняється. Якщо вона повинна відповідати користувачеві або іншим машинам у мережі, застрягання на синхронній дії може призвести до неприємних затримок.
+
+## Модуль HTTP
+
+{{index «Node.js», «node:http package», [HTTP, сервер]}}
+
+Ще один центральний модуль називається `node:http`. Він надає функціональність для запуску HTTP ((сервера)).
+
+{{index «listening (TCP)», «listen method», «createServer function»}}
+
+Це все, що потрібно для запуску HTTP-сервера:
+
+```
+import {createServer} from «node:http»;
 let server = createServer((request, response) => {
-  response.writeHead(200, {"Content-Type": "text/html"});
+  response.writeHead(200, {«Content-Type»: «text/html»});
   response.write(`
-    <h1>Hello!</h1>
-    <p>You asked for <code>${request.url}</code></p>`);
+    <h1>Привіт! </h1>
+    <p>Ви запитували <code>${request.url}</code></p>`);
   response.end();
 });
 server.listen(8000);
-console.log("Listening! (port 8000)");
+console.log("Слухаю! (порт 8000)");
 ```
 
 {{index port, localhost}}
 
-If you run this script on your own machine, you can point your web browser at [_http://localhost:8000/hello_](http://localhost:8000/hello) to make a request to your server. It will respond with a small HTML page.
+Якщо ви запускаєте цей скрипт на своєму комп'ютері, ви можете вказати веб-браузеру на [_http://localhost:8000/hello_](http://localhost:8000/hello), щоб зробити запит до вашого сервера. Він відповість невеликою HTML-сторінкою.
 
-{{index "createServer function", HTTP}}
+{{index «createServer function», HTTP}}
 
-The function passed as the argument to `createServer` is called every time a client connects to the server. The `request` and `response` bindings are objects representing the incoming and outgoing data. The first contains information about the ((request)), such as its `url` property, which tells us to what URL the request was made.
+Функція, передана як аргумент до `createServer`, викликається кожного разу, коли клієнт з'єднується з сервером. Зв'язки `request` та `response` - це об'єкти, що представляють вхідні та вихідні дані. Перша містить інформацію про ((запит)), наприклад, його властивість `url`, яка повідомляє нам, до якої URL-адреси було зроблено запит.
 
-When you open that page in your browser, it sends a request to your own computer. This causes the server function to run and send back a response, which you can then see in the browser.
+Коли ви відкриваєте цю сторінку у своєму браузері, він надсилає запит на ваш власний комп'ютер. Це призводить до того, що функція сервера запускається і надсилає відповідь, яку ви можете побачити в браузері.
 
-{{index "200 (HTTP status code)", "Content-Type header", "writeHead method"}}
+{{index «200 (код стану HTTP)», «Content-Type header», «writeHead method»}}
 
-To send something to the client, you call methods on the `response` object. The first, `writeHead`, will write out the ((response)) ((header))s (see [Chapter ?](http#headers)). You give it the status code (200 for "OK" in this case) and an object that contains header values. The example sets the `Content-Type` header to inform the client that we'll be sending back an HTML document.
+Щоб відправити щось клієнту, ви викликаєте методи на об'єкті `response`. Перший, `writeHead`, випише ((відповідь)) ((заголовок)) (див. [Глава ?](http#headers)). Ви передаєте йому код статусу (у цьому випадку 200 для «OK») і об'єкт, який містить значення заголовків. У прикладі задано заголовок `Content-Type`, щоб повідомити клієнту, що ми надсилатимемо назад HTML-документ.
 
-{{index "writable stream", "body (HTTP)", stream, "write method", "end method"}}
+{{index «writable stream», «body (HTTP)», stream, «write method», «end method»}}
 
-Next, the actual response body (the document itself) is sent with `response.write`. You're allowed to call this method multiple times if you want to send the response piece by piece—for example, to stream data to the client as it becomes available. Finally, `response.end` signals the end of the response.
+Далі за допомогою `response.write` надсилається власне тіло відповіді (сам документ). Ви можете викликати цей метод декілька разів, якщо хочете надсилати відповідь по частинах - наприклад, щоб передавати дані клієнту по мірі їх надходження. Нарешті, `response.end` сигналізує про кінець відповіді.
 
-{{index "listen method"}}
+{{index «метод прослуховування»}}
 
-The call to `server.listen` causes the ((server)) to start waiting for connections on ((port)) 8000. This is why you have to connect to _localhost:8000_ to speak to this server, rather than just _localhost_, which would use the default port 80.
+Виклик `server.listen` призводить до того, що ((сервер)) починає очікувати з'єднання на ((порт)) 8000. Ось чому для зв'язку з цим сервером вам слід підключатися до _localhost:8000_, а не просто до _localhost_, який використовує порт 80 за замовчуванням.
 
-{{index "Node.js", "kill process"}}
+{{index «Node.js», «kill process»}}
 
-When you run this script, the process just sits there and waits. When a script is listening for events—in this case, network connections—`node` will not automatically exit when it reaches the end of the script. To close it, press [ctrl]{keyname}-C.
+Коли ви запускаєте цей скрипт, процес просто сидить і чекає. Коли скрипт прослуховує події - у цьому випадку мережеві з'єднання - `node` не буде автоматично завершувати роботу, коли досягне кінця скрипта. Щоб закрити його, натисніть [ctrl]{ім'я}-C.
 
-{{index [method, HTTP]}}
+{{index [метод, HTTP]}}
 
-A real web ((server)) usually does more than the one in the example—it looks at the request's ((method)) (the `method` property) to see what action the client is trying to perform and looks at the request's ((URL)) to find out on which resource this action is being performed. We'll see a more advanced server [later in this chapter](node#file_server).
+Справжній веб-сервер зазвичай робить більше, ніж показано у прикладі - він дивиться на метод запиту (властивість `method`), щоб побачити, яку дію намагається виконати клієнт, і дивиться на URL-адресу запиту, щоб дізнатися, на якому ресурсі ця дія виконується. Ми розглянемо більш просунутий сервер [пізніше у цій главі] (node#file_server).
 
-{{index "node:http package", "request function", "fetch function", [HTTP, client]}}
+{{index «node:http package», «request function», «fetch function», [HTTP, client]}}
 
-The `node:http` module also provides a `request` function that can be used to make HTTP requests. However, it is a lot more cumbersome to use than `fetch`, which we saw in [Chapter ?](http). Fortunately, `fetch` is also available in Node as a global binding. Unless you want to do something very specific, such as processing the response document piece by piece as the data comes in over the network, I recommend sticking to `fetch`.
+Модуль `node:http` також надає функцію `request`, за допомогою якої можна робити HTTP-запити. Однак, вона набагато більш громіздка у використанні, ніж `fetch`, яку ми розглядали у [Розділ ?](http). На щастя, `fetch` також доступна у Node як глобальна прив'язка. Якщо ви не хочете робити щось дуже специфічне, наприклад, обробляти документ-відповідь шматок за шматком по мірі надходження даних по мережі, я рекомендую використовувати `fetch`.
 
-## Streams
+## Потоки
 
-{{index "Node.js", stream, "writable stream", "callback function", ["asynchronous programming", "in Node.js"], "write method", "end method", "Buffer class"}}
+{{index «Node.js», stream, «потік для запису», «функція зворотного виклику», [«асинхронне програмування», «в Node.js»], «метод запису», «метод завершення», «клас буфера»}}
 
-The response object that the HTTP server could write to is an example of a _writable stream_ object, which is a widely used concept in Node. Such objects have a `write` method that can be passed a string or a `Buffer` object to write something to the stream. Their `end` method closes the stream and optionally takes a value to write to the stream before closing. Both of these methods can also be given a callback as an additional argument, which they will call when the writing or closing has finished.
+Об'єкт-відповідь, до якого може писати HTTP-сервер, є прикладом об'єкта _записуваного потоку_, який є широко використовуваною концепцією в Node. Такі об'єкти мають метод `write`, якому можна передати рядок або об'єкт `Buffer`, щоб записати щось у потік. Їх метод `end` закриває потік і за бажанням приймає значення для запису в потік перед закриттям. Обом цим методам також можна передавати як додатковий аргумент функцію зворотного виклику, яку вони викличуть після завершення запису або закриття.
 
-{{index "createWriteStream function", "writeFile function", [file, stream]}}
+{{index «createWriteStream function», «writeFile function», [file, stream]}}
 
-It is possible to create a writable stream that points at a file with the `createWriteStream` function from the `node:fs` module. You can then use the `write` method on the resulting object to write the file one piece at a time rather than in one shot, as with `writeFile`.
+Можна створити доступний для запису потік, який вказує на файл, за допомогою функції `createWriteStream` з модуля `node:fs`. Ви можете використовувати метод `write` на отриманому об'єкті для запису файлу по частинах, а не за один раз, як у випадку з `writeFile`.
 
-{{index "createServer function", "request function", "event handling", "readable stream"}}
+{{index «createServer function», «request function», «event handling», «readable stream»}}
 
-_Readable ((stream))s_ are a little more involved. The `request` argument to the HTTP server's callback is a readable stream. Reading from a stream is done using event handlers rather than methods.
+_Readable ((stream))s_ трохи більше задіяні. Аргумент `request` для зворотного виклику HTTP-сервера є потоком для читання. Читання з потоку здійснюється за допомогою обробників подій, а не методів.
 
-{{index "on method", "addEventListener method"}}
+{{index «on method», «addEventListener method»}}
 
-Objects that emit events in Node have a method called `on` that is similar to the `addEventListener` method in the browser. You give it an event name and then a function, and it will register that function to be called whenever the given event occurs.
+Об'єкти, які генерують події у Node, мають метод з назвою `on`, який подібний до методу `addEventListener` у браузері. Ви даєте йому ім'я події, а потім функцію, і він зареєструє цю функцію для виклику щоразу, коли відбувається дана подія.
 
-{{index "createReadStream function", "data event", "end event", "readable stream"}}
+{{index «createReadStream function», «data event», «end event», «readable stream»}}
 
-Readable ((stream))s have `"data"` and `"end"` events. The first is fired every time data comes in, and the second is called whenever the stream is at its end. This model is most suited for _streaming_ data that can be immediately processed, even when the whole document isn't available yet. A file can be read as a readable stream by using the `createReadStream` function from `node:fs`.
+Потоки для читання мають події «дані» та «кінець». Перша виконується щоразу, коли надходять дані, а друга викликається, коли потік досягає кінця. Ця модель найкраще підходить для _потокових_ даних, які можна негайно обробити, навіть якщо весь документ ще не доступний. Файл можна прочитати як потік для читання за допомогою функції `createReadStream` з `node:fs`.
 
-{{index "upcasing server example", capitalization, "toUpperCase method"}}
+{{index «upcasing server example», capitalization, «toUpperCase method»}}
 
-This code creates a ((server)) that reads request bodies and streams them back to the client as all-uppercase text:
+Цей код створює ((сервер)), який читає тіла запитів і передає їх назад клієнту у вигляді тексту у верхньому регістрі:
 
 ```
-import {createServer} from "node:http";
+import {createServer} from «node:http»;
 createServer((request, response) => {
-  response.writeHead(200, {"Content-Type": "text/plain"});
-  request.on("data", chunk =>
+  response.writeHead(200, {«Content-Type»: «text/plain»});
+  request.on(«data», chunk =>)
     response.write(chunk.toString().toUpperCase()));
-  request.on("end", () => response.end());
+  request.on(«end», () => response.end());
 }).listen(8000);
 ```
 
-{{index "Buffer class", "toString method"}}
+{{index «Buffer class», «toString method»}}
 
-The `chunk` value passed to the data handler will be a binary `Buffer`. We can convert this to a string by decoding it as UTF-8 encoded characters with its `toString` method.
+Значення `chunk`, передане обробнику даних, буде двійковим `Buffer`. Ми можемо перетворити його в рядок, декодувавши його в символи в кодуванні UTF-8 за допомогою методу `toString`.
 
-The following piece of code, when run with the uppercasing server active, will send a request to that server and write out the response it gets:
+Наступний фрагмент коду, якщо запустити його з активним сервером верхнього регістру, надішле запит до цього сервера і виведе відповідь, яку він отримає:
 
 ```
-fetch("http://localhost:8000/", {
-  method: "POST",
-  body: "Hello server"
+fetch(«http://localhost:8000/», {
+  метод: «POST»,
+  тіло: «Hello server»
 }).then(resp => resp.text()).then(console.log);
-// → HELLO SERVER
+// → ПРИВІТ СЕРВЕРУ
 ```
 
 {{id file_server}}
 
-## A file server
+## Файловий сервер
 
-{{index "file server example", "Node.js", [HTTP, server]}}
+{{index «file server example», «Node.js», [HTTP, server]}}
 
-Let's combine our newfound knowledge about HTTP ((server))s and working with the ((filesystem)) to create a bridge between the two: an HTTP server that allows ((remote access)) to a filesystem. Such a server has all kinds of uses—it allows web applications to store and share data, or it can give a group of people shared access to a bunch of files.
+Давайте об'єднаємо наші нові знання про HTTP ((сервер)) і роботу з ((файловою системою)), щоб створити міст між ними: HTTP-сервер, який дозволяє ((віддалений доступ)) до файлової системи. Такий сервер має безліч застосувань - він дозволяє веб-програмам зберігати та обмінюватися даними, або може надати групі людей спільний доступ до групи файлів.
 
-{{index [path, URL], "GET method", "PUT method", "DELETE method", [file, resource]}}
+{{index [шлях, URL], «метод GET», «метод PUT», «метод DELETE», [файл, ресурс]}}
 
-When we treat files as HTTP ((resource))s, the HTTP methods `GET`, `PUT`, and `DELETE` can be used to read, write, and delete the files, respectively. We will interpret the path in the request as the path of the file that the request refers to.
+Коли ми розглядаємо файли як HTTP ((ресурс))и, HTTP-методи `GET`, `PUT` і `DELETE` можна використовувати для читання, запису і видалення файлів відповідно. Ми будемо інтерпретувати шлях у запиті як шлях до файлу, на який посилається запит.
 
-{{index [path, "filesystem"], "relative path"}}
+{{index [шлях, «файлова система»], «відносний шлях»}}
 
-We probably don't want to share our whole filesystem, so we'll interpret these paths as starting in the server's working ((directory)), which is the directory in which it was started. If I ran the server from `/tmp/public/` (or `C:\tmp\public\` on Windows), then a request for `/file.txt` should refer to `/tmp/public/file.txt` (or `C:\tmp\public\file.txt`).
+Ймовірно, ми не хочемо ділитися всією нашою файловою системою, тому будемо інтерпретувати ці шляхи як такі, що починаються в робочому ((каталозі)) сервера, тобто в каталозі, в якому його було запущено. Якщо я запустив сервер з `/tmp/public/` (або `C:\tmp\public\` у Windows), то запит до `/file.txt` має посилатися на `/tmp/public/file.txt` (або `C:\tmp\public\file.txt`).
 
-{{index "file server example", "Node.js", "methods object", "Promise class"}}
+{{index «example of file server», «Node.js», «methods object», «Promise class»}}
 
-We'll build the program piece by piece, using an object called `methods` to store the functions that handle the various HTTP methods. Method handlers are `async` functions that get the request object as their argument and return a promise that resolves to an object that describes the response.
+Ми будемо збирати програму по частинах, використовуючи об'єкт під назвою `methods` для зберігання функцій, які обробляють різні методи HTTP. Обробники методів - це функції `async`, які отримують об'єкт запиту як аргумент і повертають обіцянку, що перетворюється в об'єкт, який описує відповідь.
 
-```{includeCode: ">code/file_server.mjs"}
-import {createServer} from "node:http";
+```{includeCode: «>code/file_server.mjs"}}
+import {createServer} from «node:http»;
 
 const methods = Object.create(null);
 
@@ -438,89 +438,89 @@ createServer((request, response) => {
   handler(request).catch(error => {
     if (error.status != null) return error;
     return {body: String(error), status: 500};
-  }).then(({body, status = 200, type = "text/plain"}) => {
-    response.writeHead(status, {"Content-Type": type});
+  }).then(({body, status = 200, type = «text/plain»}) => {
+    response.writeHead(status, {«Content-Type»: type});
     if (body?.pipe) body.pipe(response);
     else response.end(body);
   });
 }).listen(8000);
 
-async function notAllowed(request) {
-  return {
-    status: 405,
-    body: `Method ${request.method} not allowed.`
+async-функція notAllowed(request) {
+  return {}}
+    статус: 405,
+    body: `Метод ${request.method} не дозволений.
   };
 }
 ```
 
-{{index "405 (HTTP status code)"}}
+{{index «405 (код стану HTTP)»}}
 
-This starts a server that just returns 405 error responses, which is the code used to indicate that the server refuses to handle a given method.
+Це запускає сервер, який просто повертає відповідь про помилку 405, що є кодом, який використовується для позначення того, що сервер відмовляється обробляти даний метод.
 
-{{index "500 (HTTP status code)", "error handling", "error response"}}
+{{index «500 (HTTP status code)», «error handling», «error response»}}
 
-When a request handler's promise is rejected, the `catch` call translates the error into a response object, if it isn't one already, so that the server can send back an error response to inform the client that it failed to handle the request.
+Коли обіцянку обробника запиту відхилено, виклик `catch` переводить помилку в об'єкт відповіді, якщо він ще не є таким, щоб сервер міг відправити назад відповідь про помилку, щоб повідомити клієнту, що він не зміг обробити запит.
 
-{{index "200 (HTTP status code)", "Content-Type header"}}
+{{index «200 (код статусу HTTP)», «Content-Type header»}}
 
-The `status` field of the response description may be omitted, in which case it defaults to 200 (OK). The content type, in the `type` property, can also be left off, in which case the response is assumed to be plain text.
+Поле `status` в описі відповіді може бути опущено, у цьому випадку воно за замовчуванням дорівнює 200 (OK). Тип вмісту у властивості `type` також можна не вказувати, у цьому випадку відповідь вважатиметься звичайним текстом.
 
-{{index "end method", "pipe method", stream}}
+{{index «end method», «pipe method», stream}}
 
-When the value of `body` is a ((readable stream)), it will have a `pipe` method that we can use to forward all content from a readable stream to a ((writable stream)). If not, it is assumed to be either `null` (no body), a string, or a buffer, and it is passed directly to the ((response))'s `end` method.
+Якщо значенням `body` є ((потік для читання)), він матиме метод `pipe`, який ми можемо використати для пересилання всього вмісту з потоку для читання до потоку для запису. Якщо ні, то вважається, що це або `null` (без тіла), або рядок, або буфер, і він передається безпосередньо до методу `end` ((response)).
 
-{{index [path, URL], "urlPath function", "URL class", parsing, [escaping, "in URLs"], "decodeURIComponent function", "startsWith method"}}
+{{index [шлях, URL], «функція urlPath», «клас URL», parsing, [екранування, «в URL»], «функція decodeURIComponent», «метод startsWith»}}
 
-To figure out which file path corresponds to a request URL, the `urlPath` function uses the built-in `URL` class (which also exists in the browser) to parse the URL. This constructor expects a full URL, not just the part starting with the slash that we get from `request.url`, so we give it a dummy domain name to fill in. It extracts its pathname, which will be something like `"/file.txt"`, decodes that to get rid of the `%20`-style escape codes, and resolves it relative to the program's working directory.
+Щоб з'ясувати, який шлях до файлу відповідає URL запиту, функція `urlPath` використовує вбудований клас `URL` (який також існує в браузері) для розбору URL. Цей конструктор очікує повну URL-адресу, а не лише частину, що починається з косої риски, яку ми отримуємо з `request.url`, тому ми даємо йому фіктивне доменне ім'я для заповнення. Він витягує ім'я шляху, яке матиме вигляд `«/file.txt»`, декодує його, щоб позбутися екранних кодів у стилі `%20`, і розв'язує його відносно робочого каталогу програми.
 
-```{includeCode: ">code/file_server.mjs"}
-import {resolve, sep} from "node:path";
+```{includeCode: «>code/file_server.mjs"}{includeCode: “>code/file_server.mjs”}
+import {resolve, sep} from «node:path»;
 
 const baseDirectory = process.cwd();
 
 function urlPath(url) {
-  let {pathname} = new URL(url, "http://d");
+  let {pathname} = new URL(url, «http://d»);
   let path = resolve(decodeURIComponent(pathname).slice(1));
   if (path != baseDirectory &&
       !path.startsWith(baseDirectory + sep)) {
-    throw {status: 403, body: "Forbidden"};
+    throw {status: 403, body: «Forbidden"};
   }
-  return path;
+  шлях повернення;
 }
 ```
 
-As soon as you set up a program to accept network requests, you have to start worrying about ((security)). In this case, if we aren't careful, it is likely that we'll accidentally expose our whole ((filesystem)) to the network.
+Як тільки ви налаштували програму на прийом мережевих запитів, ви повинні почати турбуватися про ((безпеку)). У цьому випадку, якщо ми не будемо обережними, є ймовірність того, що ми випадково відкриємо всю нашу ((файлову систему)) для мережі.
 
-File paths are strings in Node. To map such a string to an actual file, there's a nontrivial amount of interpretation going on. Paths may, for example, include `../` to refer to a parent directory. One obvious source of problems would be requests for paths like `/../secret_file`.
+Шляхи до файлів - це рядки у Node. Щоб зіставити такий рядок з реальним файлом, потрібно виконати нетривіальну інтерпретацію. Шляхи можуть, наприклад, містити `../` для посилання на батьківський каталог. Очевидним джерелом проблем можуть бути запити для шляхів на кшталт `/../secret_file`.
 
-{{index "node:path package", "resolve function", "cwd function", "process object", "403 (HTTP status code)", "sep binding", ["backslash character", "as path separator"], "slash character"}}
+{{index «node:path package», «resolve function», «cwd function», «process object», «403 (HTTP status code)», «sep binding», [«backslash character», «as path separator»], «slash character»}}
 
-To avoid such problems, `urlPath` uses the `resolve` function from the `node:path` module, which resolves relative paths. It then verifies that the result is _below_ the working directory. The `process.cwd` function (where `cwd` stands for _current working directory_) can be used to find this working directory. The `sep` binding from the `node:path` package is the system's path separator—a backslash on Windows and a forward slash on most other systems. When the path doesn't start with the base directory, the function throws an error response object, using the HTTP status code indicating that access to the resource is forbidden.
+Щоб уникнути таких проблем, `urlPath` використовує функцію `resolve` з модуля `node:path`, яка вирішує відносні шляхи. Потім вона перевіряє, що результат знаходиться _нижче_ робочого каталогу. Функція `process.cwd` (де `cwd` означає _поточний робочий каталог_) може бути використана для пошуку цього робочого каталогу. Зв'язка `ep` з пакунка `node:path` є системним роздільником шляху - зворотна коса риска у Windows і пряма коса риска у більшості інших систем. Якщо шлях не починається з базового каталогу, функція згенерує об'єкт відповіді про помилку, використовуючи код стану HTTP, який вказує на те, що доступ до ресурсу заборонено.
 
-{{index "file server example", "Node.js", "GET method", [file, resource]}}
+{{index «приклад файлового сервера», «Node.js», «метод GET», [файл, ресурс]}}
 
-We'll set up the `GET` method to return a list of files when reading a ((directory)) and to return the file's content when reading a regular file.
+Ми налаштуємо метод `GET` на повернення списку файлів при читанні ((каталогу)) і на повернення вмісту файлу при читанні звичайного файлу.
 
-{{index "media type", "Content-Type header", "mime-types package"}}
+{{index «media type», «Content-Type header», «mime-types package»}}
 
-One tricky question is what kind of `Content-Type` header we should set when returning a file's content. Since these files could be anything, our server can't simply return the same content type for all of them. ((NPM)) can help us again here. The `mime-types` package (content type indicators like `text/plain` are also called _((MIME type))s_) knows the correct type for a large number of ((file extension))s.
+Одне з складних питань полягає в тому, який саме заголовок `Content-Type` ми повинні встановити при поверненні вмісту файлу. Оскільки ці файли можуть бути чим завгодно, наш сервер не може просто повернути однаковий тип вмісту для всіх файлів. ((NPM)) знову може допомогти нам тут. Пакет `mime-types` (індикатори типу вмісту, такі як `text/plain`, також називаються _((MIME тип))s_) знає правильний тип для великої кількості ((розширення файлу))s.
 
-{{index "npm program"}}
+{{index «npm програма»}}
 
-The following `npm` command, in the directory where the server script lives, installs a specific version of `mime`:
+Наступна команда `npm` у каталозі, де знаходиться серверний скрипт, встановлює певну версію `mime`:
 
 ```{lang: null}
 $ npm install mime-types@2.1.0
 ```
 
-{{index "404 (HTTP status code)", "stat function", [file, resource]}}
+{{index «404 (код статусу HTTP)», «stat function», [файл, ресурс]}}
 
-When a requested file does not exist, the correct HTTP status code to return is 404. We'll use the `stat` function, which looks up information about a file, to find out both whether the file exists and whether it is a ((directory)).
+Коли запитуваний файл не існує, правильним кодом статусу HTTP буде 404. Ми будемо використовувати функцію `stat`, яка шукає інформацію про файл, щоб з'ясувати, чи існує файл і чи є він ((каталогом)).
 
-```{includeCode: ">code/file_server.mjs"}
-import {createReadStream} from "node:fs";
-import {stat, readdir} from "node:fs/promises";
-import {lookup} from "mime-types";
+```{includeCode: «>code/file_server.mjs"}}{includeCode: “>code/file_server.mjs”}}
+import {createReadStream} from «node:fs»;
+import {stat, readdir} from «node:fs/promises»;
+import {lookup} from «mime-types»;
 
 methods.GET = async function(request) {
   let path = urlPath(request.url);
@@ -528,11 +528,11 @@ methods.GET = async function(request) {
   try {
     stats = await stat(path);
   } catch (error) {
-    if (error.code != "ENOENT") throw error;
-    else return {status: 404, body: "File not found"};
+    if (error.code != «ENOENT») вивести помилку;
+    else return {status: 404, body: «Файл не знайдено"};
   }
   if (stats.isDirectory()) {
-    return {body: (await readdir(path)).join("\n")};
+    return {body: (await readdir(path)).join(«\n»)};
   } else {
     return {body: createReadStream(path),
             type: lookup(path)};
@@ -540,26 +540,26 @@ methods.GET = async function(request) {
 };
 ```
 
-{{index "createReadStream function", ["asynchronous programming", "in Node.js"], "error handling", "ENOENT (status code)", "Error type", inheritance}}
+{{index «функція createReadStream», [«асинхронне програмування», «у Node.js»], «обробка помилок», «ENOENT (код стану)», «Тип помилки», успадкування}}
 
-Because it has to touch the disk and thus might take a while, `stat` is asynchronous. Since we're using promises rather than callback style, it has to be imported from `node:fs/promises` instead of directly from `node:fs`.
+Оскільки `stat` має звертатися до диска, що може зайняти деякий час, він є асинхронним. Оскільки ми використовуємо обіцянки, а не стиль зворотного виклику, його слід імпортувати з `node:fs/promises`, а не безпосередньо з `node:fs`.
 
-When the file does not exist, `stat` will throw an error object with a `code` property of `"ENOENT"`. These somewhat obscure, ((Unix))-inspired codes are how you recognize error types in Node.
+Якщо файл не існує, `stat` викине об'єкт помилки з властивістю `code`, рівною `«ENOENT»`. За допомогою цих дещо незрозумілих кодів, натхненних ((Unix)), ви розпізнаєте типи помилок у Node.
 
-{{index "Stats type", "stat function", "isDirectory method"}}
+{{index «Stats type», «stat function», «isDirectory method»}}
 
-The `stats` object returned by `stat` tells us a number of things about a ((file)), such as its size (`size` property) and its ((modification date)) (`mtime` property). Here we are interested in the question of whether it is a ((directory)) or a regular file, which the `isDirectory` method tells us.
+Об'єкт `stats`, що повертається функцією `stat`, розповідає нам ряд речей про ((файл)), таких як його розмір (властивість `size`) та його ((дата модифікації)) (властивість `mtime`). Тут нас цікавить питання, чи це ((каталог)) чи звичайний файл, про що нам повідомляє метод `isDirectory`.
 
-{{index "readdir function"}}
+{{index «функція readdir»}}
 
-We use `readdir` to read the array of files in a ((directory)) and return it to the client. For normal files, we create a readable stream with `createReadStream` and return that as the body, along with the content type that the `mime` package gives us for the file's name.
+Ми використовуємо `readdir` для читання масиву файлів у ((каталозі)) і повернення його клієнту. Для звичайних файлів ми створюємо потік для читання за допомогою `createReadStream` і повертаємо його як тіло, разом з типом вмісту, який надає нам пакет `mime` для імені файлу.
 
-{{index "Node.js", "file server example", "DELETE method", "rmdir function", "unlink function"}}
+{{index «Node.js», «приклад файлового сервера», «метод DELETE», «функція rmdir», «функція unlink»}}
 
-The code to handle `DELETE` requests is slightly simpler.
+Код для обробки запитів `DELETE` трохи простіший.
 
-```{includeCode: ">code/file_server.mjs"}
-import {rmdir, unlink} from "node:fs/promises";
+```{includeCode: «>code/file_server.mjs"}}
+import {rmdir, unlink} from «node:fs/promises»;
 
 methods.DELETE = async function(request) {
   let path = urlPath(request.url);
@@ -567,135 +567,135 @@ methods.DELETE = async function(request) {
   try {
     stats = await stat(path);
   } catch (error) {
-    if (error.code != "ENOENT") throw error;
+    if (error.code != «ENOENT») вивести помилку;
     else return {status: 204};
   }
   if (stats.isDirectory()) await rmdir(path);
-  else await unlink(path);
+  else wait unlink(path);
   return {status: 204};
 };
 ```
 
-{{index "204 (HTTP status code)", "body (HTTP)"}}
+{{index «204 (код статусу HTTP)», «body (HTTP)»}}
 
-When an ((HTTP)) ((response)) does not contain any data, the status code 204 ("no content") can be used to indicate this. Since the response to deletion doesn't need to transmit any information beyond whether the operation succeeded, that is a sensible thing to return here.
+Коли ((HTTP)) ((відповідь)) не містить жодних даних, код статусу 204 («немає вмісту») може бути використаний для позначення цього. Оскільки у відповіді на видалення не потрібно передавати жодної інформації, окрім того, чи операція пройшла успішно, доцільно повернути її сюди.
 
-{{index idempotence, "error response"}}
+{{index idempotence, «response to error»}}
 
-You may be wondering why trying to delete a nonexistent file returns a success status code rather than an error. When the file being deleted is not there, you could say that the request's objective is already fulfilled. The ((HTTP)) standard encourages us to make requests _idempotent_, which means that making the same request multiple times produces the same result as making it once. In a way, if you try to delete something that's already gone, the effect you were trying to create has been achieved—the thing is no longer there.
+Вам може бути цікаво, чому спроба видалити неіснуючий файл повертає код статусу успіху, а не помилку. Коли файл, який видаляється, не існує, можна сказати, що мета запиту вже досягнута. Стандарт ((HTTP)) заохочує нас робити запити _ідемпотентними_, що означає, що багаторазове виконання одного і того ж запиту призводить до того ж результату, що  і однократне виконання. У певному сенсі, якщо ви намагаєтеся видалити щось, що вже зникло, ефект, який ви намагалися створити, буде досягнутий - речі більше немає.
 
-{{index "file server example", "Node.js", "PUT method"}}
+{{index «приклад файлового сервера», «Node.js», «метод PUT»}}
 
-This is the handler for `PUT` requests:
+Це обробник для запитів `PUT`:
 
-```{includeCode: ">code/file_server.mjs"}
-import {createWriteStream} from "node:fs";
+```{includeCode: «>code/file_server.mjs"}}.
+імпортуйте {createWriteStream} з «node:fs»;
 
 function pipeStream(from, to) {
   return new Promise((resolve, reject) => {
-    from.on("error", reject);
-    to.on("error", reject);
-    to.on("finish", resolve);
+    from.on(«error», reject);
+    to.on(«error», reject);
+    to.on(«finish», resolve);
     from.pipe(to);
   });
 }
 
 methods.PUT = async function(request) {
   let path = urlPath(request.url);
-  await pipeStream(request, createWriteStream(path));
+  wait pipeStream(request, createWriteStream(path));
   return {status: 204};
 };
 ```
 
-{{index overwriting, "204 (HTTP status code)", "error event", "finish event", "createWriteStream function", "pipe method", stream}}
+{{перезапис індексу, «204 (код стану HTTP)», «подія помилки», «подія завершення», «функція createWriteStream», «метод pipe», stream}}
 
-We don't need to check whether the file exists this time—if it does, we'll just overwrite it. We again use `pipe` to move data from a readable stream to a writable one, in this case from the request to the file. But since `pipe` isn't written to return a promise, we have to write a wrapper, `pipeStream`, that creates a promise around the outcome of calling `pipe`.
+Цього разу нам не потрібно перевіряти, чи існує файл - якщо він існує, ми просто перезапишемо його. Ми знову використовуємо `pipe` для переміщення даних з потоку для читання у потік для запису, у цьому випадку із запиту у файл. Але оскільки `pipe` написано не для того, щоб повертати обіцянку, ми повинні написати обгортку, `pipeStream`, яка створює обіцянку на основі результату виклику `pipe`.
 
-{{index "error event", "finish event"}}
+{{index «error event», «finish event»}}
 
-When something goes wrong when opening the file, `createWriteStream` will still return a stream, but that stream will fire an `"error"` event. The stream from the request may also fail—for example, if the network goes down. So we wire up both streams' `"error"` events to reject the promise. When `pipe` is done, it will close the output stream, which causes it to fire a `"finish"` event. That's the point at which we can successfully resolve the promise (returning nothing).
+Якщо під час відкриття файлу щось піде не так, `createWriteStream` все одно поверне потік, але цей потік згенерує подію `«error»`. Потік від запиту також може вийти з ладу - наприклад, якщо мережа впаде. Тому ми об'єднаємо події `error` обох потоків, щоб відхилити обіцянку. Коли `pipe` завершить роботу, він закриє вихідний потік, що спричинить подію `finish`. На цьому етапі ми можемо успішно виконати обіцянку (нічого не повертаючи).
 
-{{index download, "file server example", "Node.js"}}
+{{index download, «file server example», «Node.js»}}
 
-The full script for the server is available at [_https://eloquentjavascript.net/code/file_server.mjs_](https://eloquentjavascript.net/code/file_server.mjs). You can download that and, after installing its dependencies, run it with Node to start your own file server. And, of course, you can modify and extend it to solve this chapter's exercises or to experiment.
+Повний скрипт для сервера доступний за адресою [_https://eloquentjavascript.net/code/file_server.mjs_](https://eloquentjavascript.net/code/file_server.mjs). Ви можете завантажити його і, встановивши залежності, запустити за допомогою Node, щоб запустити свій власний файловий сервер. І, звичайно, ви можете модифікувати і розширювати його для виконання вправ цієї глави або для експериментів.
 
-{{index "body (HTTP)", "curl program", [HTTP, client], [method, HTTP]}}
+{{index «body (HTTP)», «curl program», [HTTP, client], [method, HTTP]}}
 
-The command line tool `curl`, widely available on ((Unix))-like systems (such as macOS and Linux), can be used to make HTTP ((request))s. The following session briefly tests our server. The `-X` option is used to set the request's method, and `-d` is used to include a request body.
+Інструмент командного рядка `curl`, широко доступний на ((Unix))-подібних системах (таких як macOS і Linux), можна використовувати для створення HTTP-запитів. У наступному сеансі ми коротко протестуємо наш сервер. Параметр `-X` використовується для встановлення методу запиту, а `-d` використовується для включення тіла запиту.
 
 ```{lang: null}
 $ curl http://localhost:8000/file.txt
-File not found
+Файл не знайдено
 $ curl -X PUT -d CONTENT http://localhost:8000/file.txt
 $ curl http://localhost:8000/file.txt
 CONTENT
 $ curl -X DELETE http://localhost:8000/file.txt
 $ curl http://localhost:8000/file.txt
-File not found
+Файл не знайдено
 ```
 
-The first request for `file.txt` fails since the file does not exist yet. The `PUT` request creates the file, and behold, the next request successfully retrieves it. After deleting it with a `DELETE` request, the file is again missing.
+Перший запит до `file.txt` завершується невдачею, оскільки файл ще не існує. Запит `PUT` створює файл, і ось, наступний запит успішно його отримує. Після видалення його запитом `DELETE` файл знову не знайдено.
 
-## Summary
+## Підсумок
 
-{{index "Node.js"}}
+{{index «Node.js»}}
 
-Node is a nice, small system that lets us run JavaScript in a nonbrowser context. It was originally designed for network tasks to play the role of a node in a network, but it lends itself to all kinds of scripting tasks. If writing JavaScript is something you enjoy, automating tasks with Node may work well for you.
+Node - це гарна, невелика система, яка дозволяє запускати JavaScript у небраузерному контексті. Спочатку вона була розроблена для мережевих завдань, щоб грати роль вузла в мережі, але вона підходить для всіх видів скриптових завдань. Якщо вам подобається писати JavaScript, автоматизація завдань за допомогою Node може вам підійти.
 
-NPM provides packages for everything you can think of (and quite a few things you'd probably never think of), and it allows you to fetch and install those packages with the `npm` program. Node comes with a number of built-in modules, including the `node:fs` module for working with the filesystem and the `node:http` module for running HTTP servers.
+NPM надає пакунки для всього, що ви можете собі уявити (і для багатьох речей, про які ви, ймовірно, ніколи б не подумали), і дозволяє вам отримувати і встановлювати ці пакунки за допомогою програми `npm`. Node постачається з низкою вбудованих модулів, зокрема модулем `node:fs` для роботи з файловою системою та модулем `node:http` для запуску HTTP-серверів.
 
-All input and output in Node is done asynchronously, unless you explicitly use a synchronous variant of a function, such as `readFileSync`. Node originally used callbacks for asynchronous functionality, but the `node:fs/promises` package provides a promise-based interface to the filesystem.
+Весь ввід і вивід у Node виконується асинхронно, якщо тільки ви явно не використовуєте синхронний варіант функції, наприклад, `readFileSync`. Спочатку Node використовував зворотні виклики для асинхронної функціональності, але пакет `node:fs/promises` надає інтерфейс до файлової системи, заснований на обіцянках.
 
-## Exercises
+## Вправи
 
-### Search tool
+### Інструмент пошуку
 
-{{index grep, "search problem", "search tool (exercise)"}}
+{{index grep, «проблема пошуку», «інструмент пошуку (вправа)»}}
 
-On ((Unix)) systems, there is a command line tool called `grep` that can be used to quickly search files for a ((regular expression)).
+У системах ((Unix)) існує інструмент командного рядка `grep`, який можна використовувати для швидкого пошуку файлів за ((регулярним виразом)).
 
-Write a Node script that can be run from the ((command line)) and acts somewhat like `grep`. It treats its first command line argument as a regular expression and treats any further arguments as files to search. It outputs the names of any file whose content matches the regular expression.
+Напишіть скрипт Node, який можна запустити з ((командного рядка)) і який діє дещо подібно до `grep`. Він розглядає перший аргумент командного рядка як регулярний вираз, а всі інші аргументи - як файли для пошуку. Вона виводить назви усіх файлів, вміст яких відповідає регулярному виразу.
 
-When that works, extend it so that when one of the arguments is a ((directory)), it searches through all files in that directory and its subdirectories.
+Коли це спрацює, розширьте його так, щоб коли одним з аргументів є ((каталог)), він шукав усі файли у цьому каталозі та його підкаталогах.
 
-{{index ["asynchronous programming", "in Node.js"], "synchronous programming"}}
+{{index [«асинхронне програмування», «у Node.js»], «синхронне програмування»}}
 
-Use asynchronous or synchronous filesystem functions as you see fit. Setting things up so that multiple asynchronous actions are requested at the same time might speed things up a little, but not a huge amount, since most filesystems can read only one thing at a time.
+Використовуйте асинхронні або синхронні функції файлової системи на свій розсуд. Налаштування так, щоб запитувати декілька асинхронних дій одночасно, може дещо прискорити роботу, але не на багато, оскільки більшість файлових систем можуть читати лише один файл за раз.
 
 {{hint
 
-{{index "RegExp class", "search tool (exercise)"}}
+{{index «RegExp class», «інструмент пошуку (вправа)»}}
 
-Your first command line argument, the ((regular expression)), can be found in `process.argv[2]`. The input files come after that. You can use the `RegExp` constructor to go from a string to a regular expression object.
+Ваш перший аргумент командного рядка, ((регулярний вираз)), можна знайти у `process.argv[2]`. Далі йдуть вхідні файли. Ви можете використовувати конструктор `RegExp` для переходу від рядка до об'єкта регулярного виразу.
 
-{{index "readFileSync function"}}
+{{index «функція readFileSync»}}
 
-Doing this synchronously, with `readFileSync`, is more straightforward, but if you use `node:fs/promises` to get promise-returning functions and write an `async` function, the code looks similar.
+Зробити це синхронно, за допомогою `readFileSync`, простіше, але якщо використовувати `node:fs/promises` для отримання функцій, що повертають обіцянку, і написати функцію `async`, то код буде схожим.
 
-{{index "stat function", "statSync function", "isDirectory method"}}
+{{index «stat function», «statSync function», «isDirectory method»}}
 
-To figure out whether something is a directory, you can again use `stat` (or `statSync`) and the stats object's `isDirectory` method.
+Щоб з'ясувати, чи є щось каталогом, можна знову ж таки скористатися функцією `stat` (або `statSync`) і методом `isDirectory` об'єкта stats.
 
-{{index "readdir function", "readdirSync function"}}
+{{index «readdir function», «readdirSync function»}}
 
-Exploring a directory is a branching process. You can do it either by using a recursive function or by keeping an array of work (files that still need to be explored). To find the files in a directory, you can call `readdir` or `readdirSync`. Note the strange capitalization—Node's filesystem function naming is loosely based on standard Unix functions, such as `readdir`, that are all lowercase, but then it adds `Sync` with a capital letter.
+Дослідження каталогу - це процес розгалуження. Ви можете зробити це або за допомогою рекурсивної функції, або зберігаючи масив напрацювань (файлів, які ще потрібно дослідити). Щоб знайти файли у каталозі, ви можете викликати `readdir` або `readdirSync`. Зверніть увагу на дивну велику літеру - імена функцій файлової системи Node засновано на стандартних функціях Unix, таких як `readdir`, які пишуться з малої літери, але тут додається `Sync` з великої літери.
 
-To go from a filename read with `readdir` to a full path name, you have to combine it with the name of the directory, either putting `sep` from `node:path` between them or using the `join` function from that same package.
+Щоб перейти від назви файла, прочитаної за допомогою `readdir`, до повної назви шляху, вам слід поєднати її з назвою каталогу, додавши між ними `ep` з `node:path` або скориставшись функцією `join` з цього ж пакунка.
 
-hint}}
+підказка}}
 
-### Directory creation
+### Створення каталогу
 
-{{index "file server example", "directory creation (exercise)", "rmdir function"}}
+{{index «приклад файлового сервера», «створення каталогу (вправа)», «функція rmdir»}}
 
-Though the `DELETE` method in our file server is able to delete directories (using `rmdir`), the server currently does not provide any way to _create_ a ((directory)).
+Хоча метод `DELETE` у нашому файловому сервері може видаляти каталоги (за допомогою `rmdir`), наразі сервер не надає жодного способу _створити_ каталог ((каталог)).
 
-{{index "MKCOL method", "mkdir function"}}
+{{index «метод MKCOL», «функція mkdir»}}
 
-Add support for the `MKCOL` method ("make collection"), which should create a directory by calling `mkdir` from the `node:fs` module. `MKCOL` is not a widely used HTTP method, but it does exist for this same purpose in the _((WebDAV))_ standard, which specifies a set of conventions on top of ((HTTP)) that make it suitable for creating documents.
+Додайте підтримку методу `MKCOL` («зробити колекцію»), який має створювати каталог за допомогою виклику `mkdir` з модуля `node:fs`. Метод `MKCOL` не є широко використовуваним HTTP-методом, але він існує для цієї ж мети у стандарті _((WebDAV))_, який визначає набір домовленостей на додаток до ((HTTP)), що робить його придатним для створення документів.
 
-```{hidden: true, includeCode: ">code/file_server.mjs"}
-import {mkdir} from "node:fs/promises";
+```{hidden: true, includeCode: «>code/file_server.mjs"}}
+import {mkdir} from «node:fs/promises»;
 
 methods.MKCOL = async function(request) {
   let path = urlPath(request.url);
@@ -703,53 +703,53 @@ methods.MKCOL = async function(request) {
   try {
     stats = await stat(path);
   } catch (error) {
-    if (error.code != "ENOENT") throw error;
+    if (error.code != «ENOENT») throw error;
     await mkdir(path);
     return {status: 204};
   }
   if (stats.isDirectory()) return {status: 204};
-  else return {status: 400, body: "Not a directory"};
+  else return {status: 400, body: «Не каталог"};
 };
 ```
 
 {{hint
 
-{{index "directory creation (exercise)", "file server example", "MKCOL method", "mkdir function", idempotency, "400 (HTTP status code)"}}
+{{index «створення каталогу (вправа)», «приклад файлового сервера», «метод MKCOL», «функція mkdir», idempotency, «400 (код стану HTTP)»}}
 
-You can use the function that implements the `DELETE` method as a blueprint for the `MKCOL` method. When no file is found, try to create a directory with `mkdir`. When a directory exists at that path, you can return a 204 response so that directory creation requests are idempotent. If a nondirectory file exists here, return an error code. Code 400 ("bad request") would be appropriate.
+Ви можете використати функцію, яка реалізує метод `DELETE`, як зразок для методу `MKCOL`. Якщо файл не знайдено, спробуйте створити каталог за допомогою `mkdir`. Якщо каталог за цим шляхом існує, ви можете повернути відповідь 204, що означає, що запити на створення каталогу є недієздатними. Якщо за цим шляхом існує файл, який не є каталогом, поверніть код помилки. Доречним буде код 400 («поганий запит»).
 
-hint}}
+підказка}}
 
-### A public space on the web
+### Публічний простір у мережі
 
-{{index "public space (exercise)", "file server example", "Content-Type header", website}}
+{{index «public space (exercise)», «file server example», «Content-Type header», website}}
 
-Since the file server serves up any kind of file and even includes the right `Content-Type` header, you can use it to serve a website. Given that this server allows everybody to delete and replace files, this would make for an interesting kind of website: one that can be modified, improved, and vandalized by everybody who takes the time to make the right HTTP request.
+Оскільки файловий сервер обслуговує будь-який тип файлів і навіть містить правильний заголовок `Content-Type`, ви можете використовувати його для обслуговування веб-сайту. Враховуючи, що цей сервер дозволяє будь-кому видаляти і замінювати файли, можна створити цікавий тип веб-сайту: такий, який може бути змінений, покращений і зруйнований будь-ким, хто знайде час, щоб зробити правильний HTTP-запит.
 
-Write a basic ((HTML)) page that includes a simple JavaScript file. Put the files in a directory served by the file server and open them in your browser.
+Напишіть базову ((HTML)) сторінку, яка включає простий файл JavaScript. Помістіть файли в каталог, який обслуговується файловим сервером, і відкрийте їх у своєму браузері.
 
-Next, as an advanced exercise or even a ((weekend project)), combine all the knowledge you gained from this book to build a more user-friendly interface for modifying the website—from _inside_ the website.
+Далі, в якості поглибленої вправи або навіть ((проект вихідного дня)), об'єднайте всі знання, отримані з цієї книги, щоб створити більш зручний інтерфейс для модифікації веб-сайту - "зсередини » веб-сайту.
 
-Use an HTML ((form)) to edit the content of the files that make up the website, allowing the user to update them on the server by using HTTP requests, as described in [Chapter ?](http).
+Використовуйте HTML ((форму)) для редагування вмісту файлів, що складають веб-сайт, дозволяючи користувачеві оновлювати їх на сервері за допомогою HTTP-запитів, як описано в [Розділ ?](http).
 
-Start by making only a single file editable. Then make it so that the user can select which file to edit. Use the fact that our file server returns lists of files when reading a directory.
+Почніть з того, що зробіть редагованим лише один файл. Потім зробіть так, щоб користувач міг вибрати, який файл редагувати. Використовуйте той факт, що наш файловий сервер повертає списки файлів при читанні каталогу.
 
-{{index overwriting}}
+{{перезапис індексів}}
 
-Don't work directly in the code exposed by the file server, since if you make a mistake, you are likely to damage the files there. Instead, keep your work outside of the publicly accessible directory and copy it there when testing.
+Не працюйте безпосередньо в коді, який відкриває файловий сервер, оскільки, якщо ви зробите помилку, то, швидше за все, пошкодите файли, які там знаходяться. Замість цього, зберігайте свою роботу поза загальнодоступним каталогом і копіюйте її туди під час тестування.
 
 {{hint
 
-{{index "file server example", "textarea (HTML tag)", "fetch function", "relative path", "public space (exercise)"}}
+{{index «приклад файлового сервера», «текстова область (HTML-тег)», «функція вибірки», «відносний шлях», «загальнодоступний простір (вправа)»}}
 
-You can create a `<textarea>` element to hold the content of the file that is being edited. A `GET` request, using `fetch`, can retrieve the current content of the file. You can use relative URLs like _index.html_, instead of [_http://localhost:8000/index.html_](http://localhost:8000/index.html), to refer to files on the same server as the running script.
+Ви можете створити елемент `<textarea>` для зберігання вмісту файлу, який редагується. Запит `GET`, використовуючи `fetch`, може отримати поточний вміст файлу. Ви можете використовувати відносні URL-адреси, такі як _index.html_, замість [_http://localhost:8000/index.html_](http://localhost:8000/index.html), щоб посилатися на файли на тому ж сервері, що і запущений скрипт.
 
-{{index "form (HTML tag)", "submit event", "PUT method"}}
+{{index «форма (HTML-тег)», «подія відправлення», «метод PUT»}}
 
-Then, when the user clicks a button (you can use a `<form>` element and `"submit"` event), make a `PUT` request to the same URL, with the content of the `<textarea>` as the request body, to save the file.
+Потім, коли користувач натисне кнопку (можна використовувати елемент `<form>` і подію `«submit»`), зробіть запит `PUT` до тієї ж URL-адреси, з вмістом області `<textarea>` в якості тіла запиту, щоб зберегти файл.
 
-{{index "select (HTML tag)", "option (HTML tag)", "change event"}}
+{{index «select (HTML-тег)», «option (HTML-тег)», «change event»}}
 
-You can then add a `<select>` element that contains all the files in the server's top ((directory)) by adding `<option>` elements containing the lines returned by a `GET` request to the URL `/`. When the user selects another file (a `"change"` event on the field), the script must fetch and display that file. When saving a file, use the currently selected filename.
+Потім ви можете додати елемент `<select>`, який містить всі файли в топі (каталозі) сервера, додавши до URL-адреси `/` елементи `<option>`, що містять рядки, повернуті `GET`-запитом. Коли користувач вибирає інший файл (подія `«change»` на полі), скрипт повинен отримати і відобразити цей файл. При збереженні файлу використовуйте поточне ім'я файлу.
 
-hint}}
+підказка}}

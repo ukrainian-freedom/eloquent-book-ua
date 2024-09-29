@@ -1,267 +1,266 @@
-# JavaScript and the Browser
+# JavaScript та браузер
 
-{{quote {author: "Tim Berners-Lee", title: "The World Wide Web: A Very Short Personal Pistory", chapter: true}
+{{quote {author: «Tim Berners-Lee», title: «The World Wide Web: A Very Short Personal Pistory», chapter: true}}
 
-The dream behind the web is of a common information space in which we communicate by sharing information. Its universality is essential: the fact that a hypertext link can point to anything, be it personal, local or global, be it draft or highly polished.
+Мрія, що стоїть за павутиною, - це спільний інформаційний простір, в якому ми спілкуємося, обмінюючись інформацією. Його універсальність має важливе значення: той факт, що гіпертекстове посилання може вказувати на будь-що, будь то особисте, локальне чи глобальне, будь то чернетка чи відшліфована версія.
 
 quote}}
+{{index «Бернерс-Лі, Тім», «Всесвітня павутина», HTTP, [JavaScript, «історія»], «Всесвітня павутина»}}
 
-{{index "Berners-Lee, Tim", "World Wide Web", HTTP, [JavaScript, "history of"], "World Wide Web"}}
+{{figure {url: «img/chapter_picture_13.jpg», alt: «Ілюстрація із зображенням телефонного комутатора», »chapter: «Обрамлення"}}}}
 
-{{figure {url: "img/chapter_picture_13.jpg", alt: "Illustration showing a telephone switchboard", chapter: "framed"}}}
+У наступних розділах цієї книги мова піде про веб-браузери. Без ((браузерів)) не було б JavaScript - а якби й був, ніхто б ніколи не звернув на нього уваги.
 
-The next chapters of this book will discuss web browsers. Without ((browser))s, there would be no JavaScript—or if there were, no one would ever have paid any attention to it.
+{Децентралізація, сумісність
 
-{{index decentralization, compatibility}}
+Веб-технологія була децентралізованою від самого початку, не лише технічно, але й з точки зору способу її розвитку. Різні виробники браузерів додавали нову функціональність спеціальними, а іноді і непродуманими способами, які потім - іноді - переймалися іншими, і врешті-решт були закріплені у ((стандартах)).
 
-Web technology has been decentralized from the start, not just technically but also in terms of the way it evolved. Various browser vendors have added new functionality in ad hoc and sometimes poorly thought-out ways, which were then—sometimes—adopted by others, and finally set down in ((standards)).
+Це і благословення, і прокляття. З одного боку, це розширює можливості, коли система не контролюється центральною партією, а вдосконалюється різними партіями, які працюють у вільній ((співпраці)) (а іноді й у відкритій ворожнечі). З іншого боку, безсистемний спосіб, у який розроблявся веб, означає, що отримана система не є блискучим прикладом внутрішньої ((узгодженості)). Деякі її частини є відверто заплутаними і погано спроектованими.
 
-This is both a blessing and a curse. On the one hand, it is empowering to not have a central party control a system but have it be improved by various parties working in loose ((collaboration)) (or occasionally, open hostility). On the other hand, the haphazard way in which the web was developed means that the resulting system is not exactly a shining example of internal ((consistency)). Some parts of it are downright confusing and badly designed.
+## Мережі та Інтернет
 
-## Networks and the Internet
+Комп'ютерні мережі існують з 1950-х років. Якщо ви прокладете кабелі між двома чи більше комп'ютерами і дозволите їм пересилати дані туди-сюди через ці кабелі, ви зможете робити безліч чудових речей.
 
-Computer ((network))s have been around since the 1950s. If you put cables between two or more computers and allow them to send data back and forth through these cables, you can do all kinds of wonderful things.
+Якщо з'єднання двох комп'ютерів в одній будівлі дозволяє нам робити чудові речі, то з'єднання комп'ютерів по всій планеті має бути ще кращим. Технологія, яка дозволила почати реалізовувати це бачення, була розроблена у 1980-х роках, а створена в результаті мережа отримала назву _((Інтернет))_. Вона виправдала покладені на неї сподівання.
 
-If connecting two machines in the same building allows us to do wonderful things, connecting machines all over the planet should be even better. The technology to start implementing this vision was developed in the 1980s, and the resulting network is called the _((internet))_. It has lived up to its promise.
+Комп'ютер може використовувати цю мережу, щоб стріляти бітами в інший комп'ютер. Для того, щоб з цього обміну бітами міг виникнути ефективний зв'язок, комп'ютери на обох кінцях мережі повинні знати, що ці біти мають означати. Значення будь-якої послідовності бітів повністю залежить від того, що саме вона намагається виразити, і від використовуваного механізму кодування.
 
-A computer can use this network to shoot bits at another computer. For any effective ((communication)) to arise out of this bit-shooting, the computers on both ends must know what the bits are supposed to represent. The meaning of any given sequence of bits depends entirely on the kind of thing that it is trying to express and on the ((encoding)) mechanism used.
+{{індекс [мережі, протоколу]}}
 
-{{index [network, protocol]}}
+Мережевий ((протокол))_ описує стиль спілкування у ((мережі)). Існують протоколи для надсилання електронної пошти, отримання електронної пошти, обміну файлами і навіть для керування комп'ютерами, які випадково були заражені шкідливим програмним забезпеченням.
 
-A _network ((protocol))_ describes a style of communication over a ((network)). There are protocols for sending email, for fetching email, for sharing files, and even for controlling computers that happen to be infected by malicious software.
+{{див. «Протокол передачі гіпертексту», HTTP}}
 
-{{indexsee "HyperText Transfer Protocol", HTTP}}
-
-The _HyperText Transfer Protocol_ (((HTTP))) is a protocol for retrieving named ((resource))s (chunks of information, such as web pages or pictures). It specifies that the side making the request should start with a line like this, naming the resource and the version of the protocol that it is trying to use:
+Протокол_передачі_гіпертексту_ (((HTTP)) - це протокол для отримання іменованих ((ресурсів)) (фрагментів інформації, таких як веб-сторінки або зображення). Він визначає, що сторона, яка робить запит, повинна починати його з такого рядка, називаючи ресурс і версію протоколу, яку вона намагається використати:
 
 ```{lang: http}
 GET /index.html HTTP/1.1
 ```
 
-There are many more rules about the way the requester can include more information in the ((request)) and the way the other side, which returns the resource, packages up its content. We'll look at HTTP in a little more detail in [Chapter ?](http).
+Існує ще багато правил про те, як запитувач може включити більше інформації в ((запит)) і як інша сторона, яка повертає ресурс, упаковує його вміст. Ми розглянемо HTTP більш детально у [Розділі ?](http).
 
-{{index layering, stream, ordering}}
+{{Розшарування індексів, потік, впорядкування}}
 
-Most protocols are built on top of other protocols. HTTP treats the network as a streamlike device into which you can put bits and have them arrive at the correct destination in the correct order. Providing those guarantees on top of the primitive data-sending that the network gives you is already a rather tricky problem.
+Більшість протоколів побудовано на основі інших протоколів. HTTP розглядає мережу як потоковий пристрій, у який ви можете передавати біти і чекати, що вони прибудуть до місця призначення у правильному порядку. Забезпечення цих гарантій на додаток до примітивного надсилання даних, які надає вам мережа, вже є досить складною проблемою.
 
 {{index TCP}}
 
-{{indexsee "Transmission Control Protocol", TCP}}
+{{indexsee «Протокол керування передаванням», TCP}}
 
-The _Transmission Control Protocol_ (TCP) is a ((protocol)) that addresses this problem. All internet-connected devices "speak" it, and most communication on the ((internet)) is built on top of it.
+Протокол керування передаванням (TCP) - це протокол, який вирішує цю проблему. Усі пристрої, підключені до інтернету, «розмовляють» ним, і більшість комунікацій в інтернеті побудовано на його основі.
 
-{{index "listening (TCP)"}}
+{{index «listening (TCP)»}}
 
-A TCP ((connection)) works as follows: one computer must be waiting, or _listening_, for other computers to start talking to it. To be able to listen for different kinds of communication at the same time on a single machine, each listener has a number (called a _((port))_) associated with it. Most ((protocol))s specify which port should be used by default. For example, when we want to send an email using the ((SMTP)) protocol, the machine through which we send it is expected to be listening on port 25.
+TCP-з'єднання працює наступним чином: один комп'ютер повинен чекати, або _слухати_, коли інші комп'ютери почнуть з ним розмовляти. Щоб мати можливість слухати різні види зв'язку одночасно на одному комп'ютері, кожен слухач має номер (який називається _((порт))_), пов'язаний з ним. Більшість ((протоколів)) визначають, який порт слід використовувати за замовчуванням. Наприклад, коли ми хочемо надіслати електронного листа за допомогою протоколу ((SMTP)), очікується, що комп'ютер, через який ми його надсилаємо, слухатиме порт 25.
 
-Another computer can then establish a ((connection)) by connecting to the target machine using the correct port number. If the target machine can be reached and is listening on that port, the connection is successfully created. The listening computer is called the _((server))_, and the connecting computer is called the _((client))_.
+Інший комп'ютер може встановити з'єднання, підключившись до цільового комп'ютера, використовуючи правильний номер порту. Якщо цільовий комп'ютер доступний і прослуховує цей порт, з'єднання буде успішно встановлено. Комп'ютер, що слухає, називається _((сервер))_, а комп'ютер, що підключається, називається _((клієнт))_.
 
-{{index [abstraction, "of the network"]}}
+{{index [абстракція, «мережі»]}}
 
-Such a connection acts as a two-way ((pipe)) through which bits can flow—the machines on both ends can put data into it. Once the bits are successfully transmitted, they can be read out again by the machine on the other side. This is a convenient model. You could say that ((TCP)) provides an abstraction of the network.
+Таке з'єднання діє як двостороння ((труба)), якою можуть текти біти - комп'ютери на обох кінцях можуть поміщати в неї дані. Після того, як біти успішно передані, вони можуть бути знову зчитані машиною на іншій стороні. Це зручна модель. Можна сказати, що ((TCP)) надає абстракцію мережі.
 
 {{id web}}
 
 ## The Web
 
-The _((World Wide Web))_ (not to be confused with the ((internet)) as a whole) is a set of ((protocol))s and formats that allow us to visit web pages in a browser. The word _Web_ refers to the fact that such pages can easily link to each other, thus connecting into a huge ((mesh)) that users can move through.
+Всесвітня павутина (не плутати з Інтернетом в цілому) - це набір ((протоколів)) і форматів, які дозволяють нам відвідувати веб-сторінки у браузері. Слово _Веб_ вказує на те, що такі сторінки можуть легко посилатися одна на одну, об'єднуючись таким чином у величезну ((мережу)), якою користувачі можуть переміщатися.
 
-To become part of the web, all you need to do is connect a machine to the ((internet)) and have it listen on port 80 with the ((HTTP)) protocol so that other computers can ask it for documents.
+Щоб стати частиною павутини, все, що вам потрібно зробити, це підключити комп'ютер до Інтернету і налаштувати його на прослуховування порту 80 за протоколом (HTTP), щоб інші комп'ютери могли запитувати у нього документи.
 
 {{index URL}}
 
-{{indexsee "uniform resource locator", URL}}
+{{indexsee «уніфікований локатор ресурсів», URL}}
 
-Each ((document)) on the web is named by a _uniform resource locator_ (URL), which looks something like this:
+Кожен ((документ)) в Інтернеті називається за допомогою _уніфікованого локатора ресурсів_ (URL), який виглядає приблизно так:
 
 ```{lang: null}
   http://eloquentjavascript.net/13_browser.html
- |      |                      |               |
- protocol       server               path
+ 
+ шлях до сервера протоколу
 ```
 
 {{index HTTPS}}
 
-The first part tells us that this URL uses the HTTP ((protocol)) (as opposed to, for example, encrypted HTTP, which would be _https://_). Then comes the part that identifies which ((server)) we are requesting the document from. Last is a path string that identifies the document (or _((resource))_) we are interested in.
+Перша частина говорить нам про те, що ця URL-адреса використовує протокол HTTP (на відміну від, наприклад, зашифрованого HTTP, який мав би вигляд _https://_). Далі йде частина, яка визначає, з якого ((сервера)) ми запитуємо документ. І нарешті, рядок шляху, який ідентифікує документ (або _((ресурс))_), який нас цікавить.
 
-Machines connected to the internet get an _((IP address))_, a number that can be used to send messages to that machine, and looks something like `149.210.142.219` or `2001:4860:4860::8888`. Since lists of more or less random numbers are hard to remember and awkward to type, you can instead register a _((domain)) name_ for an address or set of addresses. I registered _eloquentjavascript.net_ to point at the IP address of a machine I control and can thus use that domain name to serve web pages.
+Комп'ютери, підключені до Інтернету, отримують _((IP-адресу))_, число, яке можна використовувати для надсилання повідомлень на цей комп'ютер, і яке виглядає приблизно так: `149.210.142.219` або `2001:4860:4860::8888`. Оскільки списки більш-менш випадкових чисел важко запам'ятати і незручно вводити, ви можете замість цього зареєструвати _((доменне)) ім'я_ для адреси або набору адрес. Я зареєстрував _eloquentjavascript.net_, щоб вказати на IP-адресу комп'ютера, яким я керую, і таким чином можу використовувати це доменне ім'я для обслуговування веб-сторінок.
 
-{{index browser}}
+{{індекс браузера}}
 
-If you type this URL into your browser's ((address bar)), the browser will try to retrieve and display the ((document)) at that URL. First, your browser has to find out what address _eloquentjavascript.net_ refers to. Then, using the ((HTTP)) protocol, it will make a connection to the server at that address and ask for the resource _/13_browser.html_. If all goes well, the server sends back a document, which your browser then displays on your screen.
+Якщо ви введете цю URL-адресу в адресний рядок вашого браузера, браузер спробує знайти і відобразити ((документ)) за цією адресою. Спочатку браузер має з'ясувати, на яку адресу посилається _eloquentjavascript.net_. Потім, використовуючи протокол ((HTTP)), він встановить з'єднання з сервером за цією адресою і запросить ресурс _/13_browser.html_. Якщо все пройшло успішно, сервер повертає документ, який потім відображається на екрані вашого браузера.
 
 ## HTML
 
 {{index HTML}}
 
-{{indexsee "HyperText Markup Language", HTML}}
+{{indexsee «HyperText Markup Language», HTML}}
 
-_HTML_, which stands for HyperText Markup Language, is the document format used for web pages. An HTML document contains ((text)), as well as _((tag))s_ that give structure to the text, describing things such as links, paragraphs, and headings.
+HTML_, що розшифровується як HyperText Markup Language (мова розмітки гіпертексту), є форматом документа, який використовується для веб-сторінок. Документ HTML містить ((текст)), а також _((теги))_, які надають тексту структуру, описуючи такі речі, як посилання, абзаци та заголовки.
 
-A short HTML document might look like this:
+Короткий HTML-документ може мати такий вигляд:
 
-```{lang: "html"}
+```{lang: «html"}
 <!doctype html>
 <html>
   <head>
-    <meta charset="utf-8">
-    <title>My home page</title>
-  </head>
+    <meta charset=«utf-8»>
+    <title>Моя домашня сторінка</title>
+  </ head> </ head> </ head> </ head> </ head> </ head> </ head> </ head
   <body>
-    <h1>My home page</h1>
-    <p>Hello, I am Marijn and this is my home page.</p>
-    <p>I also wrote a book! Read it
-      <a href="http://eloquentjavascript.net">here</a>.</p>
-  </body>
+    <h1>Моя домашня сторінка</h1>
+    <p>Привіт, мене звуть Марін, і це моя домашня сторінка.
+    <А ще я написала книгу! Прочитайте її
+      <a href=«http://eloquentjavascript.net»>тут</a>.</p>
+  </p> <p>
 </html>
 ```
 
 {{if book
 
-This is what such a document would look like in the browser:
+Ось як такий документ виглядатиме у браузері:
 
-{{figure {url: "img/home-page.png", alt: "A rendered version of the home page example HTML",width: "6.3cm"}}}
+{{figure {url: «img/home-page.png», alt: «Відрендерена версія прикладу HTML домашньої сторінки»,width: “6.3cm”}}}}
 
 if}}
 
-{{index [HTML, notation]}}
+{{індекс [HTML, нотація]}}
 
-The tags, wrapped in ((angle brackets)) (`<` and `>`, the symbols for _less than_ and _greater than_), provide information about the ((structure)) of the document. The other ((text)) is just plain text.
+Теги, загорнуті у ((кутові дужки)) (`<` і `>`, символи для _менше ніж_ і _більше ніж_), надають інформацію про ((структуру)) документа. Решта ((текст)) є звичайним текстом.
 
-{{index doctype, version}}
+{{індекс доктрини, версія}}
 
-The document starts with `<!doctype html>`, which tells the browser to interpret the page as _modern_ HTML, as opposed to obsolete styles used in the past.
+Документ починається з `<!doctype html>`, що вказує браузеру інтерпретувати сторінку як _сучасний_ HTML, на відміну від застарілих стилів, що використовувалися у минулому.
 
-{{index "head (HTML tag)", "body (HTML tag)", "title (HTML tag)", "h1 (HTML tag)", "p (HTML tag)"}}
+{{index «head (HTML-тег)», «body (HTML-тег)», «title (HTML-тег)», «h1 (HTML-тег)», «p (HTML-тег)»}}
 
-HTML documents have a head and a body. The head contains information _about_ the document, and the body contains the document itself. In this case, the head declares that the title of this document is "My home page" and that it uses the UTF-8 encoding, which is a way to encode Unicode text as binary data. The document's body contains a heading (`<h1>`, meaning "heading 1"—`<h2>` to `<h6>` produce subheadings) and two ((paragraph))s (`<p>`).
+HTML-документи складаються із заголовка та тіла. У заголовку міститься інформація _про_ документ, а в тілі - сам документ. У цьому випадку в заголовку оголошується, що цей документ називається «Моя домашня сторінка» і що він використовує кодування UTF-8, яке є способом кодування тексту Unicode у вигляді двійкових даних. Тіло документа містить заголовок (`<h1>`, що означає «заголовок 1» - `<h2>` до `<h6>` створюють підзаголовки) і два ((абзаци)) (`<p>`).
 
-{{index "href attribute", "a (HTML tag)"}}
+{{index «href attribute», «a (HTML-тег)»}}
 
-Tags come in several forms. An ((element)), such as the body, a paragraph, or a link, is started by an _((opening tag))_ like `<p>` and ended by a _((closing tag))_ like `</p>`. Some opening tags, such as the one for the ((link)) (`<a>`), contain extra information in the form of `name="value"` pairs. These are called _((attribute))s_. In this case, the destination of the link is indicated with `href="http://eloquentjavascript.net"`, where `href` stands for "hypertext reference".
+Теги бувають декількох видів. ((елемент)), такий як тіло, абзац або посилання, починається з _((відкриваючий тег))_ як `<p>` і закінчується _((закриваючий тег))_ як `</p>`. Деякі відкриваючі теги, наприклад, тег ((посилання)) (`<a>`), містять додаткову інформацію у вигляді пар `назва=«значення»`. Вони називаються _((атрибут))s_. У цьому випадку місце призначення посилання вказується за допомогою `href=«http://eloquentjavascript.net»`, де `href` означає «гіпертекстове посилання».
 
-{{index "src attribute", "self-closing tag", "img (HTML tag)"}}
+{{index «атрибут src», «самозакривний тег», «img (HTML-тег)»}}
 
-Some kinds of ((tag))s do not enclose anything and thus do not need to be closed. The metadata tag `<meta charset="utf-8">` is an example of this.
+Деякі види ((тегів)) нічого не містять і тому їх не потрібно закривати. Прикладом цього є тег метаданих `<meta charset=«utf-8»>`.
 
-{{index [escaping, "in HTML"]}}
+{{index [escape, «in HTML»]}}
 
-To be able to include ((angle brackets)) in the text of a document even though they have a special meaning in HTML, yet another form of special notation has to be introduced. A plain opening angle bracket is written as `&lt;` ("less than"), and a closing bracket is written as `&gt;` ("greater than"). In HTML, an ampersand (`&`) character followed by a name or character code and a semicolon (`;`) is called an _((entity))_ and will be replaced by the character it encodes.
+Щоб мати змогу включати ((кутові дужки)) у текст документа, навіть якщо вони мають спеціальне значення у HTML, необхідно ввести ще одну форму спеціальних позначень. Звичайна відкриваюча кутова дужка записується як `&lt;` («менше ніж»), а закриваюча дужка записується як `&gt;` («більше ніж»). У HTML символ амперсанду (`&`), за яким слідує ім'я або код символу і крапка з комою (`;`), називається _((об'єкт))_ і буде замінений символом, який він кодує.
 
-{{index ["backslash character", "in strings"], "ampersand character", "double-quote character"}}
+{{index [«символ зворотної косої риски», «у рядках»], «символ амперсанду», «символ подвійних лапок»}}
 
-This is analogous to the way backslashes are used in JavaScript strings. Since this mechanism gives ampersand characters a special meaning too, they need to be escaped as `&amp;`. Inside attribute values, which are wrapped in double quotes, `&quot;` can be used to insert a literal quote character.
+Це аналогічно тому, як використовується зворотна коса риска у рядках JavaScript. Оскільки цей механізм також надає символам амперсанду особливого значення, їх слід екранувати як `&amp;`. Всередині значень атрибутів, які взято у подвійні лапки, `&quot;` можна використовувати для вставки буквального символу лапок.
 
-{{index "error tolerance", parsing}}
+{{індекс «толерантність до помилок», розбір}}
 
-HTML is parsed in a remarkably error-tolerant way. When tags that should be there are missing, the browser automatically adds them. The way this is done has been standardized, and you can rely on all modern browsers to do it in the same way.
+HTML розбирається напрочуд толерантно до помилок. Коли теги, які мають бути присутніми, відсутні, браузер автоматично додає їх. Спосіб, у який це робиться, стандартизовано, і ви можете покладатися на те, що всі сучасні браузери роблять це однаково.
 
-The following document will be treated just like the one shown previously:
+Наступний документ буде оброблятися так само, як і попередній:
 
-```{lang: "html"}
+```{lang: «html"}
 <!doctype html>
 
 <meta charset=utf-8>
-<title>My home page</title>
+<title>Моя домашня сторінка</title>
 
-<h1>My home page</h1>
-<p>Hello, I am Marijn and this is my home page.
-<p>I also wrote a book! Read it
-  <a href=http://eloquentjavascript.net>here</a>.
+<h1>Моя домашня сторінка</h1>
+<p>Привіт, мене звати Марін, і це моя домашня сторінка.
+<А ще я написала книгу! Прочитайте її
+  <a href=http://eloquentjavascript.net>тут</a>.
 ```
 
-{{index "title (HTML tag)", "head (HTML tag)", "body (HTML tag)", "html (HTML tag)"}}
+{{index «title (HTML-тег)», «head (HTML-тег)», «body (HTML-тег)», «html (HTML-тег)»}}
 
-The `<html>`, `<head>`, and `<body>` tags are completely gone. The browser knows that `<meta>` and `<title>` belong in the head and that `<h1>` means the body has started. Furthermore, I am no longer explicitly closing the paragraphs, since opening a new paragraph or ending the document will close them implicitly. The quotes around the attribute values are also gone.
+Теги `<html>`, `<head>` і `<body>` повністю зникли. Браузер знає, що `<meta>` і `<title>` належать до заголовка, а `<h1>` означає, що почалося тіло. Крім того, я більше не закриваю абзаци явно, оскільки відкриття нового абзацу або завершення документа закриває їх неявно. Також зникли лапки навколо значень атрибутів.
 
-This book will usually omit the `<html>`, `<head>`, and `<body>` tags from examples to keep them short and free of clutter. I _will_ close tags and include quotes around attributes, though.
+У цій книзі у прикладах зазвичай не використовуються теги `<html>`, `<head>` і `<body>`, щоб зробити їх короткими і не захаращеними. Однак я _закрию_ теги і включу лапки навколо атрибутів.
 
-{{index browser}}
+{{індекс браузера}}
 
-I will also usually omit the ((doctype)) and `charset` declaration. Don't take this as encouragement to drop these from HTML documents. Browsers will often do ridiculous things when you forget them. Consider the doctype and the `charset` metadata to be implicitly present in examples, even when they are not actually shown in the text.
+Зазвичай я також опускатиму оголошення ((doctype)) і `charset`. Не сприймайте це як заохочення до їх вилучення з HTML-документів. Браузери часто роблять безглузді речі, коли ви їх забуваєте. Вважайте, що метадані doctype і `charset` неявно присутні у прикладах, навіть якщо вони не показані у тексті.
 
 {{id script_tag}}
 
-## HTML and JavaScript
+## HTML та JavaScript
 
-{{index [JavaScript, "in HTML"], "script (HTML tag)"}}
+{{index [JavaScript, «у HTML»], «скрипт (тег HTML)»}}
 
-In the context of this book, the most important HTML tag is `<script>`, which allows us to include a piece of JavaScript in a document.
+У контексті цієї книги найважливішим тегом HTML є тег `<script>`, який дозволяє включити в документ фрагмент JavaScript.
 
-```{lang: "html"}
-<h1>Testing alert</h1>
-<script>alert("hello!");</script>
+```{lang: «html"}}
+<h1>Тестувальне попередження</h1>
+<script>alert(«hello!»);</script>
 ```
 
-{{index "alert function", timeline}}
+{{index «alert function», timeline}}
 
-Such a script will run as soon as its `<script>` tag is encountered while the browser reads the HTML. This page will pop up a dialog when opened—the `alert` function resembles `prompt`, in that it pops up a little window, but only shows a message without asking for input.
+Такий скрипт буде запущено, як тільки браузер зустріне його тег `<script>` під час читання HTML. При відкритті цієї сторінки з'явиться діалогове вікно - функція `alert` схожа на `prompt`, у тому сенсі, що вона відкриває маленьке вікно, але показує лише повідомлення без запиту на введення.
 
-{{index "src attribute"}}
+{{index «src attribute»}}
 
-Including large programs directly in HTML documents is often impractical. The `<script>` tag can be given an `src` attribute  to fetch a script file (a text file containing a JavaScript program) from a URL.
+Включення великих програм безпосередньо у HTML-документи часто є недоцільним. Тегу `<script>` можна надати атрибут src`, щоб отримати файл сценарію (текстовий файл, що містить програму на JavaScript) з URL-адреси.
 
-```{lang: "html"}
-<h1>Testing alert</h1>
-<script src="code/hello.js"></script>
+```{lang: «html"}
+<h1>Повідомлення про тестування</h1>
+<script src=«code/hello.js»></script>
 ```
 
-The _code/hello.js_ file included here contains the same program—`alert("hello!")`. When an HTML page references other URLs as part of itself, such as an image file or a script, web browsers will retrieve them immediately and include them in the page.
+Файл _code/hello.js_, включений сюди, містить ту саму програму - `alert(«hello!»)`. Коли HTML-сторінка посилається на інші URL-адреси, такі як файл зображення або скрипт, веб-браузери негайно отримують їх і включають у сторінку.
 
-{{index "script (HTML tag)", "closing tag"}}
+{{index «script (HTML-тег)», «закриваючий тег»}}
 
-A script tag must always be closed with `</script>`, even if it refers to a script file and doesn't contain any code. If you forget this, the rest of the page will be interpreted as part of the script.
+Тег script завжди повинен закриватися `</script>`, навіть якщо він посилається на файл скрипта і не містить ніякого коду. Якщо ви забудете про це, решта сторінки буде інтерпретуватися як частина скрипта.
 
-{{index "relative path", dependency}}
+{{індекс «відносний шлях», залежність}}
 
-You can load ((ES modules)) (see [Chapter ?](modules#es)) in the browser by giving your script tag a `type="module"` attribute. Such modules can depend on other modules by using ((URL))s relative to themselves as module names in `import` declarations.
+Ви можете завантажити ((модулі ES)) (див. [Глава ?](модулі#es)) у браузері, надавши тегу вашого скрипту атрибут `type=«module»`. Такі модулі можуть залежати від інших модулів, використовуючи ((URL))и відносно себе як імена модулів в оголошеннях `import`.
 
-{{index "button (HTML tag)", "onclick attribute"}}
+{{index «кнопка (HTML-тег)», «атрибут натискання»}}
 
-Some attributes can also contain a JavaScript program. The `<button>` tag (which shows up as a button) supports an `onclick` attribute. The attribute's value will be run whenever the button is clicked.
+Деякі атрибути також можуть містити програму на JavaScript. Тег `<button>` (який відображається як кнопка) підтримує атрибут `onclick`. Значення атрибута буде виконуватися щоразу, коли буде натиснуто кнопку.
 
-```{lang: "html"}
-<button onclick="alert('Boom!');">DO NOT PRESS</button>
+```{lang: «html"}
+<button onclick=«alert(“Boom!”);»>НЕ НАТИСКАТИ</button>
 ```
 
-{{index "single-quote character", [escaping, "in HTML"]}}
+{{index «символ в одинарних лапках», [escaping, «in HTML»]}}
 
-Note that I had to use single quotes for the string in the `onclick` attribute because double quotes are already used to quote the whole attribute. I could also have used `&quot;` to escape the inner quotes.
+Зауважте, що для рядка в атрибуті `onclick` мені довелося використати одинарні лапки, оскільки для всього атрибута вже використано подвійні лапки. Я також міг би використати `&quot;` для уникнення внутрішніх лапок.
 
-## In the sandbox
+## У пісочниці
 
-{{index "malicious script", "World Wide Web", browser, website, security}}
+{{index «malicious script», «World Wide Web», браузер, сайт, безпека}}
 
-Running programs downloaded from the ((internet)) is potentially dangerous. You don't know much about the people behind most sites you visit, and they do not necessarily mean well. Running programs by malicious actors is how you get your computer infected by ((virus))es, your data stolen, and your accounts hacked.
+Запуск програм, завантажених з ((Інтернету)), є потенційно небезпечним. Ви мало знаєте про людей, які стоять за більшістю сайтів, які ви відвідуєте, і вони не обов'язково мають добрі наміри. Запуск програм зловмисниками може призвести до зараження комп'ютера вірусом, викрадення даних та зламу облікових записів.
 
-Yet the attraction of the web is that you can browse it without necessarily ((trust))ing all the pages you visit. This is why browsers severely limit the things a JavaScript program may do: it can't look at the files on your computer or modify anything not related to the web page it was embedded in.
+Проте привабливість Інтернету полягає в тому, що ви можете переглядати його, не обов'язково довіряючи всім сторінкам, які ви відвідуєте. Саме тому браузери суворо обмежують можливості програми на JavaScript: вона не може переглядати файли на вашому комп'ютері або змінювати будь-що, що не пов'язане з веб-сторінкою, в яку її було вбудовано.
 
-{{index isolation}}
+{Ізоляція індексів
 
-Isolating a programming environment in this way is called _((sandbox))ing_, the idea being that the program is harmlessly playing in a sandbox. But you should imagine this particular kind of sandbox as having a cage of thick steel bars over it so that the programs playing in it can't actually get out.
+Ізоляція середовища програмування у такий спосіб називається _((пісочниця))ing_, ідея полягає в тому, що програма нешкідливо грається у пісочниці. Але ви повинні уявити собі цей вид пісочниці як клітку з товстих сталевих прутів над нею, щоб програми, які граються в ній, насправді не могли вийти.
 
-The hard part of sandboxing is allowing programs enough room to be useful while restricting them from doing anything dangerous. Lots of useful functionality, such as communicating with other servers or reading the content of the copy-paste ((clipboard)), can also be used for problematic, ((privacy))-invading purposes.
+Складність пісочниці полягає в тому, щоб надати програмам достатньо простору для корисної роботи, водночас не даючи їм робити нічого небезпечного. Багато корисних функцій, таких як зв'язок з іншими серверами або читання вмісту буферу обміну, також можуть бути використані для проблемних цілей, що порушують приватність.
 
-{{index leak, exploit, security}}
+{{витік індексів, уразливість, безпека}}
 
-Every now and then, someone comes up with a new way to circumvent the limitations of a ((browser)) and do something harmful, ranging from leaking minor private information to taking over the whole machine on which the browser is running. The browser developers respond by fixing the hole, and all is well again—until the next problem is discovered, and hopefully publicized rather than secretly exploited by some government agency or criminal organization.
+Час від часу хтось придумує новий спосіб обійти обмеження ((браузера)) і зробити щось шкідливе, починаючи від витоку незначної приватної інформації і закінчуючи захопленням всього комп'ютера, на якому запущено браузер. Розробники браузерів реагують на це, виправляючи дірку, і все знову стає добре - до тих пір, поки не буде виявлено наступну проблему, яка, сподіваємося, буде оприлюднена, а не таємно використана якоюсь державною установою або злочинною організацією.
 
-## Compatibility and the browser wars
+## Сумісність та війни браузерів
 
-{{index Microsoft, "World Wide Web"}}
+{{індекс Microsoft, «World Wide Web»}}
 
-In the early stages of the web, a browser called ((Mosaic)) dominated the market. After a few years, the balance shifted to ((Netscape)), which was, in turn, largely supplanted by Microsoft's ((Internet Explorer)). At any point where a single ((browser)) was dominant, that browser's vendor would feel entitled to unilaterally invent new features for the web. Since most users used the most popular browser, ((website))s would simply start using those features—never mind the other browsers.
+На ранніх стадіях розвитку Інтернету на ринку домінував браузер під назвою ((Mosaic)). Через кілька років баланс змістився на користь ((Netscape)), який, у свою чергу, був значною мірою витіснений ((Internet Explorer)) від Microsoft. У будь-який момент, коли один ((браузер)) був домінуючим, постачальник цього браузера відчував себе вправі в односторонньому порядку винаходити нові функції для Інтернету. Оскільки більшість користувачів використовували найпопулярніший браузер, ((веб-сайт)) просто починав використовувати ці функції, не звертаючи уваги на інші браузери.
 
-This was the dark age of ((compatibility)), often called the _((browser wars))_. Web developers were left with not one unified web but two or three incompatible platforms. To make things worse, the browsers in use around 2003 were all full of ((bug))s, and of course the bugs were different for each ((browser)). Life was hard for people writing web pages.
+Це була темна доба ((сумісності)), яку часто називають _((війнами браузерів))_. Веб-розробники залишилися не з одним єдиним інтернетом, а з двома чи трьома несумісними платформами. Що ще гірше, браузери, які використовувалися близько 2003 року, були повні ((помилок)), і, звичайно, помилки були різними для кожного ((браузера)). Життя людей, які писали веб-сторінки, було важким.
 
-{{index Apple, "Internet Explorer", Mozilla}}
+{{індекс Apple, «Internet Explorer», Mozilla}}
 
-Mozilla ((Firefox)), a not-for-profit offshoot of ((Netscape)), challenged Internet Explorer's position in the late 2000s. Because ((Microsoft)) was not particularly interested in staying competitive at the time, Firefox took a lot of market share away from it. Around the same time, ((Google)) introduced its ((Chrome)) browser and Apple's ((Safari)) browser gained popularity, leading to a situation where there were four major players, rather than one.
+Mozilla ((Firefox)), некомерційне відгалуження ((Netscape)), кинуло виклик позиції Internet Explorer наприкінці 2000-х років. Оскільки ((Microsoft)) не була особливо зацікавлена в тому, щоб залишатися конкурентоспроможною в той час, Firefox відібрав у неї значну частку ринку. Приблизно в той самий час ((Google)) представив свій браузер ((Chrome)), а браузер Apple ((Safari)) набув популярності, що призвело до ситуації, коли на ринку було чотири основних гравці, а не один.
 
-{{index compatibility}}
+{Сумісність індексів
 
-The new players had a more serious attitude toward ((standards)) and better ((engineering)) practices, giving us less incompatibility and fewer ((bug))s. Microsoft, seeing its market share crumble, came around and adopted these attitudes in its Edge browser, which replaced Internet Explorer. If you are starting to learn web development today, consider yourself lucky. The latest versions of the major browsers behave quite uniformly and have relatively few bugs.
+Нові гравці серйозніше ставилися до ((стандарти)) та кращих ((інженерія)) практик, що дало нам менше несумісності та менше ((багів)). Microsoft, побачивши, що її частка на ринку зменшується, оговталася і застосувала ці підходи у своєму браузері Edge, який замінив Internet Explorer. Якщо ви починаєте вивчати веб-розробку сьогодні, вважайте, що вам пощастило. Останні версії основних браузерів поводяться досить одноманітно і мають відносно мало помилок.
 
-Unfortunately, with Firefox's market share getting ever smaller, and Edge becoming just a wrapper around Chrome's core in 2018, this uniformity might once again take the form of a single vendor—Google, this time—having enough control over the browser market to push its idea of what the web should look like onto the rest of the world.
+На жаль, зважаючи на те, що частка Firefox на ринку стає дедалі меншою, а Edge стає лише обгорткою навколо ядра Chrome у 2018 році, ця одноманітність може знову набути форми єдиного постачальника - цього разу Google - який має достатньо контролю над ринком браузерів, щоб нав'язати решті світу своє уявлення про те, як має виглядати веб.
 
-For what it is worth, this long chain of historical events and accidents has produced the web platform that we have today. In the next chapters, we are going to write programs for it.
+Як би там не було, цей довгий ланцюг історичних подій і випадковостей призвів до створення тієї веб-платформи, яку ми маємо сьогодні. У наступних розділах ми будемо писати для неї програми.

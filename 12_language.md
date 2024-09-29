@@ -1,113 +1,113 @@
-{{meta {load_files: ["code/chapter/12_language.js"], zip: "node/html"}}}
+{{meta {load_files: [«code/chapter/12_language.js»], zip: «node/html"}}}
 
-# Project: A Programming Language
+# Project: Мова програмування
 
-{{quote {author: "Hal Abelson and Gerald Sussman", title: "Structure and Interpretation of Computer Programs", chapter: true}
+{{quote {author: «Hal Abelson and Gerald Sussman», title: 
 
-The evaluator, which determines the meaning of expressions in a programming language, is just another program.
+Обчислювач, який визначає значення виразів у мові програмування, - це просто ще одна програма.
 
 quote}}
 
-{{index "Abelson, Hal", "Sussman, Gerald", SICP, "project chapter"}}
+{{index «Abelson, Hal», «Sussman, Gerald», SICP, «chapter of project»}}
 
-{{figure {url: "img/chapter_picture_12.jpg", alt: "Illustration showing an egg with holes in it, showing smaller eggs inside, which in turn have even smaller eggs in them, and so on", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_12.jpg», alt: «Ілюстрація із зображенням яйця з дірками, всередині якого знаходяться менші яйця, в яких, у свою чергу, є ще менші яйця, і так далі», »chapter: «Обрамлення"}}}.
 
-Building your own ((programming language)) is surprisingly easy (as long as you do not aim too high) and very enlightening.
+Створити власну ((мову програмування)) напрочуд легко (якщо не цілитися занадто високо) і дуже пізнавально.
 
-The main thing I want to show in this chapter is that there's no ((magic)) involved in building a programming language. I've often felt that some human inventions were so immensely clever and complicated that I'd never be able to understand them. But with a little reading and experimenting, they often turn out to be quite mundane.
+Головне, що я хочу показати у цій главі, це те, що у створенні мови програмування немає ніякої ((магії)). Мені часто здавалося, що деякі людські винаходи були настільки розумними і складними, що я ніколи не зможу їх зрозуміти. Але якщо трохи почитати і поекспериментувати, вони часто виявляються цілком буденними.
 
-{{index "Egg language", [abstraction, "in Egg"]}}
+{{index «Egg language», [abstraction, «in Egg»]}}
 
-We will build a programming language called Egg. It will be a tiny, simple language—but one that is powerful enough to express any computation you can think of. It will allow simple ((abstraction)) based on ((function))s.
+Ми створимо мову програмування під назвою Egg. Це буде крихітна, проста мова - але достатньо потужна, щоб виражати будь-які обчислення, які ви можете собі уявити. Вона дозволить створювати прості ((абстракції)) на основі ((функцій)).
 
 {{id parsing}}
 
-## Parsing
+## Синтаксичний аналіз
 
-{{index parsing, validation, [syntax, "of Egg"]}}
+{{розбір індексів, валідація, [синтаксис, «of Egg»]}}
 
-The most immediately visible part of a programming language is its _syntax_, or notation. A _parser_ is a program that reads a piece of text and produces a data structure that reflects the structure of the program contained in that text. If the text does not form a valid program, the parser should point out the error.
+Найбільш видимою частиною мови програмування є її _синтаксис_, або нотація. Синтаксичний аналізатор - це програма, яка читає фрагмент тексту і створює структуру даних, яка відображає структуру програми, що міститься в цьому тексті. Якщо текст не є правильною програмою, синтаксичний аналізатор повинен вказати на помилку.
 
-{{index "special form", [function, application]}}
+{{index «спеціальна форма», [функція, програма]}}
 
-Our language will have a simple and uniform syntax. Everything in Egg is an ((expression)). An expression can be the name of a binding, a number, a string, or an _application_. Applications are used for function calls but also for constructs such as `if` or `while`.
+Наша мова матиме простий та уніфікований синтаксис. Все у мові Egg - це ((вираз)). Вираз може бути ім'ям прив'язки, числом, рядком або _програмою_. Додатки використовуються для виклику функцій, а також для таких конструкцій, як `if` або `while`.
 
-{{index "double-quote character", parsing, [escaping, "in strings"], [whitespace, syntax]}}
+{{індекс «символ подвійних лапок», розбір, [екранування, «у рядках»], [пробіли, синтаксис]}}
 
-To keep the parser simple, strings in Egg do not support anything like backslash escapes. A string is simply a sequence of characters that are not double quotes, wrapped in double quotes. A number is a sequence of digits. Binding names can consist of any character that is not whitespace and that does not have a special meaning in the syntax.
+Щоб спростити роботу синтаксичного аналізатора, рядки у Egg не підтримують нічого подібного до екранування зворотним слешем. Рядок - це просто послідовність символів, які не є подвійними лапками, загорнута у подвійні лапки. Число - це послідовність цифр. Імена зв'язування можуть складатися з будь-яких символів, які не є пробілами і не мають спеціального значення у синтаксисі.
 
-{{index "comma character", [parentheses, arguments]}}
+{{індекс «символ коми», [дужки, аргументи]}}
 
-Applications are written the way they are in JavaScript, by putting parentheses after an expression and having any number of ((argument))s between those parentheses, separated by commas.
+Програми записуються так само, як і у JavaScript, з використанням круглих дужок після виразу та довільної кількості ((аргументів)) між цими дужками, розділених комами.
 
 ```{lang: null}
 do(define(x, 10),
    if(>(x, 5),
-      print("large"),
-      print("small")))
+      print(«large»),
+      print(«small»)))
 ```
 
-{{index block, [syntax, "of Egg"]}}
+{{index block, [syntax, «of Egg»]}}
 
-The ((uniformity)) of the ((Egg language)) means that things that are ((operator))s in JavaScript (such as `>`) are normal bindings in this language, applied just like other ((function))s. Since the syntax has no concept of a block, we need a `do` construct to represent doing multiple things in sequence.
+((одноманітність)) мови ((Egg)) означає, що речі, які є ((операторами)) у JavaScript (наприклад, `>`), є звичайними зв'язками у цій мові, які застосовуються так само, як і інші ((функції)). Оскільки синтаксис не має поняття блоку, нам потрібна конструкція `do`, щоб представити виконання декількох дій послідовно.
 
-{{index "type property", parsing, ["data structure", tree]}}
+{{індекс «властивість типу», parsing, [«структура даних», tree]}}
 
-The data structure that the parser will use to describe a program consists of ((expression)) objects, each of which has a `type` property indicating the kind of expression it is and other properties to describe its content.
+Структура даних, яку синтаксичний аналізатор використовуватиме для опису програми, складається з об'єктів ((вираз)), кожен з яких має властивість `type`, що вказує на тип виразу, та інші властивості для опису його вмісту.
 
-{{index identifier}}
+{{ідентифікатор індексу}}
 
-Expressions of type `"value"` represent literal strings or numbers. Their `value` property contains the string or number value that they represent. Expressions of type `"word"` are used for identifiers (names). Such objects have a `name` property that holds the identifier's name as a string. Finally, `"apply"` expressions represent applications. They have an `operator` property that refers to the expression that is being applied, as well as an `args` property that holds an array of argument expressions.
+Вирази типу `«значення»` представляють літерні рядки або числа. Їх властивість `value` містить значення рядка або числа, яке вони представляють. Вирази типу ``word`` використовуються для ідентифікаторів (імен). Такі об'єкти мають властивість `name`, яка містить ім'я ідентифікатора у вигляді рядка. Нарешті, вирази типу apply представляють програми. Вони мають властивість `operator`, яка посилається на вираз, що застосовується, а також властивість `args`, яка містить масив виразів-аргументів.
 
-The `>(x, 5)` part of the previous program would be represented like this:
+Частину `>(x, 5)` попередньої програми буде представлено таким чином:
 
-```{lang: "json"}
+```{lang: «json"}
 {
-  type: "apply",
-  operator: {type: "word", name: ">"},
+  type: «apply»,
+  operator: {type: «word», name: “>”},
   args: [
-    {type: "word", name: "x"},
-    {type: "value", value: 5}
+    {type: «word», name: “x”},
+    {type: «value», value: 5}
   ]
 }
 ```
 
-{{indexsee "abstract syntax tree", "syntax tree", ["data structure", tree]}}
+{{indexsee «абстрактне дерево синтаксису», «дерево синтаксису», [«структура даних», дерево]}}
 
-Such a data structure is called a _((syntax tree))_. If you imagine the objects as dots and the links between them as lines between those dots, as shown in the following diagram, the structure has a ((tree))like shape. The fact that expressions contain other expressions, which in turn might contain more expressions, is similar to the way tree branches split and split again.
+Така структура даних називається _((дерево синтаксису))_. Якщо уявити об'єкти у вигляді точок, а зв'язки між ними у вигляді ліній між цими точками, як показано на наступній схемі, то структура матиме вигляд ((дерева))-подібної. Той факт, що вирази містять інші вирази, які, у свою чергу, можуть містити більше виразів, подібний до того, як гілки дерева розгалужуються і знову розгалужуються.
 
-{{figure {url: "img/syntax_tree.svg", alt: "A diagram showing the structure of the syntax tree for the example program. The root is labeled 'do' and has two children, one labeled 'define' and one labeled 'if'. Those in turn have more children, describing their content.", width: "5cm"}}}
+{{figure {url: «img/syntax_tree.svg», alt: «Діаграма, що показує структуру дерева синтаксису для прикладу програми. Корінь позначено як do і він має два дочірні елементи, один з яких позначено як define, а інший - як if. Ті, у свою чергу, мають більше дочірніх елементів, що описують їхній вміст.», width: “5cm”}}}
 
-{{index parsing}}
+{{Розбір індексів}}
 
-Contrast this to the parser we wrote for the configuration file format in [Chapter ?](regexp#ini), which had a simple structure: it split the input into lines and handled those lines one at a time. There were only a few simple forms that a line was allowed to have.
+Порівняйте це з синтаксичним аналізатором, який ми написали для формату конфігураційного файлу у [Глава ?](regexp#ini), який мав просту структуру: він розбивав вхідні дані на рядки і опрацьовував ці рядки по одному. Існувало лише декілька простих форм, які дозволялося приймати рядкам.
 
-{{index recursion, [nesting, "of expressions"]}}
+{{індексна рекурсія, [вкладеність, «вирази»]}}
 
-Here we must find a different approach. Expressions are not separated into lines, and they have a recursive structure. Application expressions _contain_ other expressions.
+Тут ми повинні знайти інший підхід. Вирази не розділено на рядки, і вони мають рекурсивну структуру. Вирази програми _містять_ інші вирази.
 
-{{index elegance}}
+{{витонченість індексів}}
 
-Fortunately, this problem can be solved very well by writing a parser function that is recursive in a way that reflects the recursive nature of the language.
+На щастя, цю проблему можна вирішити дуже добре, написавши функцію синтаксичного аналізатора, яка є рекурсивною у спосіб, що відображає рекурсивну природу мови.
 
-{{index "parseExpression function", "syntax tree"}}
+{{index «parseExpression function», «syntax tree»}}
 
-We define a function `parseExpression` that takes a string as input. It returns an object containing the data structure for the expression at the start of the string, along with the part of the string left after parsing this expression. When parsing subexpressions (the argument to an application, for example), this function can be called again, yielding the argument expression as well as the text that remains. This text may in turn contain more arguments or may be the closing parenthesis that ends the list of arguments.
+Визначимо функцію `parseExpression`, яка отримує на вхід рядок. Вона повертає об'єкт, що містить структуру даних для виразу на початку рядка, а також частину рядка, що залишилася після розбору цього виразу. При розборі підвиразів (наприклад, аргументу програми) цю функцію можна викликати повторно, отримавши вираз-аргумент, а також текст, що залишився. Цей текст, у свою чергу, може містити більше аргументів або може бути закриваючою дужкою, яка завершує список аргументів.
 
-This is the first part of the parser:
+Це перша частина синтаксичного аналізатора:
 
 ```{includeCode: true}
 function parseExpression(program) {
   program = skipSpace(program);
-  let match, expr;
-  if (match = /^"([^"]*)"/.exec(program)) {
-    expr = {type: "value", value: match[1]};
+  нехай match, expr;
+  if (match = /^«([^»]*)"/.exec(program)) {
+    expr = {type: «value», value: match[1]};
   } else if (match = /^\d+\b/.exec(program)) {
-    expr = {type: "value", value: Number(match[0])};
+    expr = {type: «value», value: Number(match[0])};
   } else if (match = /^[^\s(),#"]+/.exec(program)) {
-    expr = {type: "word", name: match[0]};
+    expr = {type: «word», name: match[0]};
   } else {
-    throw new SyntaxError("Unexpected syntax: " + program);
+    throw new SyntaxError("Неочікуваний синтаксис: » + program);
   }
 
   return parseApply(expr, program.slice(match[0].length));
@@ -115,140 +115,140 @@ function parseExpression(program) {
 
 function skipSpace(string) {
   let first = string.search(/\S/);
-  if (first == -1) return "";
+  if (first == -1) return «»;
   return string.slice(first);
 }
 ```
 
-{{index "skipSpace function", [whitespace, syntax]}}
+{{index «skipSpace function», [пробіли, синтаксис]}}
 
-Because Egg, like JavaScript, allows any amount of whitespace between its elements, we have to repeatedly cut the whitespace off the start of the program string. The `skipSpace` function helps with this.
+Оскільки Egg, як і JavaScript, допускає будь-яку кількість пробілів між своїми елементами, нам доводиться неодноразово відрізати пробіли від початку рядка програми. Функція `skipSpace` допомагає у цьому.
 
-{{index "literal expression", "SyntaxError type"}}
+{{index «буквальний вираз», «тип синтаксичної помилки»}}
 
-After skipping any leading space, `parseExpression` uses three ((regular expression))s to spot the three atomic elements that Egg supports: strings, numbers, and words. The parser constructs a different kind of data structure depending on which expression matches. If the input does not match one of these three forms, it is not a valid expression, and the parser throws an error. We use the `SyntaxError` constructor here. This is an exception class defined by the standard, like `Error`, but more specific.
+Після пропуску будь-якого початкового пробілу, `parseExpression` використовує три ((регулярні вирази))и, щоб визначити три атомарні елементи, які підтримує Egg: рядки, числа та слова. Синтаксичний аналізатор створює різну структуру даних залежно від того, який вираз збігається. Якщо вхідні дані не відповідають жодній з цих трьох форм, це не є допустимим виразом, і синтаксичний аналізатор видасть помилку. Тут ми використовуємо конструктор `SyntaxError`. Це клас винятків, визначений стандартом, подібно до `Error`, але більш специфічний.
 
-{{index "parseApply function"}}
+{{index «parseApply function»}}
 
-We then cut off the part that was matched from the program string and pass that, along with the object for the expression, to `parseApply`, which checks whether the expression is an application. If so, it parses a parenthesized list of arguments.
+Потім ми вирізаємо з рядка програми ту частину, яка була знайдена, і передаємо її разом з об'єктом для виразу до `parseApply`, яка перевіряє, чи вираз є додатком. Якщо так, то він розбирає список аргументів у круглих дужках.
 
 ```{includeCode: true}
 function parseApply(expr, program) {
   program = skipSpace(program);
-  if (program[0] != "(") {
+  if (program[0] != «(») {
     return {expr: expr, rest: program};
   }
 
   program = skipSpace(program.slice(1));
-  expr = {type: "apply", operator: expr, args: []};
-  while (program[0] != ")") {
+  expr = {type: «apply», operator: expr, args: []};
+  while (program[0] != «)») {
     let arg = parseExpression(program);
     expr.args.push(arg.expr);
     program = skipSpace(arg.rest);
-    if (program[0] == ",") {
+    if (program[0] == «,») { { program
       program = skipSpace(program.slice(1));
-    } else if (program[0] != ")") {
-      throw new SyntaxError("Expected ',' or ')'");
+    } else if (program[0] != «)») {
+      throw new SyntaxError(«Expected “,” or “)”»);
     }
   }
   return parseApply(expr, program.slice(1));
 }
 ```
 
-{{index parsing, recursion}}
+{{індексний розбір, рекурсія}}
 
-If the next character in the program is not an opening parenthesis, this is not an application, and `parseApply` returns the expression it was given. Otherwise, it skips the opening parenthesis and creates the ((syntax tree)) object for this application expression. It then recursively calls `parseExpression` to parse each argument until a closing parenthesis is found. The recursion is indirect, through `parseApply` and `parseExpression` calling each other.
+Якщо наступний символ у програмі не є відкриваючою круглою дужкою, це не додаток, і `parseApply` повертає вираз, який йому було передано. В іншому випадку він пропускає відкриваючу дужку і створює об'єкт ((дерево синтаксису)) для цього прикладного виразу. Потім він рекурсивно викликає `parseExpression` для розбору кожного аргументу, доки не буде знайдено закриваючу дужку. Рекурсія є непрямою, через виклики `parseApply` і `parseExpression` один одного.
 
-Because an application expression can itself be applied (such as in `multiplier(2)(1)`), `parseApply` must, after it has parsed an application, call itself again to check whether another pair of parentheses follows.
+Оскільки прикладний вираз може сам застосовуватися (наприклад, у `multiplier(2)(1)`), `parseApply` повинен, після того як він розібрав приклад, викликати себе знову, щоб перевірити, чи не слідує інша пара дужок.
 
-{{index "syntax tree", "Egg language", "parse function"}}
+{{index «дерево синтаксису», «мова Egg», «функція розбору»}}
 
-This is all we need to parse Egg. We wrap it in a convenient `parse` function that verifies that it has reached the end of the input string after parsing the expression (an Egg program is a single expression), and that gives us the program's data structure.
+Це все, що нам потрібно для розбору мови Egg. Ми обертаємо його у зручну функцію `parse`, яка перевіряє, чи досягнуто кінця вхідного рядка після розбору виразу (програма на мові Egg - це один вираз), і яка дає нам структуру даних програми.
 
 ```{includeCode: strip_log, test: join}
 function parse(program) {
   let {expr, rest} = parseExpression(program);
   if (skipSpace(rest).length > 0) {
-    throw new SyntaxError("Unexpected text after program");
+    throw new SyntaxError(«Неочікуваний текст після програми»);
   }
   return expr;
 }
 
-console.log(parse("+(a, 10)"));
-// → {type: "apply",
-//    operator: {type: "word", name: "+"},
-//    args: [{type: "word", name: "a"},
-//           {type: "value", value: 10}]}
+console.log(parse(«+(a, 10)»));
+// → {type: «apply»,
+// оператор: {type: «word», name: “+”},
+// args: [{type: «word», name: “a”},
+// {type: «value», value: 10}]}
 ```
 
-{{index "error message"}}
+{{index «повідомлення про помилку»}}
 
-It works! It doesn't give us very helpful information when it fails and doesn't store the line and column on which each expression starts, which might be helpful when reporting errors later, but it's good enough for our purposes.
+Працює! Він не дає нам дуже корисної інформації у випадку помилки і не зберігає рядок і стовпець, з якого починається кожен вираз, що могло б бути корисним при подальшому повідомленні про помилки, але для наших цілей цього цілком достатньо.
 
-## The evaluator
+## Обчислювач
 
-{{index "evaluate function", evaluation, interpretation, "syntax tree", "Egg language"}}
+{{індекс «оцінити функцію», оцінка, інтерпретація, «дерево синтаксису», «яєчна мова»}}
 
-What can we do with the syntax tree for a program? Run it, of course! And that is what the evaluator does. You give it a syntax tree and a scope object that associates names with values, and it will evaluate the expression that the tree represents and return the value that this produces.
+Що ми можемо зробити з деревом синтаксису програми? Звичайно ж, запустити її на виконання! Саме цим і займається оцінювач. Ви даєте йому дерево синтаксису і об'єкт області видимості, який пов'язує імена зі значеннями, і він обчислить вираз, який представляє дерево, і поверне значення, яке це дає.
 
 ```{includeCode: true}
 const specialForms = Object.create(null);
 
 function evaluate(expr, scope) {
-  if (expr.type == "value") {
-    return expr.value;
-  } else if (expr.type == "word") {
+  if (expr.type == «value») {
+    повернути expr.value;
+  } else if (expr.type == «word») {
     if (expr.name in scope) {
-      return scope[expr.name];
+      return scope[ім'я_експресу];
     } else {
       throw new ReferenceError(
-        `Undefined binding: ${expr.name}`);
+        Невизначене зв'язування: ${expr.name}`);
     }
-  } else if (expr.type == "apply") {
-    let {operator, args} = expr;
-    if (operator.type == "word" &&
-        operator.name in specialForms) {
-      return specialForms[operator.name](expr.args, scope);
+  } else if (expr.type == «apply») {
+    let {оператор, аргументи} = expr;
+    if (operator.type == «word» &&
+        ім'я оператора в specialForms) { {
+      return specialForms[ім'я оператора](expr.args, область видимості);
     } else {
       let op = evaluate(operator, scope);
-      if (typeof op == "function") {
+      if (typeof op == «функція») {
         return op(...args.map(arg => evaluate(arg, scope)));
       } else {
-        throw new TypeError("Applying a non-function.");
+        throw new TypeError(«Застосування не функції.»);
       }
     }
   }
 }
 ```
 
-{{index "literal expression", scope}}
+{{index «буквальний вираз», scope}}
 
-The evaluator has code for each of the ((expression)) types. A literal value expression produces its value. (For example, the expression `100` evaluates to the number 100.) For a binding, we must check whether it is actually defined in the scope and, if it is, fetch the binding's value.
+Обчислювач має код для кожного з типів ((вираз)). Вираз з буквальним значенням виводить своє значення. (Наприклад, вираз `100` обчислюється до числа 100.) Для зв'язування ми повинні перевірити, чи дійсно воно визначене в області видимості, і якщо так, то отримати значення зв'язування.
 
-{{index [function, application]}}
+{{index [функція, додаток]}}
 
-Applications are more involved. If they are a ((special form)), like `if`, we do not evaluate anything—we just and pass the argument expressions, along with the scope, to the function that handles this form. If it is a normal call, we evaluate the operator, verify that it is a function, and call it with the evaluated arguments.
+Додатки є більш складними. Якщо це спеціальна форма, як-от `if`, ми нічого не обчислюємо - ми просто передаємо вираз аргументів разом з областю видимості функції, яка обробляє цю форму. Якщо це звичайний виклик, ми обчислюємо оператор, перевіряємо, що це функція, і викликаємо її з обчисленими аргументами.
 
-We use plain JavaScript function values to represent Egg's function values. We will come back to this [later](language#egg_fun), when the special form `fun` is defined.
+Ми використовуємо звичайні значення функцій JavaScript для представлення значень функцій Egg. Ми повернемося до цього [пізніше] (language#egg_fun), коли буде визначено спеціальну форму `fun`.
 
-{{index readability, "evaluate function", recursion, parsing}}
+{{читабельність індексів, «оцінити функцію», рекурсія, синтаксичний аналіз}}
 
-The recursive structure of `evaluate` resembles the structure of the parser, and both mirror the structure of the language itself. It would also be possible to combine the parser and the evaluator into one function and evaluate during parsing, but splitting them up this way makes the program clearer and more flexible.
+Рекурсивна структура `evaluate` нагадує структуру синтаксичного аналізатора, і обидві відображають структуру самої мови. Можна було б також об'єднати синтаксичний аналізатор і обчислювач в одну функцію і виконувати обчислення під час синтаксичного аналізу, але розділення їх таким чином робить програму зрозумілішою і гнучкішою.
 
-{{index "Egg language", interpretation}}
+{{index «Egg language», інтерпретація}}
 
-This is really all that's needed to interpret Egg. It's that simple. But without defining a few special forms and adding some useful values to the ((environment)), you can't do much with this language yet.
+Це дійсно все, що потрібно для інтерпретації мови Egg. Це дуже просто. Але без визначення декількох спеціальних форм та додавання деяких корисних значень до ((оточення)), ви не зможете багато чого зробити з цією мовою.
 
-## Special forms
+## Спеціальні форми
 
-{{index "special form", "specialForms object"}}
+{{index «special form», «specialForms object»}}
 
-The `specialForms` object is used to define special syntax in Egg. It associates words with functions that evaluate such forms. It is currently empty. Let's add `if`.
+Об'єкт `specialForms` використовується для визначення спеціального синтаксису в Egg. Він пов'язує слова з функціями, які обчислюють такі форми. Наразі він порожній. Давайте додамо `if`.
 
 ```{includeCode: true}
 specialForms.if = (args, scope) => {
   if (args.length != 3) {
-    throw new SyntaxError("Wrong number of args to if");
+    throw new SyntaxError(«Неправильна кількість аргументів для if»);
   } else if (evaluate(args[0], scope) !== false) {
     return evaluate(args[1], scope);
   } else {
@@ -257,36 +257,36 @@ specialForms.if = (args, scope) => {
 };
 ```
 
-{{index "conditional execution", "ternary operator", "?: operator", "conditional operator"}}
+{{індекс «умовне виконання», «тернарний оператор», «?: оператор», «умовний оператор»}}
 
-Egg's `if` construct expects exactly three arguments. It will evaluate the first, and if the result isn't the value `false`, it will evaluate the second. Otherwise, the third gets evaluated. This `if` form is more similar to JavaScript's ternary `?:` operator than to JavaScript's `if`. It is an expression, not a statement, and it produces a value—namely, the result of the second or third argument.
+Конструкція `if` в Egg очікує рівно три аргументи. Вона обчислює перший, і якщо результат не є значенням `false`, вона обчислює другий. В іншому випадку обчислюється третій. Ця форма `if` більше схожа на потрійний оператор JavaScript `?:`, ніж на `if`. Це вираз, а не оператор, і він створює значення, а саме результат другого або третього аргументу.
 
 {{index Boolean}}
 
-Egg also differs from JavaScript in how it handles the condition value to `if`. It will treat only the value `false` as false, not things like zero or the empty string.
+Egg також відрізняється від JavaScript тим, як вона обробляє значення умови в `if`. Вона вважатиме хибним лише значення `false`, а не нуль або порожній рядок.
 
-{{index "short-circuit evaluation"}}
+{{index «оцінка короткого замикання»}}
 
-The reason we need to represent `if` as a special form rather than a regular function is that all arguments to functions are evaluated before the function is called, whereas `if` should evaluate only _either_ its second or its third argument, depending on the value of the first.
+Причина, з якої нам потрібно представляти `if` як спеціальну форму, а не як звичайну функцію, полягає у тому, що всі аргументи функцій обчислюються перед викликом функції, тоді як `if` має обчислювати лише _або_ другий, або третій аргумент, залежно від значення першого.
 
-The `while` form is similar.
+Форма `while` подібна.
 
 ```{includeCode: true}
 specialForms.while = (args, scope) => {
   if (args.length != 2) {
-    throw new SyntaxError("Wrong number of args to while");
+    throw new SyntaxError(«Неправильна кількість аргументів для while»);
   }
-  while (evaluate(args[0], scope) !== false) {
+  while (evaluate(args[0], scope) !== false) { {
     evaluate(args[1], scope);
   }
 
-  // Since undefined does not exist in Egg, we return false,
-  // for lack of a meaningful result
-  return false;
+  // Оскільки в Egg не існує undefined, повертаємо false,
+  // через відсутність осмисленого результату
+  повертаємо false;
 };
 ```
 
-Another basic building block is `do`, which executes all its arguments from top to bottom. Its value is the value produced by the last argument.
+Ще одним базовим будівельним блоком є `do`, який виконує всі свої аргументи зверху вниз. Його значенням є значення, отримане від останнього аргументу.
 
 ```{includeCode: true}
 specialForms.do = (args, scope) => {
@@ -298,14 +298,14 @@ specialForms.do = (args, scope) => {
 };
 ```
 
-{{index ["= operator", "in Egg"], [binding, "in Egg"]}}
+{{index [«= оператор», «in Egg»], [binding, «in Egg»]}}
 
-To be able to create bindings and give them new values, we also create a form called `define`. It expects a word as its first argument and an expression producing the value to assign to that word as its second argument. Since `define`, like everything, is an expression, it must return a value. We'll make it return the value that was assigned (just like JavaScript's `=` operator).
+Щоб мати можливість створювати прив'язки і надавати їм нові значення, ми також створюємо форму, яка називається `define`. Вона очікує, що першим аргументом буде слово, а другим аргументом - вираз, що створює значення, яке слід присвоїти цьому слову. Оскільки `define`, як і все інше, є виразом, вона повинна повертати значення. Ми зробимо так, щоб він повертав значення, яке було присвоєно (подібно до оператора `=` у JavaScript).
 
 ```{includeCode: true}
 specialForms.define = (args, scope) => {
-  if (args.length != 2 || args[0].type != "word") {
-    throw new SyntaxError("Incorrect use of define");
+  if (args.length != 2 || args[0].type != «word») { {} if (args.length != 2 || args[0].type != «word»)
+    throw new SyntaxError(«Неправильне використання define»);
   }
   let value = evaluate(args[1], scope);
   scope[args[0].name] = value;
@@ -313,51 +313,51 @@ specialForms.define = (args, scope) => {
 };
 ```
 
-## The environment
+## Оточення
 
-{{index "Egg language", "evaluate function", [binding, "in Egg"]}}
+{{index «Egg language», «evaluate function», [binding, «in Egg»]}}
 
-The ((scope)) accepted by `evaluate` is an object with properties whose names correspond to binding names and whose values correspond to the values those bindings are bound to. Let's define an object to represent the ((global scope)).
+((область видимості)), прийнята функцією `evaluate` - це об'єкт з властивостями, назви яких відповідають назвам зв'язувань, а значення - значенням, до яких ці зв'язування прив'язані. Давайте визначимо об'єкт для представлення ((глобальної області видимості)).
 
-To be able to use the `if` construct we just defined, we must have access to ((Boolean)) values. Since there are only two Boolean values, we do not need special syntax for them. We simply bind two names to the values `true` and `false` and use them.
+Щоб мати змогу використовувати конструкцію `if`, яку ми щойно визначили, ми повинні мати доступ до значень ((Boolean)). Оскільки існує лише два булевих значення, нам не потрібен спеціальний синтаксис для них. Ми просто прив'язуємо два імені до значень `true` і `false` і використовуємо їх.
 
 ```{includeCode: true}
 const topScope = Object.create(null);
 
-topScope.true = true;
+topScope.true = true
 topScope.false = false;
 ```
 
-We can now evaluate a simple expression that negates a Boolean value.
+Тепер ми можемо обчислити простий вираз, який заперечує булеве значення.
 
 ```
-let prog = parse(`if(true, false, true)`);
+нехай prog = parse(`if(true, false, true)`);
 console.log(evaluate(prog, topScope));
 // → false
 ```
 
-{{index arithmetic, "Function constructor"}}
+{{index arithmetic, «Конструктор функцій»}}
 
-To supply basic ((arithmetic)) and ((comparison)) ((operator))s, we will also add some function values to the ((scope)). In the interest of keeping the code short, we'll use `Function` to synthesize a bunch of operator functions in a loop instead of defining them individually.
+Щоб надати базові ((арифметика)) та ((порівняння)) ((оператор)), ми також додамо деякі значення функцій до ((область видимості)). Щоб скоротити код, ми будемо використовувати `Function` для синтезу групи операторних функцій у циклі замість того, щоб визначати їх окремо.
 
 ```{includeCode: true}
-for (let op of ["+", "-", "*", "/", "==", "<", ">"]) {
-  topScope[op] = Function("a, b", `return a ${op} b;`);
+for (let op of [«+», «-», «*», «/», «==», «<», «>»]) {
+  topScope[op] = Function(«a, b», `повертає a ${op} b;`);
 }
 ```
 
-It is also useful to have a way to ((output)) values, so we'll wrap `console.log` in a function and call it `print`.
+Також корисно мати спосіб ((виведення)) значень, тому ми обернемо `console.log` у функцію і викличемо її `print`.
 
 ```{includeCode: true}
 topScope.print = value => {
   console.log(value);
-  return value;
+  повернути value;
 };
 ```
 
-{{index parsing, "run function"}}
+{{index parsing, «run function»}}
 
-That gives us enough elementary tools to write simple programs. The following function provides a convenient way to parse a program and run it in a fresh scope:
+Це дає нам достатньо елементарних інструментів для написання простих програм. Наступна функція надає зручний спосіб розбору програми і запуску її на виконання у свіжій області видимості:
 
 ```{includeCode: true}
 function run(program) {
@@ -365,9 +365,9 @@ function run(program) {
 }
 ```
 
-{{index "Object.create function", prototype}}
+{{index «Object.create function», prototype}}
 
-We'll use object prototype chains to represent nested scopes so that the program can add bindings to its local scope without changing the top-level scope.
+Ми будемо використовувати ланцюжки прототипів об'єктів для представлення вкладених областей видимості, щоб програма могла додавати прив'язки до своєї локальної області видимості, не змінюючи область видимості верхнього рівня.
 
 ```
 run(`
@@ -381,34 +381,34 @@ do(define(total, 0),
 // → 55
 ```
 
-{{index "summing example", "Egg language"}}
+{{index «summing example», «Egg language»}}
 
-This is the program we've seen several times before that computes the sum of the numbers 1 to 10, expressed in Egg. It is clearly uglier than the equivalent JavaScript program—but not bad for a language implemented in fewer than 150 ((lines of code)).
+Це програма, яку ми вже бачили кілька разів, яка обчислює суму чисел від 1 до 10, виражену мовою Egg. Вона явно потворніша за еквівалентну програму на JavaScript - але непогана для мови, реалізованої менш ніж за 150 ((рядків коду)).
 
 {{id egg_fun}}
 
-## Functions
+## Функції
 
-{{index function, "Egg language"}}
+{{index function, «Egg language»}}
 
-A programming language without functions is a poor programming language indeed. Fortunately, it isn't hard to add a `fun` construct, which treats its last argument as the function's body and uses all arguments before that as the names of the function's parameters.
+Мова програмування без функцій - це справді погана мова програмування. На щастя, неважко додати конструкцію `fun`, яка розглядає свій останній аргумент як тіло функції, а всі аргументи до нього використовує як імена параметрів функції.
 
 ```{includeCode: true}
 specialForms.fun = (args, scope) => {
   if (!args.length) {
-    throw new SyntaxError("Functions need a body");
+    throw new SyntaxError(«Функції потрібне тіло»);
   }
   let body = args[args.length - 1];
   let params = args.slice(0, args.length - 1).map(expr => {
-    if (expr.type != "word") {
-      throw new SyntaxError("Parameter names must be words");
+    if (expr.type != «word») {
+      throw new SyntaxError(«Імена параметрів повинні бути словами»);
     }
     return expr.name;
   });
 
   return function(...args) {
     if (args.length != params.length) {
-      throw new TypeError("Wrong number of arguments");
+      throw new TypeError(«Неправильна кількість аргументів»);
     }
     let localScope = Object.create(scope);
     for (let i = 0; i < args.length; i++) {
@@ -419,14 +419,14 @@ specialForms.fun = (args, scope) => {
 };
 ```
 
-{{index "local scope"}}
+{{index «local scope»}}
 
-Functions in Egg get their own local scope. The function produced by the `fun` form creates this local scope and adds the argument bindings to it. It then evaluates the function body in this scope and returns the result.
+Функції в Egg отримують власну локальну область видимості. Функція, створена формою `fun`, створює цю локальну область видимості і додає до неї прив'язки аргументів. Потім вона обчислює тіло функції у цій області видимості і повертає результат.
 
 ```{startCode: true}
 run(`
 do(define(plusOne, fun(a, +(a, 1))),
-   print(plusOne(10)))
+   print(plusOne(10))
 `);
 // → 11
 
@@ -440,72 +440,72 @@ do(define(pow, fun(base, exp,
 // → 1024
 ```
 
-## Compilation
+## Компіляція
 
-{{index interpretation, compilation}}
+{{інтерпретація індексів, компіляція}}
 
-What we have built is an interpreter. During evaluation, it acts directly on the representation of the program produced by the parser.
+Те, що ми створили, є інтерпретатором. Під час оцінки він діє безпосередньо на представлення програми, отримане синтаксичним аналізатором.
 
-{{index efficiency, performance, [binding, definition], [memory, speed]}}
+{{індекс ефективності, продуктивності, [зв'язування, визначення], [пам'ять, швидкість]}}
 
-_Compilation_ is the process of adding another step between the parsing and the running of a program, which transforms the program into something that can be evaluated more efficiently by doing as much work as possible in advance. For example, in well-designed languages it is obvious, for each use of a binding, which binding is being referred to, without actually running the program. This can be used to avoid looking up the binding by name every time it is accessed, instead directly fetching it from some predetermined memory location.
+Компіляція - це процес додавання ще одного кроку між синтаксичним аналізом і виконанням програми, який перетворює програму на те, що можна оцінити більш ефективно, виконавши якомога більше роботи заздалегідь. Наприклад, у добре спроектованих мовах для кожного використання зв'язування очевидно, на яке саме зв'язування посилається програма, навіть не запускаючи її на виконання. Це дозволяє уникнути необхідності шукати зв'язування за іменем кожного разу, коли до нього звертаються, натомість безпосередньо отримувати його з деякої наперед визначеної ділянки пам'яті.
 
-Traditionally, ((compilation)) involves converting the program to ((machine code)), the raw format that a computer's processor can execute. But any process that converts a program to a different representation can be thought of as compilation.
+Традиційно, ((компіляція)) передбачає перетворення програми у ((машинний код)), необроблений формат, який може виконати процесор комп'ютера. Але будь-який процес, який перетворює програму в інше представлення, можна вважати компіляцією.
 
-{{index simplicity, "Function constructor", transpilation}}
+{{індекс простоти, «Конструктор функцій», трансполяція}}
 
-It would be possible to write an alternative ((evaluation)) strategy for Egg, one that first converts the program to a JavaScript program, uses `Function` to invoke the JavaScript compiler on it, and runs the result. When done right, this would make Egg run very fast while still being quite simple to implement.
+Можна було б написати альтернативну стратегію ((оцінки)) для Egg, яка спочатку перетворює програму на програму на JavaScript, використовує `Function` для виклику компілятора JavaScript, а потім запускає результат. Якщо все зроблено правильно, це зробить роботу Egg дуже швидкою, але при цьому досить простою у реалізації.
 
-If you are interested in this topic and willing to spend some time on it, I encourage you to try to implement such a compiler as an exercise.
+Якщо вас зацікавила ця тема і ви готові витратити на неї трохи часу, я рекомендую вам спробувати реалізувати такий компілятор у якості вправи.
 
-## Cheating
+## Шахрайство
 
-{{index "Egg language"}}
+{{index «Egg language»}}
 
-When we defined `if` and `while`, you probably noticed that they were more or less trivial wrappers around JavaScript's own `if` and `while`. Similarly, the values in Egg are just regular old JavaScript values. Bridging the gap to a more primitive system, such as the machine code the processor understands, takes more effort—but the way it works resembles what we are doing here.
+Коли ми визначили `if` і `while`, ви, мабуть, помітили, що вони є більш-менш тривіальними обгортками навколо власних `if` і `while` JavaScript. Аналогічно, значення в Egg - це звичайні старі добрі значення JavaScript. Подолання розриву до більш примітивної системи, такої як машинний код, який розуміє процесор, вимагає більше зусиль - але спосіб, яким він працює, нагадує те, що ми робимо тут.
 
-Though the toy language in this chapter doesn't do anything that couldn't be done better in JavaScript, there _are_ situations where writing small languages helps get real work done.
+Хоча іграшкова мова в цій главі не робить нічого такого, що не можна було б зробити краще в JavaScript,  існують ситуації, коли написання маленьких мов допомагає виконати реальну роботу.
 
-Such a language does not have to resemble a typical programming language. If JavaScript didn't come equipped with regular expressions, for example, you could write your own parser and evaluator for regular expressions.
+Така мова не обов'язково має бути схожою на типову мову програмування. Наприклад, якби в JavaScript не було регулярних виразів, ви могли б написати власний синтаксичний аналізатор та обчислювач регулярних виразів.
 
-{{index "parser generator"}}
+{{index «parser generator»}}
 
-Or imagine you are building a program that makes it possible to quickly create parsers by providing a logical description of the language they need to parse. You could define a specific notation for that, and a compiler that compiles it to a parser program.
+Або уявіть, що ви створюєте програму, яка дозволяє швидко створювати синтаксичні аналізатори, надаючи логічний опис мови, яку вони мають аналізувати. Ви можете визначити для цього спеціальну нотацію і компілятор, який скомпілює її у програму синтаксичного аналізатора.
 
 ```{lang: null}
 expr = number | string | name | application
 
-number = digit+
+число = цифра+
 
-name = letter+
+ім'я = літера +
 
-string = '"' (! '"')* '"'
+string = '«“ (! ”»')* '"'
 
 application = expr '(' (expr (',' expr)*)? ')'
 ```
 
-{{index expressivity}}
+{{виразність індексу}}
 
-This is what is usually called a _((domain-specific language))_, a language tailored to express a narrow domain of knowledge. Such a language can be more expressive than a general-purpose language because it is designed to describe exactly the things that need to be described in its domain and nothing else.
+Це те, що зазвичай називають _((предметно-специфічною мовою))_, мовою, пристосованою для вираження вузької галузі знань. Така мова може бути більш виразною, ніж мова загального призначення, оскільки вона призначена для опису саме тих речей, які потрібно описувати у своїй галузі, і нічого іншого.
 
-## Exercises
+## Вправи
 
-### Arrays
+### Масиви
 
-{{index "Egg language", "arrays in egg (exercise)", [array, "in Egg"]}}
+{{index «Egg language», «arrays in egg (exercise)», [array, «in Egg»]}}
 
-Add support for arrays to Egg by adding the following three functions to the top scope: `array(...values)` to construct an array containing the argument values, `length(array)` to get an array's length, and `element(array, n)` to fetch the *n*th element from an array.
+Додайте підтримку масивів до мови Egg, додавши наступні три функції до верхньої області видимості: `array(...values)` для створення масиву, що містить значення аргументів, `length(array)` для отримання довжини масиву та `element(array, n)` для отримання *n*-гоелементу з масиву.
 
-{{if interactive
+{{якщо інтерактивний
 
 ```{test: no}
-// Modify these definitions...
+// Змініть ці визначення...
 
-topScope.array = "...";
+topScope.array = «...»;
 
-topScope.length = "...";
+topScope.length = «...»;
 
-topScope.element = "...";
+topScope.element = «...»;
 
 run(`
 do(define(sum, fun(array,
@@ -524,23 +524,23 @@ if}}
 
 {{hint
 
-{{index "arrays in egg (exercise)"}}
+{{index «масиви у яйці (вправа)»}}
 
-The easiest way to do this is to represent Egg arrays with JavaScript arrays.
+Найпростіший спосіб зробити це - представити масиви Egg масивами JavaScript.
 
-{{index "slice method"}}
+{{index «метод зрізу»}}
 
-The values added to the top scope must be functions. By using a rest argument (with triple-dot notation), the definition of `array` can be _very_ simple.
+Значення, що додаються до верхньої області видимості, мають бути функціями. Використовуючи аргумент rest (з нотацією з трьома крапками), визначення `array` може бути  дуже простим.
 
-hint}}
+підказка}}
 
-### Closure
+### Закриття
 
-{{index closure, [function, scope], "closure in egg (exercise)"}}
+{{індекс закриття, [функція, область видимості], «закриття у яйці (вправа)»}}
 
-The way we have defined `fun` allows functions in Egg to reference the surrounding scope, allowing the function's body to use local values that were visible at the time the function was defined, just like JavaScript functions do.
+Те, як ми визначили `fun`, дозволяє функціям в Egg посилатися на навколишню область видимості, дозволяючи тілу функції використовувати локальні значення, які були видимі на момент визначення функції, так само, як це роблять функції JavaScript.
 
-The following program illustrates this: function `f` returns a function that adds its argument to `f`'s argument, meaning that it needs access to the local ((scope)) inside `f` to be able to use binding `a`.
+Наступна програма ілюструє це: функція `f` повертає функцію, яка додає свій аргумент до аргументу `f`, що означає, що їй потрібен доступ до локальної області видимості всередині `f`, щоб мати змогу використовувати прив'язку `a`.
 
 ```
 run(`
@@ -550,83 +550,83 @@ do(define(f, fun(a, fun(b, +(a, b)))),
 // → 9
 ```
 
-Go back to the definition of the `fun` form and explain which mechanism causes this to work.
+Поверніться до визначення форми `fun` і поясніть, який механізм змушує її працювати.
 
 {{hint
 
-{{index closure, "closure in egg (exercise)"}}
+{{index closure, «закриття у яйці (вправа)»}}
 
-Again, we are riding along on a JavaScript mechanism to get the equivalent feature in Egg. Special forms are passed the local scope in which they are evaluated so that they can evaluate their subforms in that scope. The function returned by `fun` has access to the `scope` argument given to its enclosing function and uses that to create the function's local ((scope)) when it is called.
+Знову ж таки, ми використовуємо механізм JavaScript, щоб отримати еквівалентну функцію в Egg. Спеціальним формам передається локальна область видимості, в якій вони обчислюються, щоб вони могли обчислювати свої підформи у цій області видимості. Функція, яку повертає `fun`, має доступ до аргументу `scope`, переданого її охоплюючій функції, і використовує його для створення локальної області видимості функції під час її виклику.
 
-{{index compilation}}
+{{індексна компіляція}}
 
-This means that the ((prototype)) of the local scope will be the scope in which the function was created, which makes it possible to access bindings in that scope from the function. This is all there is to implementing closure (though to compile it in a way that is actually efficient, you'd need to do some more work).
+Це означає, що ((прототипом)) локальної області видимості буде область видимості, у якій було створено функцію, що дає змогу отримати доступ до прив'язок у цій області видимості з функції. Це все, що потрібно для реалізації закриття (хоча для ефективної компіляції вам потрібно буде виконати ще деяку роботу).
 
-hint}}
+підказка}}
 
-### Comments
+### Коментарі
 
-{{index "hash character", "Egg language", "comments in egg (exercise)"}}
+{{index «hash character», «Egg language», «comments in egg (exercise)»}}
 
-It would be nice if we could write ((comment))s in Egg. For example, whenever we find a hash sign (`#`), we could treat the rest of the line as a comment and ignore it, similar to `//` in JavaScript.
+Було б добре, якби ми могли писати ((коментар))и мовою Egg. Наприклад, коли ми знаходимо хеш-символ (`#`), ми можемо вважати решту рядка коментарем і ігнорувати його, подібно до `//` у JavaScript.
 
-{{index "skipSpace function"}}
+{{index «skipSpace function»}}
 
-We do not have to make any big changes to the parser to support this. We can simply change `skipSpace` to skip comments as if they are ((whitespace)) so that all the points where `skipSpace` is called will now also skip comments. Make this change.
+Нам не потрібно вносити значних змін до синтаксичного аналізатора, щоб підтримати цю можливість. Ми можемо просто змінити `skipSpace` так, щоб вона пропускала коментарі так, ніби вони є ((пробілами)), так що у всіх точках, де викликається `skipSpace`, тепер також пропускатимуться коментарі. Зробіть цю зміну.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no}
-// This is the old skipSpace. Modify it...
+// Це старий skipSpace. Змініть його...
 function skipSpace(string) {
   let first = string.search(/\S/);
-  if (first == -1) return "";
+  if (first == -1) return «»;
   return string.slice(first);
 }
 
-console.log(parse("# hello\nx"));
-// → {type: "word", name: "x"}
+console.log(parse(«# hello\nx»));
+// → {type: «word», name: “x”} }
 
-console.log(parse("a # one\n   # two\n()"));
-// → {type: "apply",
-//    operator: {type: "word", name: "a"},
-//    args: []}
+console.log(parse(«a # one\n # two\n()»));
+// → {type: «apply»,
+// оператор: {type: «word», name: “a”},
+// args: []}
 ```
 if}}
 
 {{hint
 
-{{index "comments in egg (exercise)", [whitespace, syntax]}}
+{{index «comments in egg (exercise)», [whitespace, syntax]}}
 
-Make sure your solution handles multiple comments in a row, with whitespace potentially between or after them.
+Переконайтеся, що ваш розв'язок обробляє декілька коментарів підряд, між або після яких можуть бути пропуски.
 
-A ((regular expression)) is probably the easiest way to solve this. Write something that matches "whitespace or a comment, zero or more times". Use the `exec` or `match` method and look at the length of the first element in the returned array (the whole match) to find out how many characters to slice off.
+((регулярний вираз)) - це, мабуть, найпростіший спосіб вирішити цю проблему. Напишіть щось, що відповідає «пробіл або коментар, нуль або більше разів». Використовуйте метод `exec` або `match` і подивіться на довжину першого елемента у повернутому масиві (весь вираз), щоб дізнатися, скільки символів потрібно відрізати.
 
-hint}}
+підказка}}
 
-### Fixing scope
+### Фіксація області видимості
 
-{{index [binding, definition], assignment, "fixing scope (exercise)"}}
+{{index [зв'язування, визначення], присвоєння, «фіксування області видимості (вправа)»}}
 
-Currently, the only way to assign a binding a value is `define`. This construct acts as a way both to define new bindings and to give existing ones a new value.
+Наразі єдиним способом присвоїти прив'язці значення є `define`. За допомогою цієї конструкції можна як визначати нові прив'язки, так і надавати нове значення існуючим прив'язкам.
 
-{{index "local binding"}}
+{{index «local binding»}}
 
-This ((ambiguity)) causes a problem. When you try to give a nonlocal binding a new value, you will end up defining a local one with the same name instead. Some languages work like this by design, but I've always found it an awkward way to handle ((scope)).
+Ця ((неоднозначність)) викликає проблему. Коли ви намагаєтеся надати нелокальному зв'язуванню нове значення, ви зрештою визначите локальне зв'язування з тим самим іменем. Деякі мови працюють так за замовчуванням, але я завжди вважав це незручним способом роботи з ((область видимості)).
 
-{{index "ReferenceError type"}}
+{{index «ReferenceError type»}}
 
-Add a special form `set`, similar to `define`, which gives a binding a new value, updating the binding in an outer scope if it doesn't already exist in the inner scope. If the binding is not defined at all, throw a `ReferenceError` (another standard error type).
+Додайте спеціальну форму `set`, подібну до `define`, яка надає прив'язці нове значення, оновлюючи прив'язку у зовнішній області видимості, якщо вона ще не існує у внутрішній області. Якщо прив'язка взагалі не визначена, згенерує `ReferenceError` (ще один стандартний тип помилки).
 
-{{index "hasOwn function", prototype, "getPrototypeOf function"}}
+{{index «hasOwn function», prototype, «getPrototypeOf function»}}
 
-The technique of representing scopes as simple objects, which has made things convenient so far, will get in your way a little at this point. You might want to use the `Object.getPrototypeOf` function, which returns the prototype of an object. Also remember that you can use `Object.hasOwn` to find out if a given object has a property.
+Техніка представлення діапазонів як простих об'єктів, яка досі робила речі зручними, на цьому етапі трохи заважатиме вам. Можливо, ви захочете скористатися функцією `Object.getPrototypeOf`, яка повертає прототип об'єкта. Також пам'ятайте, що ви можете використовувати `Object.hasOwn`, щоб дізнатися, чи має даний об'єкт властивість.
 
-{{if interactive
+{{if інтерактивний
 
 ```{test: no}
 specialForms.set = (args, scope) => {
-  // Your code here.
+  // Ваш код тут.
 };
 
 run(`
@@ -637,18 +637,18 @@ do(define(x, 4),
 `);
 // → 50
 run(`set(quux, true)`);
-// → Some kind of ReferenceError
+// → Якась ReferenceError
 ```
 if}}
 
 {{hint
 
-{{index [binding, "compilation of"], assignment, "getPrototypeOf function", "hasOwn function", "fixing scope (exercise)"}}
+{{index [прив'язка, «компіляція»], присвоєння, «getPrototypeOf функції», «hasOwn function», «фіксація області видимості (вправи)»}}
 
-You will have to loop through one ((scope)) at a time, using `Object.getPrototypeOf` to go to the next outer scope. For each scope, use `Object.hasOwn` to find out whether the binding, indicated by the `name` property of the first argument to `set`, exists in that scope. If it does, set it to the result of evaluating the second argument to `set` and then return that value.
+Вам доведеться циклічно проходити через одну ((область видимості)) за раз, використовуючи `Object.getPrototypeOf` для переходу до наступної зовнішньої області видимості. Для кожної області видимості використовуйте `Object.hasOwn`, щоб з'ясувати, чи існує прив'язка, вказана властивістю `name` першого аргументу в `set`, у цій області видимості. Якщо так, то встановіть його як результат обчислення другого аргументу до `set` і поверніть це значення.
 
-{{index "global scope", "run-time error"}}
+{{index «глобальна область видимості», «помилка часу виконання»}}
 
-If the outermost scope is reached (`Object.getPrototypeOf` returns `null`) and we haven't found the binding yet, it doesn't exist, and an error should be thrown.
+Якщо досягнуто граничної області видимості (`Object.getPrototypeOf` повертає `null`), а прив'язки ще не знайдено, то її не існує, і слід згенерувати помилку.
 
-hint}}
+підказка}}

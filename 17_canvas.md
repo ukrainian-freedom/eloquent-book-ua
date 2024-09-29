@@ -1,168 +1,167 @@
-{{meta {load_files: ["code/chapter/16_game.js", "code/levels.js", "code/_stop_keys.js", "code/chapter/17_canvas.js"], zip: "html include=[\"img/player.png\", \"img/sprites.png\"]"}}}
+{{meta {load_files: [«code/chapter/16_game.js», «code/levels.js», «code/_stop_keys.js», «code/chapter/17_canvas.js»], zip: «html include=[\«img/player.png\», \«img/sprites.png\»]"}}}}.
 
-# Drawing on Canvas
+# Малювання на полотні
 
-{{quote {author: "M.C. Escher", title: "cited by Bruno Ernst in The Magic Mirror of M.C. Escher", chapter: true}
+{{quote {автор: «M.C. Escher», title: 
 
-Drawing is deception.
-
+Малюнок - це обман.
 quote}}
 
-{{index "Escher, M.C."}}
+{{index «Escher, M.C.»}}
 
-{{figure {url: "img/chapter_picture_17.jpg", alt: "Illustration showing an industrial-looking robot arm drawing a city on a piece of paper", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_17.jpg», alt: «Ілюстрація, що показує руку робота промислового вигляду, яка малює місто на аркуші паперу», »chapter: «Обрамлення"}}}
 
-{{index CSS, "transform (CSS)", [DOM, graphics]}}
+{{index CSS, «transform (CSS)», [DOM, graphics]}}
 
-Browsers give us several ways to display ((graphics)). The simplest way is to use styles to position and color regular DOM elements. This can get us quite far, as the game in the [previous chapter](game) showed. By adding partially transparent background ((image))s to the nodes, we can make them look exactly the way we want. It is even possible to rotate or skew nodes with the `transform` style.
+Браузери надають нам декілька способів відображення ((графіки)). Найпростіший спосіб - це використання стилів для позиціонування і кольору звичайних елементів DOM. Це може завести нас досить далеко, як показала гра у [попередньому розділі](гра). Додавши частково прозоре тло ((зображення)) до вузлів, ми можемо зробити так, щоб вони виглядали саме так, як ми хочемо. Можна навіть обертати або нахиляти вузли за допомогою стилю `transform`.
 
-But we'd be using the DOM for something that it wasn't originally designed for. Some tasks, such as drawing a ((line)) between arbitrary points, are extremely awkward to do with regular HTML elements.
+Але ми будемо використовувати DOM для того, для чого він не був спочатку призначений. Деякі завдання, такі як малювання ((лінії)) між довільними точками, вкрай незручно виконувати за допомогою звичайних HTML-елементів.
 
-{{index SVG, "img (HTML tag)"}}
+{{index SVG, «img (HTML-тег)»}}
 
-There are two alternatives. The first is DOM based but utilizes _Scalable Vector Graphics_ (SVG) rather than HTML. Think of SVG as a ((document))-markup dialect that focuses on ((shape))s rather than text. You can embed an SVG document directly in an HTML document or include it with an `<img>` tag.
+Існує дві альтернативи. Перша заснована на DOM, але використовує _Масштабовану векторну графіку_ (SVG), а не HTML. Подумайте про SVG як про діалект ((документ))-розмітки, який фокусується на ((форма)), а не на тексті. Ви можете вбудувати SVG-документ безпосередньо у HTML-документ або включити його за допомогою тегу `<img>`.
 
-{{index clearing, [DOM graphics], [interface, canvas]}}
+{{очищення індексів, [DOM-графіка], [інтерфейс, полотно]}}
 
-The second alternative is called a _((canvas))_. A canvas is a single DOM element that encapsulates a ((picture)). It provides a programming interface for drawing ((shape))s onto the space taken up by the node. The main difference between a canvas and an SVG picture is that in SVG the original description of the shapes is preserved so that they can be moved or resized at any time. A canvas, on the other hand, converts the shapes to ((pixel))s (colored dots on a raster) as soon as they are drawn and does not remember what these pixels represent. The only way to move a shape on a canvas is to clear the canvas (or the part of the canvas around the shape) and redraw it with the shape in a new position.
+Другий варіант називається _((полотно))_. Полотно - це один DOM-елемент, який інкапсулює ((зображення)). Він надає програмний інтерфейс для малювання ((фігур)) у просторі, зайнятому вузлом. Основна відмінність між полотном і SVG-зображенням полягає в тому, що в SVG зберігається оригінальний опис фігур, так що їх можна переміщати або змінювати розмір у будь-який час. Полотно, з іншого боку, перетворює фігури на ((пікселі)) (кольорові точки на растрі), як тільки вони намальовані, і не пам'ятає, що ці пікселі представляють. Єдиний спосіб перемістити фігуру на полотні - це очистити полотно (або частину полотна навколо фігури) і перемалювати його з фігурою в новому положенні.
 
 ## SVG
 
-This book won't go into ((SVG)) in detail, but I'll briefly explain how it works. At the [end of the chapter](canvas#graphics_tradeoffs), I'll come back to the trade-offs that you must consider when deciding which ((drawing)) mechanism is appropriate for a given application.
+У цій книзі ми не розглядатимемо ((SVG)) детально, але я коротко поясню, як він працює. Наприкінці розділу](canvas#graphics_tradeoffs) я повернуся до компромісів, які ви повинні враховувати, вирішуючи, який механізм ((малювання)) підходить для конкретної програми.
 
-This is an HTML document with a simple SVG ((picture)) in it:
+Це HTML-документ з простим SVG-зображенням ((малюнком)) у ньому:
 
-```{lang: html, sandbox: "svg"}
-<p>Normal HTML here.</p>
-<svg xmlns="http://www.w3.org/2000/svg">
-  <circle r="50" cx="50" cy="50" fill="red"/>
-  <rect x="120" y="5" width="90" height="90"
-        stroke="blue" fill="none"/>
+```{lang: html, sandbox: «svg»}
+<p>Звичайний HTML тут.</p>
+<svg xmlns=«http://www.w3.org/2000/svg»>
+  <circle r=«50» cx=«50» cy=«50» fill=«red»/>
+  <rect x=«120» y=«5» width=«90» height="90»
+        
 </svg>
 ```
 
-{{index "circle (SVG tag)", "rect (SVG tag)", "XML namespace", XML, "xmlns attribute"}}
+{{index «circle (SVG-тег)», «rect (SVG-тег)», «простір імен XML», XML, «атрибут xmlns»}}
 
-The `xmlns` attribute changes an element (and its children) to a different _XML namespace_. This namespace, identified by a ((URL)), specifies the dialect that we are currently speaking. The `<circle>` and `<rect>` tags, which do not exist in HTML, do have a meaning in SVG—they draw shapes using the style and position specified by their attributes.
+Атрибут `xmlns` змінює елемент (та його дочірні елементи) на інший  простір імен _XML_. Цей простір імен, ідентифікований за допомогою ((URL)), визначає діалект, яким ми зараз розмовляємо. Теги `<circle>` і `<rect>`, які не існують у HTML, мають значення у SVG - вони малюють фігури, використовуючи стиль і положення, визначені їхніми атрибутами.
 
 {{if book
 
-The document is displayed like this:
+Документ відображається таким чином:
 
-{{figure {url: "img/svg-demo.png", alt: "Screenshot showing an SVG image embedded in an HTML document", width: "4.5cm"}}}
+{{figure {url: «img/svg-demo.png», alt: «Знімок екрана із зображенням SVG, вбудованим у HTML-документ», width: “4.5cm”}}}}
 
 if}}
 
-{{index [DOM, graphics]}}
+{{index [DOM, графіка]}}
 
-These tags create DOM elements, just like HTML tags, that scripts can interact with. For example, this changes the `<circle>` element to be ((color))ed cyan instead:
+Ці теги створюють елементи DOM, так само як і теги HTML, з якими можуть взаємодіяти скрипти. Наприклад, це змінює елемент `<circle>` на ((колір))ed блакитний:
 
-```{sandbox: "svg"}
-let circle = document.querySelector("circle");
-circle.setAttribute("fill", "cyan");
+```{sandbox: «svg»}
+let circle = document.querySelector(«circle»);
+circle.setAttribute(«fill», «cyan»);
 ```
 
-## The canvas element
+## Елемент canvas
 
-{{index [canvas, size], "canvas (HTML tag)"}}
+{{index [canvas, size], «canvas (HTML-тег)»}}
 
-Canvas ((graphics)) can be drawn onto a `<canvas>` element. You can give such an element `width` and `height` attributes to determine its size in ((pixel))s.
+Полотно ((графіку)) можна намалювати на елементі `<canvas>`. Ви можете надати такому елементу атрибути `width` та `height`, щоб визначити його розмір у ((пікселях))s.
 
-A new canvas is empty, meaning it is entirely ((transparent)) and thus shows up as empty space in the document.
+Нове полотно є порожнім, тобто воно повністю ((прозоре)) і тому у документі відображається як порожній простір.
 
-{{index "2d (canvas context)", "webgl (canvas context)", OpenGL, [canvas, context], dimensions, [interface, canvas]}}
+{{index «2d (контекст полотна)», «webgl (контекст полотна)», OpenGL, [полотно, контекст], dimensions, [інтерфейс, полотно]}}
 
-The `<canvas>` tag is intended to allow different styles of ((drawing)). To get access to an actual drawing interface, we first need to create a _((context))_, an object whose methods provide the drawing interface. There are currently three widely supported drawing styles: `"2d"` for two-dimensional graphics, `"webgl"` for three-dimensional graphics through the OpenGL interface, and `"webgpu"`, a more modern and flexible alternative to WebGL.
+Тег `<canvas>` призначено для забезпечення різних стилів ((малювання)). Щоб отримати доступ до реального інтерфейсу малювання, спочатку потрібно створити _((контекст))_, об'єкт, методи якого надають інтерфейс малювання. Наразі існує три широко підтримувані стилі малювання: ``2d`` для двовимірної графіки, ``webgl`` для тривимірної графіки через інтерфейс OpenGL та ``webgpu``, більш сучасна та гнучка альтернатива WebGL.
 
-{{index rendering, graphics, efficiency}}
+{{індексний рендеринг, графіка, ефективність}}
 
-This book won't discuss WebGL or WebGPU—we'll stick to two dimensions. But if you are interested in three-dimensional graphics, I do encourage you to look into WebGPU. It provides a direct interface to graphics hardware and allows you to render even complicated scenes efficiently, using JavaScript.
+У цій книзі ми не будемо обговорювати WebGL або WebGPU - ми обмежимося двома вимірами. Але якщо вас цікавить тривимірна графіка, я рекомендую вам звернути увагу на WebGPU. Він надає прямий інтерфейс до графічного обладнання і дозволяє ефективно рендерити навіть складні сцени за допомогою JavaScript.
 
-{{index "getContext method", [canvas, context]}}
+{{index «getContext method», [canvas, context]}}
 
-You create a ((context)) with the `getContext` method on the `<canvas>` DOM element.
+Ви створюєте ((контекст)) за допомогою методу `getContext` на DOM-елементі `<canvas>`.
 
 ```{lang: html}
-<p>Before canvas.</p>
-<canvas width="120" height="60"></canvas>
-<p>After canvas.</p>
-<script>
-  let canvas = document.querySelector("canvas");
-  let context = canvas.getContext("2d");
-  context.fillStyle = "red";
+<p>Перед canvas.</p>
+<canvas width=«120» height=«60»></canvas
+<p>Після canvas.</p>
+<скрипт
+  let canvas = document.querySelector(«canvas»);
+  let context = canvas.getContext(«2d»);
+  context.fillStyle = «red»;
   context.fillRect(10, 10, 100, 50);
 </script>
 ```
 
-After creating the context object, the example draws a red ((rectangle)) that is 100 ((pixel))s wide and 50 pixels high, with its upper-left corner at coordinates (10, 10).
+Після створення об'єкта контексту приклад малює червоний ((прямокутник)) шириною 100 ((пікселів)) і висотою 50 пікселів, верхній лівий кут якого має координати (10, 10).
 
 {{if book
 
-{{figure {url: "img/canvas_fill.png", alt: "Screenshot of a canvas with a rectangle on it", width: "2.5cm"}}}
+{{figure {url: «img/canvas_fill.png», alt: «Знімок полотна з прямокутником на ньому», width: “2.5cm”}}}}
 
 if}}
 
-{{index SVG, coordinates}}
+{{індекс SVG, координати}}
 
-Just like in HTML (and SVG), the coordinate system that the canvas uses puts (0, 0) at the upper-left corner, and the positive y-((axis)) goes down from there. This means (10, 10) is 10 pixels below and to the right of the upper-left corner.
+Як і в HTML (і SVG), система координат, яку використовує полотно, ставить (0, 0) у верхній лівий кут, а додатна y-((вісь)) йде вниз звідти. Це означає, що (10, 10) знаходиться на 10 пікселів нижче і правіше верхнього лівого кута.
 
 {{id fill_stroke}}
 
-## Lines and surfaces
+## Лінії та поверхні
 
-{{index filling, stroking, drawing, SVG}}
+{{index заливка, обведення, малювання, SVG}}
 
-In the ((canvas)) interface, a shape can be _filled_, meaning its area is given a certain color or pattern, or it can be _stroked_, which means a ((line)) is drawn along its edge. SVG uses the same terminology.
+В інтерфейсі ((полотно)) фігуру можна _заповнити_, тобто надати її області певний колір або візерунок, або ж її можна _обвести_, тобто намалювати ((лінію)) вздовж її краю. SVG використовує ту ж саму термінологію.
 
-{{index "fillRect method", "strokeRect method"}}
+{{index «метод fillRect», «метод strokeRect»}}
 
-The `fillRect` method fills a ((rectangle)). It takes first the x- and y-((coordinates)) of the rectangle's upper-left corner, then its width, and then its height. A similar method called `strokeRect` draws the ((outline)) of a rectangle.
+Метод `fillRect` зафарбовує ((прямокутник)). Він бере спочатку x- та y-((координати)) верхнього лівого кута прямокутника, потім його ширину, а потім висоту. Подібний метод, який називається `strokeRect`, малює ((контур)) прямокутника.
 
-{{index [state, "of canvas"]}}
+{{index [state, «of canvas»]}}
 
-Neither method takes any further parameters. The color of the fill, thickness of the stroke, and so on, are not determined by an argument to the method, as you might reasonably expect, but rather by properties of the context object.
+Жоден з методів не приймає додаткових параметрів. Колір заливки, товщина штриха тощо визначаються не аргументом методу, як можна було б очікувати, а властивостями контекстного об'єкта.
 
-{{index filling, "fillStyle property"}}
+{{індекс заливки, «властивість fillStyle»}}
 
-The `fillStyle` property controls the way shapes are filled. It can be set to a string that specifies a ((color)), using the color notation used by ((CSS)).
+Властивість `fillStyle` контролює спосіб заповнення фігур. Вона може бути встановлена як рядок, що визначає ((колір)), використовуючи позначення кольорів, які використовуються у ((CSS)).
 
-{{index stroking, "line width", "strokeStyle property", "lineWidth property", canvas}}
+{{index stroking, «line width», «strokeStyle property», «lineWidth property», canvas}}
 
-The `strokeStyle` property works similarly but determines the color used for a stroked line. The width of that line is determined by the `lineWidth` property, which may contain any positive number.
+Властивість `strokeStyle` працює аналогічно, але визначає колір, який використовується для штрихованої лінії. Ширина цієї лінії визначається властивістю `lineWidth`, яка може містити будь-яке додатне число.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
-  cx.strokeStyle = "blue";
-  cx.strokeRect(5, 5, 50, 50);
-  cx.lineWidth = 5;
+  нехай cx = document.querySelector(«canvas»).getContext(«2d»);
+  cx.strokeStyle = «blue»;
+  cx.strokeRect(5, 5, 50, 50)
+  cx.lineWidth = 5
   cx.strokeRect(135, 5, 50, 50);
-</script>
+</script> </span> </span> </span> </span> </span
 ```
 
 {{if book
 
-This code draws two blue squares, using a thicker line for the second one.
+Цей код малює два синіх квадрати, використовуючи товстішу лінію для другого.
 
-{{figure {url: "img/canvas_stroke.png", alt: "Screenshot showing two outlined squares", width: "5cm"}}}
+{{figure {url: «img/canvas_stroke.png», alt: «Знімок екрана з двома обведеними квадратами», width: “5cm”}}}}
 
 if}}
 
-{{index "default value", [canvas, size]}}
+{{index «значення за замовчуванням», [canvas, size]}}
 
-When no `width` or `height` attribute is specified, as in the example, a canvas element gets a default width of 300 pixels and height of 150 pixels.
+Якщо не вказано атрибутів `width` або `height`, як у прикладі, елемент полотна отримує ширину за замовчуванням 300 пікселів і висоту 150 пікселів.
 
-## Paths
+## Шляхи
 
 {{index [path, canvas], [interface, design], [canvas, path]}}
 
-A path is a sequence of ((line))s. The 2D canvas interface takes a peculiar approach to describing such a path. It is done entirely through ((side effect))s. Paths are not values that can be stored and passed around. Instead, if you want to do something with a path, you make a sequence of method calls to describe its shape.
+Контур - це послідовність ((line))s. Інтерфейс 2D полотна має особливий підхід до опису такого шляху. Це робиться повністю через ((побічний ефект))s. Шляхи не є значеннями, які можна зберігати та передавати. Замість цього, якщо ви хочете щось зробити зі шляхом, ви робите послідовність викликів методів, щоб описати його форму.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  нехай cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.beginPath();
   for (let y = 10; y < 100; y += 10) {
     cx.moveTo(10, y);
@@ -172,26 +171,26 @@ A path is a sequence of ((line))s. The 2D canvas interface takes a peculiar appr
 </script>
 ```
 
-{{index canvas, "stroke method", "lineTo method", "moveTo method", shape}}
+{{index canvas, «stroke method», «lineTo method», «moveTo method», shape}}
 
-This example creates a path with a number of horizontal ((line)) segments and then strokes it using the `stroke` method. Each segment created with `lineTo` starts at the path's _current_ position. That position is usually the end of the last segment, unless `moveTo` was called. In that case, the next segment would start at the position passed to `moveTo`.
+У цьому прикладі створюється контур з декількох горизонтальних ((line)) сегментів, а потім зафарбовується за допомогою методу `stroke`. Кожен сегмент, створений за допомогою методу `lineTo`, починається з _поточної_ позиції контуру. Ця позиція зазвичай є кінцем останнього сегмента, якщо не було викликано `moveTo`. У цьому випадку наступний сегмент починається з позиції, переданої методу `moveTo`.
 
 {{if book
 
-The path described by the previous program looks like this:
+Шлях, описаний у попередній програмі, має такий вигляд:
 
-{{figure {url: "img/canvas_path.png", alt: "Screenshot showing a number of vertical lines", width: "2.1cm"}}}
+{{figure {url: «img/canvas_path.png», alt: «Знімок екрана з кількома вертикальними лініями», width: “2.1cm”}}}}
 
 if}}
 
-{{index [path, canvas], filling, [path, closing], "fill method"}}
+{{index [шлях, полотно], заливка, [шлях, закриття], «метод заливки»}}
 
-When filling a path (using the `fill` method), each ((shape)) is filled separately. A path can contain multiple shapes—each `moveTo` motion starts a new one. But the path needs to be _closed_ (meaning its start and end are in the same position) before it can be filled. If the path is not already closed, a line is added from its end to its start, and the shape enclosed by the completed path is filled.
+При заповненні контуру (методом `fill`) кожна ((фігура)) заповнюється окремо. Контур може містити декілька фігур - кожен рух `moveTo` запускає нову фігуру. Але перед заповненням контур має бути _закритим_ (тобто його початок і кінець мають бути в одному положенні). Якщо контур ще не замкнуто, то від його кінця до початку додається лінія, і фігура, що міститься у завершеному контурі, зафарбовується.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.beginPath();
   cx.moveTo(50, 10);
   cx.lineTo(10, 70);
@@ -200,32 +199,32 @@ When filling a path (using the `fill` method), each ((shape)) is filled separate
 </script>
 ```
 
-This example draws a filled triangle. Note that only two of the triangle's sides are explicitly drawn. The third, from the lower-right corner back to the top, is implied and wouldn't be there if you stroked the path.
+Цей приклад малює зафарбований трикутник. Зверніть увагу, що лише дві сторони трикутника намальовано явно. Третя, від правого нижнього кута до верхнього, мається на увазі, і її не буде, якщо ви погладите контур.
 
 {{if book
 
-{{figure {url: "img/canvas_triangle.png", alt: "Screenshot showing a filled path", width: "2.2cm"}}}
+{{figure {url: «img/canvas_triangle.png», alt: «Знімок екрана із зафарбованим контуром», width: “2.2cm”}}}}
 
 if}}
 
-{{index "stroke method", "closePath method", [path, closing], canvas}}
+{{індекс «метод обведення», «метод закриття шляху», [шлях, закриття], полотно}}
 
-You could also use the `closePath` method to explicitly close a path by adding an actual ((line)) segment back to the path's start. This segment _is_ drawn when stroking the path.
+Ви також можете використати метод `closePath` для явного закриття контуру, додавши фактичний ((лінійний)) відрізок назад до початку контуру. Цей відрізок _малюється_ при обведенні контуру.
 
-## Curves
+## Криві
 
-{{index [path, canvas], canvas, drawing}}
+{{індекс [контур, полотно], полотно, малюнок}}
 
-A path may also contain ((curve))d ((line))s. These are unfortunately a bit more involved to draw.
+Контур також може містити ((криву))d ((лінію))s. На жаль, вони трохи складніші для малювання.
 
-{{index "quadraticCurveTo method"}}
+{{index «quadraticCurveTo метод»}}
 
-The `quadraticCurveTo` method draws a curve to a given point. To determine the curvature of the line, the method is given a ((control point)) as well as a destination point. Imagine this control point as _attracting_ the line, giving it its curve. The line won't go through the control point, but its direction at the start and end points will be such that a straight line in that direction would point toward the control point. The following example illustrates this:
+Метод `quadraticCurveTo` малює криву до заданої точки. Щоб визначити кривизну лінії, методу задається ((контрольна точка)), а також точка призначення. Уявіть, що ця контрольна точка «притягує» лінію, надаючи їй кривизну. Лінія не буде проходити через контрольну точку, але її напрямок у початковій і кінцевій точках буде таким, що пряма у цьому напрямку буде вказувати на контрольну точку. Наступний приклад ілюструє це:
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.beginPath();
   cx.moveTo(10, 90);
   // control=(60, 10) goal=(90, 90)
@@ -238,24 +237,24 @@ The `quadraticCurveTo` method draws a curve to a given point. To determine the c
 
 {{if book
 
-It produces a path that looks like this:
+Виводить шлях, який виглядає наступним чином:
 
-{{figure {url: "img/canvas_quadraticcurve.png", alt: "Screenshot of a quadratic curve", width: "2.3cm"}}}
+{{figure {url: «img/canvas_quadraticcurve.png», alt: «Знімок квадратичної кривої», width: “2.3cm”}}}}
 
 if}}
 
-{{index "stroke method"}}
+{{index «метод обведення»}}
 
-We draw a ((quadratic curve)) from the left to the right, with (60, 10) as the control point, and then draw two ((line)) segments going through that control point and back to the start of the line. The result somewhat resembles a _((Star Trek))_ insignia. You can see the effect of the control point: the lines leaving the lower corners start off in the direction of the control point and then ((curve)) toward their target.
+Ми малюємо ((квадратичну криву)) зліва направо з контрольною точкою (60, 10), а потім малюємо два ((лінію)) відрізки, що проходять через цю контрольну точку і повертаються до початку лінії. Результат дещо нагадує емблему _((Star Trek))_. Ви можете бачити ефект контрольної точки: лінії, що виходять з нижніх кутів, починають рухатися у напрямку контрольної точки, а потім ((крива)) до своєї мети.
 
-{{index canvas, "bezierCurveTo method"}}
+{{index canvas, «bezierCurveTo method»}}
 
-The `bezierCurveTo` method draws a similar kind of curve. Instead of a single ((control point)), this method has two—one for each of the ((line))'s end points. Here is a similar sketch to illustrate the behavior of such a curve:
+Метод `bezierCurveTo` малює подібну криву. Замість однієї ((контрольної точки)), цей метод має дві - по одній для кожної з кінцевих точок ((лінії)). Ось подібний ескіз для ілюстрації поведінки такої кривої:
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  нехай cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.beginPath();
   cx.moveTo(10, 90);
   // control1=(10, 10) control2=(90, 10) goal=(50, 90)
@@ -267,30 +266,30 @@ The `bezierCurveTo` method draws a similar kind of curve. Instead of a single ((
 </script>
 ```
 
-The two control points specify the direction at both ends of the curve. The farther they are away from their corresponding point, the more the curve will "bulge" in that direction.
+Дві контрольні точки задають напрямок на обох кінцях кривої. Чим далі вони відстоять від відповідної точки, тим більше крива буде «випуклою» у цьому напрямку.
 
 {{if book
 
-{{figure {url: "img/canvas_beziercurve.png", alt: "Screenshot of a bezier curve", width: "2.2cm"}}}
+{{figure {url: «img/canvas_beziercurve.png», alt: «Скріншот кривої Безьє», width: “2.2cm”}}}}
 
 if}}
 
-{{index "trial and error"}}
+{{index «trial and error»}}
 
-Such ((curve))s can be hard to work with—it's not always clear how to find the ((control point))s that provide the ((shape)) you are looking for. Sometimes you can compute them, and sometimes you'll just have to find a suitable value by trial and error.
+З такими ((кривими)) може бути важко працювати - не завжди зрозуміло, як знайти ((контрольні точки)), які забезпечують ((форму)), яку ви шукаєте. Іноді їх можна обчислити, а іноді вам доведеться шукати відповідне значення методом спроб і помилок.
 
-{{index "arc method", arc}}
+{{index «метод дуги», arc}}
 
-The `arc` method is a way to draw a line that curves along the edge of a circle. It takes a pair of ((coordinates)) for the arc's center, a radius, and then a start angle and end angle.
+Метод `дуги` - це спосіб побудови лінії, яка криволінійно проходить по краю кола. Він бере пару ((координат)) для центру дуги, радіус, а потім початковий і кінцевий кути.
 
-{{index pi, "Math.PI constant"}}
+{{index pi, «Math.PI константа»}}
 
-Those last two parameters make it possible to draw only part of the circle. The ((angle))s are measured in ((radian))s, not ((degree))s. This means a full ((circle)) has an angle of 2π, or `2 * Math.PI`, which is about 6.28. The angle starts counting at the point to the right of the circle's center and goes clockwise from there. You can use a start of 0 and an end bigger than 2π (say, 7) to draw a full circle.
+Останні два параметри дозволяють намалювати лише частину кола. ((кут))s вимірюється у ((радіанах))s, а не у ((градусах))s. Це означає, що повне ((коло)) має кут 2π, або `2 * Math.PI`, що дорівнює приблизно 6.28. Кут починається з точки праворуч від центру кола і відраховується за годинниковою стрілкою. Ви можете використовувати початок 0 і кінець більший за 2π (скажімо, 7), щоб намалювати повне коло.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  нехай cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.beginPath();
   // center=(50, 50) radius=40 angle=0 to 7
   cx.arc(50, 50, 40, 0, 7);
@@ -300,54 +299,54 @@ Those last two parameters make it possible to draw only part of the circle. The 
 </script>
 ```
 
-{{index "moveTo method", "arc method", [path, " canvas"]}}
+{{index «moveTo метод», «arc метод», [шлях, « canvas»]}}
 
-The resulting picture contains a ((line)) from the right of the full circle (first call to `arc`) to the right of the quarter-((circle)) (second call).
+Отримана картинка містить ((лінія)) справа від повного кола (перший виклик `arc`) і справа від чверті-((коло)) (другий виклик).
 
 {{if book
 
-{{figure {url: "img/canvas_circle.png", alt: "Screenshot of a circle", width: "4.9cm"}}}
+{{figure {url: «img/canvas_circle.png», alt: «Скріншот кола», width: “4.9cm”}}}}
 
 if}}
 
-Like other path-drawing methods, a line drawn with `arc` is connected to the previous path segment.You can call `moveTo` or start a new path to avoid this.
+Як і інші методи малювання шляхів, лінія, намальована за допомогою `arc`, з'єднується з попереднім відрізком шляху. Щоб уникнути цього, можна викликати `moveTo` або почати новий шлях.
 
 {{id pie_chart}}
 
-## Drawing a pie chart
+## Малювання кругової діаграми
 
-{{index "pie chart example"}}
+{{index «pie chart example»}}
 
-Imagine you've just taken a ((job)) at EconomiCorp, Inc. Your first assignment is to draw a pie chart of its customer satisfaction ((survey)) results.
+Уявіть, що ви щойно влаштувалися на ((роботу)) в компанію EconomiCorp, Inc. Ваше перше завдання - побудувати кругову діаграму результатів опитування клієнтів.
 
-The `results` binding contains an array of objects that represent the survey responses.
+Зв'язка `results` містить масив об'єктів, які представляють відповіді на опитування.
 
-```{sandbox: "pie", includeCode: true}
+```{sandbox: «pie», includeCode: true}
 const results = [
-  {name: "Satisfied", count: 1043, color: "lightblue"},
-  {name: "Neutral", count: 563, color: "lightgreen"},
-  {name: "Unsatisfied", count: 510, color: "pink"},
-  {name: "No comment", count: 175, color: "silver"}
+  {name: «Satisfied», count: 1043, color: «lightblue»},
+  {name: «Neutral», count: 563, color: «lightgreen»},
+  {name: «Незадоволені», count: 510, color: «pink»},
+  {name: «Без коментарів», count: 175, color: «silver»}]; {name: «No comment», count: 175, color: «silver»}
 ];
 ```
 
-{{index "pie chart example"}}
+{{index «pie chart example»}}
 
-To draw a pie chart, we draw a number of pie slices, each made up of an ((arc)) and a pair of ((line))s to the center of that arc. We can compute the ((angle)) taken up by each arc by dividing a full circle (2π) by the total number of responses and then multiplying that number (the angle per response) by the number of people who picked a given choice.
+Щоб побудувати кругову діаграму, ми намалюємо декілька шматочків пирога, кожен з яких складається з ((дуга)) і пари ((лінія)) до центру цієї дуги. Ми можемо обчислити ((кут)), який займає кожна дуга, поділивши повне коло (2π) на загальну кількість відповідей, а потім помноживши це число (кут на відповідь) на кількість людей, які обрали певний варіант.
 
-```{lang: html, sandbox: "pie"}
-<canvas width="200" height="200"></canvas>
+```{lang: html, sandbox: «pie»}
+<canvas width=«200» height=«200»></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   let total = results
     .reduce((sum, {count}) => sum + count, 0);
-  // Start at the top
+  // Починаємо зверху
   let currentAngle = -0.5 * Math.PI;
   for (let result of results) {
     let sliceAngle = (result.count / total) * 2 * Math.PI;
     cx.beginPath();
     // center=100,100, radius=100
-    // from current angle, clockwise by slice's angle
+    // від поточного кута, за годинниковою стрілкою на кут зрізу
     cx.arc(100, 100, 100,
            currentAngle, currentAngle + sliceAngle);
     currentAngle += sliceAngle;
@@ -355,135 +354,135 @@ To draw a pie chart, we draw a number of pie slices, each made up of an ((arc)) 
     cx.fillStyle = result.color;
     cx.fill();
   }
-</script>
+</script> </script> </script> </script> </script> </script> <
 ```
 
 {{if book
 
-This draws the following chart:
+Це створить наступну діаграму:
 
-{{figure {url: "img/canvas_pie_chart.png", alt: "Screenshot showing a pie chart", width: "5cm"}}}
+{{figure {url: «img/canvas_pie_chart.png», alt: «Знімок екрана із зображенням кругової діаграми», width: “5cm”}}}}
 
 if}}
 
-But a chart that doesn't tell us what the slices mean isn't very helpful. We need a way to draw text to the ((canvas)).
+Але діаграма, яка не говорить нам, що означають зрізи, не дуже корисна. Нам потрібен спосіб намалювати текст на ((полотно)).
 
-## Text
+## Текст
 
-{{index stroking, filling, "fillStyle property", "fillText method", "strokeText method"}}
+{{індекс обведення, заповнення, «властивість fillStyle», «метод fillText», «метод strokeText»}}
 
-A 2D canvas drawing context provides the methods `fillText` and `strokeText`. The latter can be useful for outlining letters, but usually `fillText` is what you need. It will fill the outline of the given ((text)) with the current `fillStyle`.
+Контекст малювання 2D полотна надає методи `fillText` та `strokeText`. Останній може бути корисним для обведення літер, але зазвичай вам потрібен метод `fillText`. Він заповнить контур заданого ((тексту)) поточним `fillStyle`.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
-  cx.font = "28px Georgia";
-  cx.fillStyle = "fuchsia";
-  cx.fillText("I can draw text, too!", 10, 50);
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
+  cx.font = «28px Georgia»;
+  cx.fillStyle = «fuchsia»
+  cx.fillText(«Я теж вмію малювати текст!», 10, 50);
 </script>
 ```
 
-You can specify the size, style, and ((font)) of the text with the `font` property. This example just gives a font size and family name. It is also possible to add `italic` or `bold` to the start of the string to select a style.
+За допомогою властивості `font` можна вказати розмір, стиль і ((шрифт)) тексту. У цьому прикладі задано лише розмір шрифту та його назву. Також можна додати `italic` або `bold` на початку рядка для вибору стилю.
 
-{{index "fillText method", "strokeText method", "textAlign property", "textBaseline property"}}
+{{index «метод fillText», «метод strokeText», «властивість textAlign», «властивість textBaseline»}}
 
-The last two arguments to `fillText` and `strokeText` provide the position at which the font is drawn. By default, they indicate the position of the start of the text's alphabetic baseline, which is the line that letters "stand" on, not counting hanging parts in letters such as _j_ or _p_. You can change the horizontal position by setting the `textAlign` property to `"end"` or `"center"` and the vertical position by setting `textBaseline` to `"top"`, `"middle"`, or `"bottom"`.
+Останні два аргументи методів `fillText` і `strokeText` визначають позицію, у якій буде намальовано шрифт. За замовчуванням вони вказують позицію початку алфавітної базової лінії тексту, яка є лінією, на якій «стоять» літери, не враховуючи висячих частин у літерах, таких як _j_ або _p_. Ви можете змінити положення по горизонталі, встановивши властивість `textAlign` у значення `end` або `center`, а положення по вертикалі - у значення `textBaseline` у значення `top`, `middle` або `down`.
 
-{{index "pie chart example"}}
+{{index «pie chart example»}}
 
-We'll come back to our pie chart, and the problem of ((label))ing the slices, in the [exercises](canvas#exercise_pie_chart) at the end of the chapter.
+Ми повернемося до нашої кругової діаграми та проблеми ((підпису))вання зрізів у [вправах](canvas#вправа_кругова_діаграма) наприкінці розділу.
 
-## Images
+## Зображення
 
-{{index "vector graphics", "bitmap graphics"}}
+{{index «векторна графіка», «растрова графіка»}}
 
-In computer ((graphics)), a distinction is often made between _vector_ graphics and _bitmap_ graphics. The first is what we have been doing so far in this chapter—specifying a picture by giving a logical description of ((shape))s. Bitmap graphics, on the other hand, don't specify actual shapes but rather work with ((pixel)) data (rasters of colored dots).
+У комп'ютерній графіці часто розрізняють _векторну_ графіку та _растрову_ графіку. Перша - це те, чим ми займалися дотепер у цій главі - визначенням зображення за допомогою логічного опису ((фігури)). З іншого боку, растрова графіка не описує власне фігури, а працює з даними ((піксель)) (растрами кольорових точок).
 
-{{index "load event", "event handling", "img (HTML tag)", "drawImage method"}}
+{{index «load event», «event handling», «img (HTML tag)», «drawImage method»}}
 
-The `drawImage` method allows us to draw ((pixel)) data onto a ((canvas)). This pixel data can originate from an `<img>` element or from another canvas. The following example creates a detached `<img>` element and loads an image file into it. But the method cannot immediately start drawing from this picture because the browser may not have loaded it yet. To deal with this, we register a `"load"` event handler and do the drawing after the image has loaded.
+Метод `drawImage` дозволяє нам намалювати дані ((пікселі)) на ((полотно)). Ці піксельні дані можуть походити з елемента `<img>` або з іншого полотна. У наступному прикладі створюється окремий елемент `<img>` і до нього завантажується файл зображення. Але метод не може одразу почати малювати з цього зображення, оскільки браузер ще не встиг його завантажити. Щоб вирішити цю проблему, ми реєструємо обробник події ``load`` і виконуємо малювання після того, як зображення буде завантажено.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
-  let img = document.createElement("img");
-  img.src = "img/hat.png";
-  img.addEventListener("load", () => {
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
+  let img = document.createElement(«img»);
+  img.src = «img/hat.png»;
+  img.addEventListener(«load», () => {})
     for (let x = 10; x < 200; x += 30) {
       cx.drawImage(img, x, 10);
     }
   });
-</script>
+</script> </script> </script> </script> </script> </script> </script
 ```
 
-{{index "drawImage method", scaling}}
+{{index «drawImage method», scaling}}
 
-By default, `drawImage` will draw the image at its original size. You can also give it two additional arguments to specify the width and height of the drawn image, when those aren't the same as the origin image.
+За замовчуванням, `drawImage` намалює зображення у його початковому розмірі. Ви також можете передати йому два додаткові аргументи, щоб вказати ширину і висоту намальованого зображення, якщо вони відрізняються від вихідного зображення.
 
-When `drawImage` is given _nine_ arguments, it can be used to draw only a fragment of an image. The second through fifth arguments indicate the rectangle (x, y, width, and height) in the source image that should be copied, and the sixth to ninth arguments give the rectangle (on the canvas) into which it should be copied.
+Якщо команді `drawImage` надано _дев'ять_ аргументів, вона може бути використана для малювання лише фрагмента зображення. Другий-п'ятий аргументи вказують на прямокутник (x, y, ширину та висоту) у вихідному зображенні, який слід скопіювати, а шостий-дев'ятий - на прямокутник (на полотні), куди його слід скопіювати.
 
-{{index "player", "pixel art"}}
+{{index «player», «pixel art»}}
 
-This can be used to pack multiple _((sprite))s_ (image elements) into a single image file and then draw only the part you need. For example, this picture contains a game character in multiple ((pose))s:
+Це може бути використано для пакування декількох _((спрайтів))s_ (елементів зображення) в один файл зображення і подальшого малювання лише тієї частини, яка вам потрібна. Наприклад, ця картинка містить ігрового персонажа у декількох ((pose))s:
 
-{{figure {url: "img/player_big.png", alt: "Pixel art showing a computer game character in 10 different poses. The first 8 form its running animation cycle, the 9th has the character standing still, and the 10th shows him jumping.", width: "6cm"}}}
+{{figure {url: «img/player_big.png», alt: «Піксельний арт із зображенням персонажа комп'ютерної гри у 10 різних позах. Перші 8 утворюють його біжучий анімаційний цикл, на 9-й персонаж стоїть на місці, а на 10-й - стрибає.», width: “6cm”}}}}
 
-{{index [animation, "platform game"]}}
+{{index [animation, «platform game»]}}
 
-By alternating which pose we draw, we can show an animation that looks like a walking character.
+Чергуючи позу, яку ми малюємо, ми можемо показати анімацію, яка виглядає як персонаж, що ходить.
 
-{{index "fillRect method", "clearRect method", clearing}}
+{{index «fillRect method», «clearRect method», clearing}}
 
-To animate a ((picture)) on a ((canvas)), the `clearRect` method is useful. It resembles `fillRect`, but instead of coloring the rectangle, it makes it ((transparent)), removing the previously drawn pixels.
+Для анімації ((зображення)) на ((полотні)) корисним є метод `clearRect`. Він схожий на `fillRect`, але замість того, щоб зафарбовувати прямокутник, він робить його ((прозорим)), видаляючи попередньо намальовані пікселі.
 
-{{index "setInterval function", "img (HTML tag)"}}
+{{index «setInterval function», «img (HTML-тег)»}}
 
-We know that each _((sprite))_, each subpicture, is 24 ((pixel))s wide and 30 pixels high. The following code loads the image and then sets up an interval (repeated timer) to draw the next ((frame)):
+Ми знаємо, що кожен _((спрайт))_, кожне підзображення, має ширину 24 ((пікселі))с і висоту 30 пікселів. Наступний код завантажує зображення, а потім встановлює інтервал (повторюваний таймер) для малювання наступного ((кадру)):
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
-  let img = document.createElement("img");
-  img.src = "img/player.png";
-  let spriteW = 24, spriteH = 30;
-  img.addEventListener("load", () => {
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
+  let img = document.createElement(«img»);
+  img.src = «img/player.png»;
+  нехай spriteW = 24, spriteH = 30;
+  img.addEventListener(«load», () => {
     let cycle = 0;
     setInterval(() => {
       cx.clearRect(0, 0, spriteW, spriteH);
       cx.drawImage(img,
-                   // source rectangle
+                   // вихідний прямокутник
                    cycle * spriteW, 0, spriteW, spriteH,
-                   // destination rectangle
-                   0,               0, spriteW, spriteH);
+                   // прямокутник-приймач
+                   0, 0, spriteW, spriteH);
       cycle = (cycle + 1) % 8;
     }, 120);
   });
 </script>
 ```
 
-{{index "remainder operator", "% operator", [animation, "platform game"]}}
+{{index «оператор залишку», «оператор %», [animation, «platform game»]}}
 
-The `cycle` binding tracks our position in the animation. For each ((frame)), it is incremented and then clipped back to the 0 to 7 range by using the remainder operator. This binding is then used to compute the x-coordinate that the sprite for the current pose has in the picture.
+Зв'язка `cycle` відстежує нашу позицію в анімації. Для кожного ((кадру)) вона збільшується, а потім обрізається назад до діапазону від 0 до 7 за допомогою оператора залишку. Потім ця прив'язка використовується для обчислення x-координати, яку має спрайт для поточної позиції на зображенні.
 
-## Transformation
+## Перетворення
 
-{{index transformation, mirroring}}
+{{перетворення індексів, дзеркальне відображення}}
 
-{{indexsee flipping, mirroring}}
+{{indexsee перевертання, дзеркальне відображення}}
 
-What if we want our character to walk to the left instead of to the right? We could draw another set of sprites, of course. But we could also instruct the ((canvas)) to draw the picture the other way round.
+А якщо ми хочемо, щоб наш персонаж ходив ліворуч, а не праворуч? Звісно, можна намалювати інший набір спрайтів. Але ми також можемо наказати ((canvas)) намалювати картину навпаки.
 
-{{index "scale method", scaling}}
+{{index «scale method», масштабування}}
 
-Calling the `scale` method will cause anything drawn after it to be scaled. This method takes two parameters, one to set a horizontal scale and one to set a vertical scale.
+Виклик методу `scale` призведе до масштабування всього намальованого після нього. Цей метод приймає два параметри, один для встановлення горизонтального масштабу, інший для встановлення вертикального масштабу.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   cx.scale(3, .5);
   cx.beginPath();
   cx.arc(50, 50, 40, 0, 7);
@@ -494,39 +493,39 @@ Calling the `scale` method will cause anything drawn after it to be scaled. This
 
 {{if book
 
-Because of the call to `scale`, the circle is drawn three times as wide and half as high.
+Через виклик `scale` коло малюється втричі ширшим і вдвічі меншим за висотою.
 
-{{figure {url: "img/canvas_scale.png", alt: "Screenshot of a scaled circle", width: "6.6cm"}}}
+{{figure {url: «img/canvas_scale.png», alt: «Знімок масштабованого кола», width: “6.6cm”}}}}
 
 if}}
 
-{{index mirroring}}
+{{Дзеркальне відображення індексів}}
 
-Scaling will cause everything about the drawn image, including the ((line width)), to be stretched out or squeezed together as specified. Scaling by a negative amount will flip the picture around. The flipping happens around point (0, 0), which means it will also flip the direction of the coordinate system. When a horizontal scaling of -1 is applied, a shape drawn at _x_ position 100 will end up at what used to be position -100.
+Масштабування призведе до розтягування або стискання всього намальованого зображення, включно з ((шириною лінії)), відповідно до вказаних параметрів. Масштабування на від'ємну величину переверне зображення. Перевертання відбувається навколо точки (0, 0), а це означає, що напрямок системи координат також зміниться. Якщо застосовано горизонтальне масштабування -1, фігура, намальована у позиції _x_ 100, опиниться у позиції, яка раніше була позицією -100.
 
-{{index "drawImage method"}}
+{{index «drawImage method»}}
 
-To turn a picture around, we can't simply add `cx.scale(-1, 1)` before the call to `drawImage`. That would move our picture outside of the ((canvas)), where it won't be visible. We could adjust the ((coordinates)) given to `drawImage` to compensate for this by drawing the image at _x_ position -50 instead of 0. Another solution, which doesn't require the code doing the drawing to know about the scale change, is to adjust the ((axis)) around which the scaling happens.
+Щоб розвернути малюнок, ми не можемо просто додати `cx.scale(-1, 1)` перед викликом `drawImage`. Це призведе до переміщення нашого зображення за межі ((полотна)), де його не буде видно. Ми можемо скоригувати ((координати)), передані `drawImage`, щоб компенсувати це, намалювавши зображення у позиції _x_ -50 замість 0. Іншим рішенням, яке не вимагає від коду, що виконує малювання, знати про зміну масштабу, є коригування ((вісь)), навколо якої відбувається масштабування.
 
-{{index "rotate method", "translate method", transformation}}
+{{індекс «метод обертання», «метод перетворення», трансформація}}
 
-There are several other methods besides `scale` that influence the coordinate system for a ((canvas)). You can rotate subsequently drawn shapes with the `rotate` method and move them with the `translate` method. The interesting—and confusing—thing is that these transformations _stack_, meaning that each one happens relative to the previous transformations.
+Існує декілька інших методів, окрім `scale`, які впливають на систему координат для ((полотно)). Ви можете обертати намальовані фігури за допомогою методу `rotate` і переміщувати їх за допомогою методу `translate`. Цікавим і заплутаним є те, що ці перетворення «стекуються», тобто кожне з них відбувається відносно попередніх.
 
-{{index "rotate method", "translate method"}}
+{{index «rotate method», «translate method»}}
 
-If we translate by 10 horizontal pixels twice, everything will be drawn 20 pixels to the right. If we first move the center of the coordinate system to (50, 50) and then rotate by 20 ((degree))s (about 0.1π ((radian))s), that rotation will happen _around_ point (50, 50).
+Якщо ми двічі переведемо на 10 горизонтальних пікселів, то все буде перемальовано на 20 пікселів правіше. Якщо ми спочатку перемістимо центр системи координат у точку (50, 50), а потім повернемо на 20 ((градусів))с (приблизно 0.1π ((радіан))с), то цей поворот відбудеться _навколо_ точки (50, 50).
 
-{{figure {url: "img/transform.svg", alt: "Diagram showing the result of stacking transformations. The first diagram translates and then rotates, causing the translation to happen normally and rotation to happen around the target of the translation. The second diagram first rotates, and then translates, causing the rotation to happen around the origin and the translation direction to be tilted by that rotation.", width: "9cm"}}}
+{{figure {url: «img/transform.svg», alt: «Діаграма, що показує результат стекових перетворень. Перша діаграма перекладається, а потім обертається, що призводить до нормального перекладу і обертання навколо цілі перекладу. Друга діаграма спочатку обертається, а потім перекладається, що призводить до обертання навколо початку координат і нахилу напрямку перекладу в результаті цього обертання.», width: “9cm”}}}
 
-{{index coordinates}}
+{{індексні координати}}
 
-But if we _first_ rotate by 20 degrees and _then_ translate by (50, 50), the translation will happen in the rotated coordinate system and thus produce a different orientation. The order in which transformations are applied matters.
+Але якщо ми  спочатку повернемо на 20 градусів, а  потім переведемо на (50, 50), то переведення відбудеться у повернутій системі координат і, таким чином, дасть іншу орієнтацію. Порядок застосування перетворень має значення.
 
-{{index axis, mirroring}}
+{{індексна вісь, дзеркальне відображення}}
 
-To flip a picture around the vertical line at a given _x_ position, we can do the following:
+Щоб перевернути зображення навколо вертикальної лінії у заданій позиції _x_, ми можемо зробити наступне:
 
-```{includeCode: true}
+```{includeCode: true}}
 function flipHorizontally(context, around) {
   context.translate(around, 0);
   context.scale(-1, 1);
@@ -534,26 +533,26 @@ function flipHorizontally(context, around) {
 }
 ```
 
-{{index "flipHorizontally method"}}
+{{index «метод flipHorizontally»}}
 
-We move the y-((axis)) to where we want our ((mirror)) to be, apply the mirroring, and finally move the y-axis back to its proper place in the mirrored universe. The following picture explains why this works:
+Ми переміщуємо вісь y ((вісь)) туди, де ми хочемо бачити наше ((дзеркало)), застосовуємо віддзеркалення, і, нарешті, повертаємо вісь y на її належне місце у віддзеркаленому всесвіті. Наступний малюнок пояснює, як це працює:
 
-{{figure {url: "img/mirror.svg", alt: "Diagram showing the effect of translating and mirroring a triangle", width: "8cm"}}}
+{{figure {url: «img/mirror.svg», alt: «Діаграма, що показує ефект трансляції та дзеркального відображення трикутника», width: “8cm”}}}
 
-{{index "translate method", "scale method", transformation, canvas}}
+{{index «translate method», «scale method», transformation, canvas}}
 
-This shows the coordinate systems before and after mirroring across the central line. The triangles are numbered to illustrate each step. If we draw a triangle at a positive _x_ position, it would, by default, be in the place where triangle 1 is. A call to `flipHorizontally` first does a translation to the right, which gets us to triangle 2. It then scales, flipping the triangle over to position 3. This is not where it should be, if it were mirrored in the given line. The second `translate` call fixes this—it "cancels" the initial translation and makes triangle 4 appear exactly where it should.
+Тут показано системи координат до і після дзеркального відображення через центральну лінію. Трикутники пронумеровано для ілюстрації кожного кроку. Якщо ми малюємо трикутник у додатній позиції _x_, він за замовчуванням буде у місці, де знаходиться трикутник 1. Виклик `flipHorizontally` спочатку робить переклад праворуч, що приводить нас до трикутника 2. Потім він масштабується, перевертаючи трикутник у позицію 3. Це не те місце, де він мав би бути, якби він був дзеркально відображений у даному рядку. Другий виклик `translate` виправляє це - він «скасовує» початкове переведення і змушує трикутник 4 з'явитися саме там, де він має бути.
 
-We can now draw a mirrored character at position (100, 0) by flipping the world around the character's vertical center.
+Тепер ми можемо намалювати дзеркальний символ у позиції (100, 0), перевернувши світ навколо вертикального центру символу.
 
 ```{lang: html}
 <canvas></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
-  let img = document.createElement("img");
-  img.src = "img/player.png";
-  let spriteW = 24, spriteH = 30;
-  img.addEventListener("load", () => {
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
+  let img = document.createElement(«img»);
+  img.src = «img/player.png»;
+  нехай spriteW = 24, spriteH = 30;
+  img.addEventListener(«load», () => {
     flipHorizontally(cx, 100 + spriteW / 2);
     cx.drawImage(img, 0, 0, spriteW, spriteH,
                  100, 0, spriteW, spriteH);
@@ -561,28 +560,28 @@ We can now draw a mirrored character at position (100, 0) by flipping the world 
 </script>
 ```
 
-## Storing and clearing transformations
+## Зберігання та очищення перетворень
 
-{{index "side effect", canvas, transformation}}
+{{index «side effect», canvas, transformation}}
 
-Transformations stick around. Everything else we draw after ((drawing)) that mirrored character would also be mirrored. That might be inconvenient.
+Трансформації зберігаються. Все інше, що ми намалюємо після ((малювання)) цього дзеркального персонажа, також буде дзеркальним. Це може бути незручно.
 
-It is possible to save the current transformation, do some drawing and transforming, and then restore the old transformation. This is usually the proper thing to do for a function that needs to temporarily transform the coordinate system. First, we save whatever transformation the code that called the function was using. Then the function does its thing, adding more transformations on top of the current transformation. Finally, we revert to the transformation we started with.
+Можна зберегти поточну трансформацію, виконати деяке малювання і трансформацію, а потім відновити стару трансформацію. Зазвичай це правильний спосіб для функції, яка потребує тимчасового перетворення системи координат. Спочатку ми зберігаємо будь-яке перетворення, яке використовував код, що викликав функцію. Потім функція робить свою справу, додаючи нові перетворення до поточного перетворення. Нарешті, ми повертаємося до перетворення, з якого почали.
 
-{{index "save method", "restore method", [state, "of canvas"]}}
+{{index «метод збереження», «метод відновлення», [state, «of canvas»]}}
 
-The `save` and `restore` methods on the 2D ((canvas)) context do this ((transformation)) management. They conceptually keep a stack of transformation states. When you call `save`, the current state is pushed onto the stack, and when you call `restore`, the state on top of the stack is taken off and used as the context's current transformation. You can also call `resetTransform` to fully reset the transformation.
+Методи ``зберегти`` і ``відновити`` у 2D контексті ((полотно)) виконують це ((трансформація)) керування. Вони концептуально зберігають стек станів трансформації. Коли ви викликаєте `save`, поточний стан заноситься до стеку, а коли ви викликаєте `restore`, стан на вершині стеку знімається і використовується як поточна трансформація контексту. Ви також можете викликати `resetTransform` для повного скидання перетворення.
 
-{{index "branching recursion", "fractal example", recursion}}
+{{index «branching recursion», «fractal example», recursion}}
 
-The `branch` function in the following example illustrates what you can do with a function that changes the transformation and then calls a function (in this case itself), which continues drawing with the given transformation.
+Функція `branch` у наступному прикладі ілюструє, що можна зробити за допомогою функції, яка змінює перетворення, а потім викликає функцію (у цьому випадку саму себе), яка продовжує малювання із заданим перетворенням.
 
-This function draws a treelike shape by drawing a line, moving the center of the coordinate system to the end of the line, and calling itself twice—first rotated to the left and then rotated to the right. Every call reduces the length of the branch drawn, and the recursion stops when the length drops below 8.
+Ця функція малює деревоподібну фігуру, малюючи лінію, переміщуючи центр системи координат на кінець лінії і двічі викликаючи саму себе - спочатку з поворотом вліво, а потім з поворотом вправо. Кожен виклик зменшує довжину намальованої гілки, і рекурсія зупиняється, коли довжина падає нижче 8.
 
 ```{lang: html}
-<canvas width="600" height="300"></canvas>
+<canvas width=«600» height=«300»></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   function branch(length, angle, scale) {
     cx.fillRect(0, 0, 1, length);
     if (length < 8) return;
@@ -590,7 +589,7 @@ This function draws a treelike shape by drawing a line, moving the center of the
     cx.translate(0, length);
     cx.rotate(-angle);
     branch(length * scale, angle, scale);
-    cx.rotate(2 * angle);
+    cx.rotate(2 * кут);
     branch(length * scale, angle, scale);
     cx.restore();
   }
@@ -601,40 +600,40 @@ This function draws a treelike shape by drawing a line, moving the center of the
 
 {{if book
 
-The result is a simple fractal.
+Результат - простий фрактал.
 
-{{figure {url: "img/canvas_tree.png", alt: "Screenshot of a fractal", width: "5cm"}}}
+{{figure {url: «img/canvas_tree.png», alt: «Скріншот фрактала», width: “5cm”}}}}
 
 if}}
 
-{{index "save method", "restore method", canvas, "rotate method"}}
+{{index «метод збереження», «метод відновлення», canvas, «метод обертання»}}
 
-If the calls to `save` and `restore` were not there, the second recursive call to `branch` would end up with the position and rotation created by the first call. It would be connected not to the current branch but rather to the innermost, rightmost branch drawn by the first call. The resulting shape might also be interesting, but it is definitely not a tree.
+Якби не було викликів `save` і `restore`, другий рекурсивний виклик `branch` закінчився б позицією і поворотом, створеними першим викликом. Він був би пов'язаний не з поточною гілкою, а з внутрішньою, крайньою правою гілкою, намальованою першим викликом. Отримана фігура також може бути цікавою, але це точно не дерево.
 
 {{id canvasdisplay}}
 
-## Back to the game
+## Повернутися до гри
 
-{{index "drawImage method"}}
+{{index «drawImage method»}}
 
-We now know enough about ((canvas)) drawing to start working on a ((canvas))-based ((display)) system for the ((game)) from the [previous chapter](game). The new display will no longer be showing just colored boxes. Instead, we'll use `drawImage` to draw pictures that represent the game's elements.
+Тепер ми знаємо достатньо про малювання ((полотно)), щоб почати роботу над системою ((дисплей)) на основі ((полотно)) для ((гра)) з [попередньої глави](гра). Новий дисплей більше не буде показувати лише кольорові квадратики. Замість цього ми будемо використовувати `drawImage` для малювання зображень, які представляють елементи гри.
 
-{{index "CanvasDisplay class", "DOMDisplay class", [interface, object]}}
+{{index «CanvasDisplay class», «DOMDisplay class», [interface, object]}}
 
-We define another display object type called `CanvasDisplay`, supporting the same interface as `DOMDisplay` from [Chapter ?](game#domdisplay)—namely, the methods `syncState` and `clear`.
+Ми визначаємо ще один тип об'єкта відображення з назвою `CanvasDisplay`, який підтримує той самий інтерфейс, що і `DOMDisplay` з [Chapter ?](game#domdisplay)-а саме, методи `синхронізувати стан` та `очистити`.
 
-{{index [state, "in objects"]}}
+{{index [state, «in objects»]}}
 
-This object keeps a little more information than `DOMDisplay`. Rather than using the scroll position of its DOM element, it tracks its own ((viewport)), which tells us which part of the level we are currently looking at. Finally, it keeps a `flipPlayer` property so that even when the player is standing still, it keeps facing the direction in which it last moved.
+Цей об'єкт зберігає трохи більше інформації, ніж `DOMDisplay`. Замість того, щоб використовувати позицію прокрутки свого DOM-елемента, він відстежує власну ((viewport)), яка показує нам, на яку частину рівня ми зараз дивимося. Нарешті, він зберігає властивість `flipPlayer`, щоб навіть коли гравець стоїть на місці, він залишався обличчям у тому напрямку, в якому він рухався востаннє.
 
-```{sandbox: "game", includeCode: true}
+```{sandbox: «game», includeCode: true}
 class CanvasDisplay {
   constructor(parent, level) {
-    this.canvas = document.createElement("canvas");
-    this.canvas.width = Math.min(600, level.width * scale);
+    this.canvas = document.createElement(«canvas»);
+    this.canvas.width = Math.min(600, level.width * scale)
     this.canvas.height = Math.min(450, level.height * scale);
     parent.appendChild(this.canvas);
-    this.cx = this.canvas.getContext("2d");
+    this.cx = this.canvas.getContext(«2d»);
 
     this.flipPlayer = false;
 
@@ -652,26 +651,26 @@ class CanvasDisplay {
 }
 ```
 
-The `syncState` method first computes a new viewport and then draws the game scene at the appropriate position.
+Метод ``синхронізації`` спочатку обчислює новий видовий екран, а потім малює ігрову сцену у відповідній позиції.
 
-```{sandbox: "game", includeCode: true}
+```{sandbox: «game», includeCode: true}
 CanvasDisplay.prototype.syncState = function(state) {
   this.updateViewport(state);
-  this.clearDisplay(state.status);
-  this.drawBackground(state.level);
+  this.clearDisplay(state.status)
+  this.drawBackground(state.level)
   this.drawActors(state.actors);
 };
 ```
 
 {{index scrolling, clearing}}
 
-Contrary to `DOMDisplay`, this display style _does_ have to redraw the background on every update. Because shapes on a canvas are just ((pixel))s, after we draw them there is no good way to move them (or remove them). The only way to update the canvas display is to clear it and redraw the scene. We may also have scrolled, which requires the background to be in a different position.
+На відміну від `DOMDisplay`, цьому стилю відображення _не_ потрібно перемальовувати тло при кожному оновленні. Оскільки фігури на полотні - це лише ((пікселі)), після того, як ми їх намалювали, немає жодного способу їх перемістити (або вилучити). Єдиний спосіб оновити відображення полотна - це очистити його і перемалювати сцену. Можливо, ми також прокручували, що вимагає зміни положення тла.
 
-{{index "CanvasDisplay class"}}
+{{index «CanvasDisplay class»}}
 
-The `updateViewport` method is similar to `DOMDisplay`'s `scrollPlayerIntoView` method. It checks whether the player is too close to the edge of the screen and moves the ((viewport)) when this is the case.
+Метод `updateViewport` подібний до методу `scrollPlayerIntoView` у `DOMDisplay`. Він перевіряє, чи не знаходиться плеєр надто близько до краю екрана, і переміщує ((viewport)), якщо це так.
 
-```{sandbox: "game", includeCode: true}
+```{sandbox: «game», includeCode: true}
 CanvasDisplay.prototype.updateViewport = function(state) {
   let view = this.viewport, margin = view.width / 3;
   let player = state.player;
@@ -685,88 +684,88 @@ CanvasDisplay.prototype.updateViewport = function(state) {
   }
   if (center.y < view.top + margin) {
     view.top = Math.max(center.y - margin, 0);
-  } else if (center.y > view.top + view.height - margin) {
+  } else if (center.y > view.top + view.height - margin) { { view.top
     view.top = Math.min(center.y + margin - view.height,
                         state.level.height - view.height);
   }
 };
 ```
 
-{{index boundary, "Math.max function", "Math.min function", clipping}}
+{{межа індексу, «функція Math.max», «функція Math.min», відсікання}}
 
-The calls to `Math.max` and `Math.min` ensure that the viewport does not end up showing space outside of the level. `Math.max(x, 0)` makes sure the resulting number is not less than zero. `Math.min` similarly guarantees that a value stays below a given bound.
+Виклики функцій `Math.max` та `Math.min` гарантують, що у вікні перегляду не буде показано простір за межами рівня. Функція `Math.max(x, 0)` гарантує, що отримане число не буде меншим за нуль. Аналогічно, `Math.min` гарантує, що значення не буде меншим за задану межу.
 
-When ((clearing)) the display, we'll use a slightly different ((color)) depending on whether the game is won (brighter) or lost (darker).
+При ((очищенні)) дисплея ми будемо використовувати дещо інший ((колір)) в залежності від того, чи виграно гру (яскравіший), чи програно (темніший).
 
-```{sandbox: "game", includeCode: true}
+```{sandbox: «game», includeCode: true}
 CanvasDisplay.prototype.clearDisplay = function(status) {
-  if (status == "won") {
-    this.cx.fillStyle = "rgb(68, 191, 255)";
-  } else if (status == "lost") {
-    this.cx.fillStyle = "rgb(44, 136, 214)";
+  if (status == «won») {
+    this.cx.fillStyle = «rgb(68, 191, 255)»;
+  } else if (status == «lost») {
+    this.cx.fillStyle = «rgb(44, 136, 214)»;
   } else {
-    this.cx.fillStyle = "rgb(52, 166, 251)";
+    this.cx.fillStyle = «rgb(52, 166, 251)»;
   }
   this.cx.fillRect(0, 0,
                    this.canvas.width, this.canvas.height);
 };
 ```
 
-{{index "Math.floor function", "Math.ceil function", rounding}}
+{{index «Math.floor function», «Math.ceil function», округлення}}
 
-To draw the background, we run through the tiles that are visible in the current viewport, using the same trick used in the `touches` method from the [previous chapter](game#touches).
+Щоб намалювати фон, ми пробігаємось по плитках, які видно у поточному вікні перегляду, використовуючи той самий трюк, що й у методі `touches` з [попереднього розділу](game#touches).
 
-```{sandbox: "game", includeCode: true}
-let otherSprites = document.createElement("img");
-otherSprites.src = "img/sprites.png";
+```{sandbox: «game», includeCode: true}
+let otherSprites = document.createElement(«img»);
+otherSprites.src = «img/sprites.png»;
 
 CanvasDisplay.prototype.drawBackground = function(level) {
   let {left, top, width, height} = this.viewport;
-  let xStart = Math.floor(left);
-  let xEnd = Math.ceil(left + width);
-  let yStart = Math.floor(top);
+  let xStart = Math.floor(left)
+  let xEnd = Math.ceil(left + width)
+  let yStart = Math.floor(top)
   let yEnd = Math.ceil(top + height);
 
   for (let y = yStart; y < yEnd; y++) {
     for (let x = xStart; x < xEnd; x++) {
       let tile = level.rows[y][x];
-      if (tile == "empty") continue;
+      if (tile == «empty») continue
       let screenX = (x - left) * scale;
       let screenY = (y - top) * scale;
-      let tileX = tile == "lava" ? scale : 0;
+      let tileX = tile == «lava» ? scale : 0;
       this.cx.drawImage(otherSprites,
-                        tileX,         0, scale, scale,
+                        tileX, 0, scale, scale,
                         screenX, screenY, scale, scale);
     }
   }
 };
 ```
 
-{{index "drawImage method", sprite, tile}}
+{{index «drawImage method», sprite, tile}}
 
-Tiles that are not empty are drawn with `drawImage`. The `otherSprites` image contains the pictures used for elements other than the player. It contains, from left to right, the wall tile, the lava tile, and the sprite for a coin.
+Тайли, які не є порожніми, малюються за допомогою `drawImage`. Зображення `otherSprites` містить зображення, що використовуються для інших елементів, окрім гравця. Воно містить, зліва направо, тайл стіни, тайл лави та спрайт монети.
 
-{{figure {url: "img/sprites_big.png", alt: "Pixel art showing three sprites: a piece of wall, made out of small white stones, a square of orange lava, and a round coin.", width: "1.4cm"}}}
+{{figure {url: «img/sprites_big.png», alt: «Піксельна ілюстрація з трьома спрайтами: шматок стіни, складений з маленьких білих камінців, квадрат помаранчевої лави та кругла монета.», width: “1.4cm”}}}
 
-{{index scaling}}
+{{Масштабування індексу}}
 
-Background tiles are 20 by 20 pixels, since we'll use the same scale as in `DOMDisplay`. Thus, the offset for lava tiles is 20 (the value of the `scale` binding), and the offset for walls is 0.
+Плитки тла мають розмір 20 на 20 пікселів, оскільки ми будемо використовувати той самий масштаб, що і у `DOMDisplay`. Таким чином, зсув для плиток лави дорівнює 20 (значення прив'язки `scale`), а для стін - 0.
 
-{{index drawing, "load event", "drawImage method"}}
+{{index drawing, «load event», «drawImage method»}}
 
-We don't bother waiting for the sprite image to load. Calling `drawImage` with an image that hasn't been loaded yet will simply do nothing. Thus, we might fail to draw the game properly for the first few ((frame))s while the image is still loading, but that isn't a serious problem. Since we keep updating the screen, the correct scene will appear as soon as the loading finishes.
+Ми не будемо чекати на завантаження зображення спрайту. Виклик `drawImage` із зображенням, яке ще не було завантажено, просто нічого не дасть. Таким чином, ми можемо не намалювати гру належним чином протягом перших кількох ((кадрів))с, поки зображення ще завантажується, але це не є серйозною проблемою. Оскільки ми постійно оновлюємо екран, правильна сцена з'явиться одразу після завершення завантаження.
 
-{{index "player", [animation, "platform game"], drawing}}
+{{index «player», [animation, «platform game»], drawing}}
 
-The ((walking)) character shown earlier will be used to represent the player. The code that draws it needs to pick the right ((sprite)) and direction based on the player's current motion. The first eight sprites contain a walking animation. When the player is moving along a floor, we cycle through them based on the current time. We want to switch frames every 60 milliseconds, so the ((time)) is divided by 60 first. When the player is standing still, we draw the ninth sprite. During jumps, which are recognized by the fact that the vertical speed is not zero, we use the tenth, rightmost sprite.
+Для представлення гравця буде використано символ ((walking)), показаний раніше. Код, який його малює, повинен вибрати правильний спрайт і напрямок руху на основі поточного руху гравця. Перші вісім спрайтів містять анімацію ходьби. Коли гравець рухається по поверху, ми циклічно перемикаємо їх на основі поточного часу. Ми хочемо змінювати кадри кожні 60 мілісекунд, тому спочатку ((time)) ділиться на 60. Коли гравець стоїть на місці, ми малюємо дев'ятий спрайт. Під час стрибків, які розпізнаються за тим, що вертикальна швидкість не дорівнює нулю, ми використовуємо десятий, крайній правий спрайт.
 
-{{index "flipHorizontally function", "CanvasDisplay class"}}
+{{index «flipHorizontally function», «CanvasDisplay class»}}
 
-Because the ((sprite))s are slightly wider than the player object—24 instead of 16 pixels to allow some space for feet and arms—the method has to adjust the x-coordinate and width by a given amount (`playerXOverlap`).
+Оскільки ((спрайт))и трохи ширші за об'єкт гравця - 24 замість 16 пікселів, щоб залишити місце для ніг та рук - метод має відрегулювати координату x та ширину на задану величину (`playerXOverlap`).
 
-```{sandbox: "game", includeCode: true}
-let playerSprites = document.createElement("img");
-playerSprites.src = "img/player.png";
+```{sandbox: «game», includeCode: true}
+нехай playerSprites = document.createElement(«img»);
+playerSprites.src = «img/player.png»;
 const playerXOverlap = 4;
 
 CanvasDisplay.prototype.drawPlayer = function(player, x, y,
@@ -777,10 +776,10 @@ CanvasDisplay.prototype.drawPlayer = function(player, x, y,
     this.flipPlayer = player.speed.x < 0;
   }
 
-  let tile = 8;
+  нехай tile = 8;
   if (player.speed.y != 0) {
     tile = 9;
-  } else if (player.speed.x != 0) {
+  } else if (player.speed.x != 0) { tile = 9; }
     tile = Math.floor(Date.now() / 60) % 8;
   }
 
@@ -788,199 +787,199 @@ CanvasDisplay.prototype.drawPlayer = function(player, x, y,
   if (this.flipPlayer) {
     flipHorizontally(this.cx, x + width / 2);
   }
-  let tileX = tile * width;
+  нехай tileX = tile * width;
   this.cx.drawImage(playerSprites, tileX, 0, width, height,
-                                   x,     y, width, height);
+                                   x, y, width, height);
   this.cx.restore();
 };
 ```
 
-The `drawPlayer` method is called by `drawActors`, which is responsible for drawing all the actors in the game.
+Метод `drawPlayer` викликається методом `drawActors`, який відповідає за малювання всіх акторів у грі.
 
-```{sandbox: "game", includeCode: true}
+```{sandbox: «game», includeCode: true}
 CanvasDisplay.prototype.drawActors = function(actors) {
   for (let actor of actors) {
     let width = actor.size.x * scale;
-    let height = actor.size.y * scale;
+    let height = actor.size.y * scale
     let x = (actor.pos.x - this.viewport.left) * scale;
     let y = (actor.pos.y - this.viewport.top) * scale;
-    if (actor.type == "player") {
+    if (actor.type == «player») {
       this.drawPlayer(actor, x, y, width, height);
     } else {
-      let tileX = (actor.type == "coin" ? 2 : 1) * scale;
+      let tileX = (actor.type == «coin» ? 2 : 1) * scale;
       this.cx.drawImage(otherSprites,
                         tileX, 0, width, height,
-                        x,     y, width, height);
+                        x, y, width, height);
     }
   }
 };
 ```
 
-When ((drawing)) something that is not the ((player)), we look at its type to find the offset of the correct sprite. The ((lava)) tile is found at offset 20, and the ((coin)) sprite is found at 40 (two times `scale`).
+Коли ((малюнок)) малює щось, що не є ((гравцем)), ми дивимося на його тип, щоб знайти зміщення правильного спрайту. Тайл ((лава)) знаходиться на зміщенні 20, а спрайт ((монета)) - на 40 (вдвічі більшому за `масштаб`).
 
 {{index viewport}}
 
-We have to subtract the viewport's position when computing the actor's position, since (0, 0) on our ((canvas)) corresponds to the top left of the viewport, not the top left of the level. We could also have used `translate` for this. Either way works.
+При обчисленні позиції актора ми маємо відняти позицію видового екрана, оскільки (0, 0) на нашому ((canvas)) відповідає лівому верхньому куту видового екрана, а не лівому верхньому куту рівня. Ми також могли б використати для цього `translate`. Обидва способи працюють.
 
-{{if interactive
+{{якщо інтерактивний
 
-This document plugs the new display into `runGame`:
+Цей документ підключає новий дисплей до `runGame`:
 
 ```{lang: html, sandbox: game, focus: yes, startCode: true}
 <body>
   <script>
     runGame(GAME_LEVELS, CanvasDisplay);
-  </script>
-</body>
+  </script> </script> </span> </span> </span> </span
+</body></body
 ```
 
 if}}
 
 {{if book
 
-{{index [game, screenshot], [game, "with canvas"]}}
+{{індекс [гра, скріншот], [гра, «з полотном»]}}
 
-That concludes the new ((display)) system. The resulting game looks something like this:
+На цьому нову систему ((відображення)) завершено. Результуюча гра виглядає приблизно так:
 
-{{figure {url: "img/canvas_game.png", alt: "Screenshot of the game as shown on canvas", width: "8cm"}}}
+{{figure {url: «img/canvas_game.png», alt: «Скріншот гри, як показано на полотні», width: “8cm”}}}}
 
 if}}
 
 {{id graphics_tradeoffs}}
 
-## Choosing a graphics interface
+## Вибір графічного інтерфейсу
 
-When you need to generate graphics in the browser, you can choose between plain HTML, ((SVG)), and ((canvas)). There is no single _best_ approach that works in all situations. Each option has strengths and weaknesses.
+Коли вам потрібно згенерувати графіку у браузері, ви можете вибрати між звичайним HTML, ((SVG)) та ((canvas)). Не існує єдиного _найкращого_ підходу, який працює у всіх ситуаціях. Кожен варіант має сильні та слабкі сторони.
 
-{{index "text wrapping"}}
+{{index «text wrapping»}}
 
-Plain HTML has the advantage of being simple. It also integrates well with ((text)). Both SVG and canvas allow you to draw text, but they won't help you position that text or wrap it when it takes up more than one line. In an HTML-based picture, it is much easier to include blocks of text.
+Перевагою простого HTML є його простота. Він також добре інтегрується з ((text)). І SVG, і полотно дозволяють малювати текст, але вони не допоможуть вам розташувати цей текст або обернути його, якщо він займає більше одного рядка. В HTML-зображення набагато простіше включати блоки тексту.
 
-{{index zooming, SVG}}
+{{індексне масштабування, SVG}}
 
-SVG can be used to produce ((crisp)) ((graphics)) that look good at any zoom level. Unlike HTML, it is designed for drawing and is thus more suitable for that purpose.
+SVG можна використовувати для створення ((чітких)) ((графічних)) зображень, які добре виглядають на будь-якому рівні масштабування. На відміну від HTML, вона призначена для малювання і тому краще підходить для цієї мети.
 
-{{index [DOM, graphics], SVG, "event handling", ["data structure", tree]}}
+{{індекс [DOM, графіка], SVG, «обробка подій», [«структура даних», дерево]}}
 
-Both SVG and HTML build up a data structure (the DOM) that represents your picture. This makes it possible to modify elements after they are drawn. If you need to repeatedly change a small part of a big ((picture)) in response to what the user is doing or as part of an ((animation)), doing it in a canvas can be needlessly expensive. The DOM also allows us to register mouse event handlers on every element in the picture (even on shapes drawn with SVG). You can't do that with canvas.
+І SVG, і HTML створюють структуру даних (DOM), яка представляє ваше зображення. Це дає можливість змінювати елементи після того, як вони намальовані. Якщо вам потрібно неодноразово змінювати маленьку частину великого ((зображення)) у відповідь на дії користувача або як частину ((анімації)), робити це на полотні може бути невиправдано дорого. DOM також дозволяє нам реєструвати обробники подій миші на кожному елементі зображення (навіть на фігурах, намальованих за допомогою SVG). З полотном цього зробити не можна.
 
-{{index performance, optimization, "ray tracer"}}
+{Продуктивність, оптимізація, «трасування променів»}}
 
-But ((canvas))'s ((pixel))-oriented approach can be an advantage when drawing a huge number of tiny elements. The fact that it does not build up a data structure but only repeatedly draws onto the same pixel surface gives canvas a lower cost per shape. There are also effects that are only practical with a canvas element, such as rendering a scene one ((pixel)) at a time (for example, using a ray tracer) or postprocessing an image with JavaScript (blurring or distorting it).
+Але підхід ((canvas)), орієнтований на ((pixel)), може бути перевагою при малюванні величезної кількості крихітних елементів. Той факт, що він не створює структуру даних, а лише багаторазово малює на тій самій піксельній поверхні, дає полотну нижчу вартість за фігуру. Існують також ефекти, які доцільно використовувати лише з елементами полотна, наприклад, рендеринг сцени по одному ((пікселю)) за раз (наприклад, за допомогою трасувальника променів) або постобробка зображення за допомогою JavaScript (розмиття або спотворення).
 
-In some cases, you may want to combine several of these techniques. For example, you might draw a ((graph)) with ((SVG)) or ((canvas)) but show ((text))ual information by positioning an HTML element on top of the picture.
+У деяких випадках вам може знадобитися поєднати декілька з цих методів. Наприклад, ви можете намалювати ((графік)) за допомогою ((SVG)) або ((полотно)), але показати ((текст)) інформацію, розмістивши елемент HTML поверх зображення.
 
 {{index display}}
 
-For nondemanding applications, it really doesn't matter much which interface you choose. The display we built for our game in this chapter could have been implemented using any of these three ((graphics)) technologies, since it does not need to draw text, handle mouse interaction, or work with an extraordinarily large number of elements.
+Для невибагливих додатків не має особливого значення, який інтерфейс ви обираєте. Дисплей, який ми створили для нашої гри у цій главі, можна було б реалізувати за допомогою будь-якої з цих трьох ((графічних)) технологій, оскільки йому не потрібно малювати текст, обробляти взаємодію з мишею або працювати з надмірно великою кількістю елементів.
 
-## Summary
+## Підсумок
 
-In this chapter we discussed techniques for drawing graphics in the browser, focusing on the `<canvas>` element.
+У цій главі ми обговорили методи малювання графіки у браузері, зосередившись на елементі `<canvas>`.
 
-A canvas node represents an area in a document that our program may draw on. This drawing is done through a drawing context object, created with the `getContext` method.
+Вузол полотна являє собою область у документі, на якій може малювати наша програма. Малювання здійснюється за допомогою об'єкта контексту малювання, створеного методом `getContext`.
 
-The 2D drawing interface allows us to fill and stroke various shapes. The context's `fillStyle` property determines how shapes are filled. The `strokeStyle` and `lineWidth` properties control the way lines are drawn.
+Інтерфейс двовимірного малювання дозволяє нам зафарбовувати і обводити різні фігури. Властивість контексту `fillStyle` визначає спосіб заповнення фігур. Властивості `strokeStyle` та `lineWidth` контролюють спосіб малювання ліній.
 
-Rectangles and pieces of text can be drawn with a single method call. The `fillRect` and `strokeRect` methods draw rectangles, and the `fillText` and `strokeText` methods draw text. To create custom shapes, we must first build up a path.
+Прямокутники та фрагменти тексту можна намалювати одним викликом методу. Методи `fillRect` і `strokeRect` малюють прямокутники, а методи `fillText` і `strokeText` - текст. Для створення нестандартних фігур потрібно спочатку побудувати контур.
 
-{{index stroking, filling}}
+{{індекс обведення, заливки}}
 
-Calling `beginPath` starts a new path. A number of other methods add lines and curves to the current path. For example, `lineTo` can add a straight line. When a path is finished, it can be filled with the `fill` method or stroked with the `stroke` method.
+Виклик методу `beginPath` створює новий контур. Ряд інших методів додають лінії та криві до поточного контуру. Наприклад, `lineTo` може додати пряму лінію. Коли контур завершено, його можна зафарбувати методом `fill` або обвести методом `stroke`.
 
-Moving pixels from an image or another canvas onto our canvas is done with the `drawImage` method. By default, this method draws the whole source image, but by giving it more parameters, you can copy a specific area of the image. We used this for our game by copying individual poses of the game character out of an image that contained many such poses.
+Переміщення пікселів із зображення або іншого полотна на наше полотно здійснюється за допомогою методу `drawImage`. За замовчуванням цей метод малює все вихідне зображення, але, надавши йому більше параметрів, ви можете скопіювати певну область зображення. Ми використали це для нашої гри, скопіювавши окремі пози ігрового персонажа з зображення, яке містило багато таких поз.
 
-Transformations allow you to draw a shape in multiple orientations. A 2D drawing context has a current transformation that can be changed with the `translate`, `scale`, and `rotate` methods. These will affect all subsequent drawing operations. A transformation state can be saved with the `save` method and restored with the `restore` method.
+Трансформації дозволяють малювати фігуру в різних орієнтаціях. Контекст двовимірного малювання має поточну трансформацію, яку можна змінити за допомогою методів `translate`, `scale` і `rotate`. Ці зміни впливатимуть на всі наступні операції малювання. Стан трансформації можна зберегти за допомогою методу `save` і відновити за допомогою методу `restore`.
 
-When showing an animation on a canvas, the `clearRect` method can be used to clear part of the canvas before redrawing it.
+Під час показу анімації на полотні можна використовувати метод `clearRect` для очищення частини полотна перед його перемальовуванням.
 
-## Exercises
+## Вправи
 
-### Shapes
+### Фігури
 
-{{index "shapes (exercise)"}}
+{{index «фігури (вправа)»}}
 
-Write a program that draws the following ((shape))s on a ((canvas)):
+Напишіть програму, яка намалює наступні ((фігури)) на ((полотні)):
 
 {{index rotation}}
 
-1. A ((trapezoid)) (a ((rectangle)) that is wider on one side)
+1. ((трапеція)) (прямокутник, який ширший з одного боку)
 
-2. A red ((diamond)) (a rectangle rotated 45 degrees or ¼π radians)
+2. Червоний ((ромб)) (прямокутник, повернутий на 45 градусів або ¼π радіан)
 
-3. A zigzagging ((line))
+3. Зигзагоподібна ((лінія))
 
-4. A ((spiral)) made up of 100 straight line segments
+4. Спіраль, що складається зі 100 прямих відрізків
 
-5. A yellow ((star))
+5. Жовта ((зірка))
 
-{{figure {url: "img/exercise_shapes.png", alt: "Picture showing the shapes you are asked to draw", width: "8cm"}}}
+{{figure {url: «img/exercise_shapes.png», alt: «Зображення фігур, які вам потрібно намалювати», width: “8cm”}}}}
 
-When drawing the last two shapes, you may want to refer to the explanation of `Math.cos` and `Math.sin` in [Chapter ?](dom#sin_cos), which describes how to get coordinates on a circle using these functions.
+Під час малювання останніх двох фігур ви можете звернутися до пояснення функцій `Math.cos` та `Math.sin` у [Глава ?](dom#sin_cos), де описано, як отримати координати на колі за допомогою цих функцій.
 
-{{index readability, "hardcoding"}}
+{{index readability, «hardcoding»}}
 
-I recommend creating a function for each shape. Pass the position, and optionally other properties such as the size or the number of points, as parameters. The alternative, which is to hardcode numbers all over your code, tends to make the code needlessly hard to read and modify.
+Я рекомендую створити функцію для кожної фігури. Передавайте позицію і, за бажанням, інші властивості, такі як розмір або кількість точок, як параметри. Альтернатива, яка полягає у жорсткому кодуванні чисел по всьому коду, як правило, робить код надмірно важким для читання та модифікації.
 
-{{if interactive
+{{if інтерактивний
 
 ```{lang: html, test: no}
-<canvas width="600" height="200"></canvas>
+<canvas width=«600» height=«200»></canvas>
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
 
-  // Your code here.
-</script>
+  // Ваш код тут.
+</script> </span> </span> </span> </span> </p
 ```
 
 if}}
 
 {{hint
 
-{{index [path, canvas], "shapes (exercise)"}}
+{{index [path, canvas], «shapes (exercise)»}}
 
-The ((trapezoid)) (1) is easiest to draw using a path. Pick suitable center coordinates and add each of the four corners around the center.
+((трапецію)) (1) найпростіше намалювати за допомогою контуру. Виберіть відповідні координати центру і додайте кожен з чотирьох кутів навколо центру.
 
-{{index "flipHorizontally function", rotation}}
+{{index «flipHorizontally function», rotation}}
 
-The ((diamond)) (2) can be drawn the straightforward way, with a path, or the interesting way, with a `rotate` ((transformation)). To use rotation, you will have to apply a trick similar to what we did in the `flipHorizontally` function. Because you want to rotate around the center of your rectangle and not around the point (0, 0), you must first `translate` to there, then rotate, and then translate back.
+Ромб ((діамант)) (2) можна намалювати простим способом, за допомогою контуру, або цікавим способом, за допомогою `обертання` ((перетворення)). Щоб використати обертання, вам доведеться застосувати трюк, подібний до того, що ми робили у функції `flipHorizontally`. Оскільки ви хочете обертати навколо центру вашого прямокутника, а не навколо точки (0, 0), ви повинні спочатку «перевести» туди, потім обернути, а потім перевести назад.
 
-Make sure you reset the transformation after drawing any shape that creates one.
+Переконайтеся, що ви скинули перетворення після малювання будь-якої фігури, яка його створює.
 
-{{index "remainder operator", "% operator"}}
+{{індекс «оператор залишку», «оператор %»}}
 
-For the ((zigzag)) (3) it becomes impractical to write a new call to `lineTo` for each line segment. Instead, you should use a ((loop)). You can have each iteration draw either two ((line)) segments (right and then left again) or one, in which case you must use the evenness (`% 2`) of the loop index to determine whether to go left or right.
+Для ((зигзаг)) (3) стає недоцільним писати новий виклик `lineTo` для кожного відрізка. Замість цього слід використовувати ((цикл)). Ви можете на кожній ітерації малювати або два відрізки ((line)) (праворуч, а потім знову ліворуч), або один, у цьому випадку ви повинні використовувати парність (`% 2`) індексу циклу, щоб визначити, куди йти - ліворуч чи праворуч.
 
-You'll also need a loop for the ((spiral)) (4). If you draw a series of points, with each point moving farther along a circle around the spiral's center, you get a circle. If, during the loop, you vary the radius of the circle on which you are putting the current point and go around more than once, the result is a spiral.
+Вам також знадобиться цикл для ((спіраль)) (4). Якщо ви намалюєте серію точок, кожна з яких буде віддалятися по колу навколо центру спіралі, ви отримаєте коло. Якщо під час циклу змінювати радіус кола, на яке поміщається поточна точка, і пройти по колу більше одного разу, то вийде спіраль.
 
-{{index "quadraticCurveTo method"}}
+{{index «quadraticCurveTo method»}}
 
-The ((star)) (5) depicted is built out of `quadraticCurveTo` lines. You could also draw one with straight lines. Divide a circle into eight pieces for a star with eight points, or however many pieces you want. Draw lines between these points, making them curve toward the center of the star. With `quadraticCurveTo`, you can use the center as the control point.
+Зображену ((зірку)) (5) побудовано з ліній `quadraticCurveTo`. Ви також можете намалювати її з прямих ліній. Розділіть коло на вісім частин для зірки з вісьмома точками або на будь-яку іншу кількість частин. Намалюйте лінії між цими точками так, щоб вони вигиналися до центру зірки. За допомогою `quadraticCurveTo` ви можете використовувати центр як контрольну точку.
 
-hint}}
+підказка}}
 
 {{id exercise_pie_chart}}
 
-### The pie chart
+### Кругова діаграма
 
-{{index label, text, "pie chart example"}}
+{{index label, text, «pie chart example»}}
 
-[Earlier](canvas#pie_chart) in the chapter, we saw an example program that drew a pie chart. Modify this program so that the name of each category is shown next to the slice that represents it. Try to find a pleasing-looking way to automatically position this text that would work for other datasets as well. You may assume that categories are big enough to leave enough room for their labels.
+[Раніше у розділі (canvas#pie_chart) ми бачили приклад програми, яка малювала кругову діаграму. Модифікуйте цю програму так, щоб назву кожної категорії було показано поруч зі шматочком, який її представляє. Спробуйте знайти приємний на вигляд спосіб автоматичного позиціонування цього тексту, який би працював і для інших наборів даних. Ви можете припустити, що категорії достатньо великі, щоб залишити достатньо місця для їхніх міток.
 
-You might need `Math.sin` and `Math.cos` again, which are described in [Chapter ?](dom#sin_cos).
+Можливо, вам знову знадобляться `Math.sin` і `Math.cos`, які описано у [Глава ?](dom#sin_cos).
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{lang: html, test: no}
-<canvas width="600" height="300"></canvas>
+<canvas width=«600» height=«300»></canvas
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
   let total = results
     .reduce((sum, {count}) => sum + count, 0);
   let currentAngle = -0.5 * Math.PI;
   let centerX = 300, centerY = 150;
 
-  // Add code to draw the slice labels in this loop.
+  // Додаємо код для малювання міток зрізів у цьому циклі.
   for (let result of results) {
     let sliceAngle = (result.count / total) * 2 * Math.PI;
     cx.beginPath();
@@ -998,45 +997,45 @@ if}}
 
 {{hint
 
-{{index "fillText method", "textAlign property", "textBaseline property", "pie chart example"}}
+{{індекс «метод fillText», «властивість textAlign», «властивість textBaseline», «приклад кругової діаграми»}}
 
-You will need to call `fillText` and set the context's `textAlign` and `textBaseline` properties in such a way that the text ends up where you want it.
+Вам потрібно викликати `fillText` і встановити властивості контексту `textAlign` і `textBaseline` таким чином, щоб текст з'явився там, де ви хочете.
 
-A sensible way to position the labels would be to put the text on the line going from the center of the pie through the middle of the slice. You don't want to put the text directly against the side of the pie but rather move the text out to the side of the pie by a given number of pixels.
+Розумним способом розташування міток буде розміщення тексту на лінії, що йде від центру пирога через середину скибочки. Вам не потрібно розміщувати текст безпосередньо біля краю пирога, а краще відсунути його на задану кількість пікселів від краю пирога.
 
-The ((angle)) of this line is `currentAngle + 0.5 * sliceAngle`. The following code finds a position on this line 120 pixels from the center:
+((кут)) цього рядка дорівнює `currentAngle + 0.5 * sliceAngle`. Наступний код знаходить позицію на цій лінії на відстані 120 пікселів від центру:
 
 ```{test: no}
 let middleAngle = currentAngle + 0.5 * sliceAngle;
-let textX = Math.cos(middleAngle) * 120 + centerX;
+let textX = Math.cos(middleAngle) * 120 + centerX
 let textY = Math.sin(middleAngle) * 120 + centerY;
 ```
 
-For `textBaseline`, the value `"middle"` is probably appropriate when using this approach. What to use for `textAlign` depends on which side of the circle we are on. On the left, it should be `"right"`, and on the right, it should be `"left"`, so that the text is positioned away from the pie.
+Для `textBaseline` значення `«middle»`, ймовірно, буде доречним при використанні цього підходу. Що використовувати для `textAlign` залежить від того, з якого боку кола ми знаходимося. Зліва це має бути `'right'`, а справа - `'left'`, щоб текст розташовувався подалі від пирога.
 
-{{index "Math.cos function"}}
+{{index «Math.cos function»}}
 
-If you are not sure how to find out which side of the circle a given angle is on, look to the explanation of `Math.cos` in [Chapter ?](dom#sin_cos). The cosine of an angle tells us which x-coordinate it corresponds to, which in turn tells us exactly which side of the circle we are on.
+Якщо ви не знаєте, як дізнатися, на якій стороні кола знаходиться заданий кут, зверніться до пояснення функції `Math.cos` у [Глава ?](dom#sin_cos). Косинус кута показує нам, якій координаті x він відповідає, що, у свою чергу, точно вказує нам, на якій стороні кола ми знаходимося.
 
-hint}}
+підказка}}
 
-### A bouncing ball
+### М'ячик, що підстрибує
 
-{{index [animation, "bouncing ball"], "requestAnimationFrame function", bouncing}}
+{{index [animation, «bouncing ball»], «requestAnimationFrame function», bouncing}}
 
-Use the `requestAnimationFrame` technique that we saw in [Chapter ?](dom#animationFrame) and [Chapter ?](game#runAnimation) to draw a ((box)) with a bouncing ((ball)) in it. The ball moves at a constant ((speed)) and bounces off the box's sides when it hits them.
+Використовуйте техніку `requestAnimationFrame`, яку ми бачили у [Глава ?](dom#animationFrame) та [Глава ?](game#runAnimation), щоб намалювати ((box)) з м'ячиком, що стрибає ((ball)) у ньому. М'яч рухається з постійною ((швидкістю)) і відскакує від стінок коробки, коли вдаряється об них.
 
-{{if interactive
+{{if інтерактивний
 
 ```{lang: html, test: no}
-<canvas width="400" height="400"></canvas>
+<canvas width=«400» height=«400»></canvas
 <script>
-  let cx = document.querySelector("canvas").getContext("2d");
+  let cx = document.querySelector(«canvas»).getContext(«2d»);
 
   let lastTime = null;
   function frame(time) {
     if (lastTime != null) {
-      updateAnimation(Math.min(100, time - lastTime) / 1000);
+      updateAnimation(Math.min(100, time - lastTime) / 1000)
     }
     lastTime = time;
     requestAnimationFrame(frame);
@@ -1044,7 +1043,7 @@ Use the `requestAnimationFrame` technique that we saw in [Chapter ?](dom#animati
   requestAnimationFrame(frame);
 
   function updateAnimation(step) {
-    // Your code here.
+    // Ваш код тут.
   }
 </script>
 ```
@@ -1053,39 +1052,38 @@ if}}
 
 {{hint
 
-{{index "strokeRect method", animation, "arc method"}}
+{{index «strokeRect method», animation, «arc method»}}
 
-A ((box)) is easy to draw with `strokeRect`. Define a binding that holds its size, or define two bindings if your box's width and height differ. To create a round ((ball)), start a path and call `arc(x, y, radius, 0, 7)`, which creates an arc going from zero to more than a whole circle. Then fill the path.
+За допомогою `strokeRect` легко намалювати ((box)). Визначте прив'язку, яка утримує його розмір, або визначте дві прив'язки, якщо ширина і висота вашої коробки відрізняються. Щоб створити круглий об'єкт, створіть контур і викличте команду `arc(x, y, radius, 0, 7)`, яка створить дугу від нуля до більш ніж цілого кола. Потім заповніть контур.
 
-{{index "collision detection", "Vec class"}}
+{{index «collision detection», «Vec class»}}
 
-To model the ball's position and ((speed)), you can use the `Vec` class from [Chapter ?](game#vector)[ (which is available on this page)]{if interactive}. Give it a starting speed, preferably one that is not purely vertical or horizontal, and for every ((frame)) multiply that speed by the amount of time that elapsed. When the ball gets too close to a vertical wall, invert the _x_ component in its speed. Likewise, invert the _y_ component when it hits a horizontal wall.
+Для моделювання положення та ((швидкості)) м'яча ви можете використати клас `Vec` з [Chapter ?](game#vector)[ (який доступний на цій сторінці)]{якщо інтерактивний}. Задайте м'ячу початкову швидкість, бажано, щоб вона не була суто вертикальною або горизонтальною, і для кожного ((кадр)) помножте цю швидкість на кількість часу, що минув. Коли м'яч наближається до вертикальної стіни, інвертуйте складову _x_ у його швидкості. Аналогічно, інвертуйте компонент _y_, коли м'яч вдаряється об горизонтальну стіну.
 
-{{index "clearRect method", clearing}}
+{{index «clearRect method», clearing}}
 
-After finding the ball's new position and speed, use `clearRect` to delete the scene and redraw it using the new position.
+Після знаходження нового положення і швидкості м'яча, використовуйте `clearRect` для видалення сцени і перемалюйте її з урахуванням нового положення.
 
-hint}}
+підказка}}
 
-### Precomputed mirroring
+### Попереднє віддзеркалення
 
-{{index optimization, "bitmap graphics", mirror}}
+{{оптимізація індексів, «растрова графіка», дзеркало}}
 
-One unfortunate thing about ((transformation))s is that they slow down the drawing of bitmaps. The position and size of each ((pixel)) have to be transformed, and though it is possible that ((browser))s will get cleverer about transformation in the ((future)), they currently cause a measurable increase in the time it takes to draw a bitmap.
+Одним з недоліків ((перетворень))у є те, що вони сповільнюють малювання растрових зображень. Положення і розмір кожного ((пікселя)) потрібно трансформувати, і хоча можливо, що ((браузер)) стануть розумнішими щодо трансформації у ((майбутньому)), наразі вони спричиняють помітне збільшення часу, необхідного для малювання растрової графіки.
 
-In a game like ours, where we are drawing only a single transformed sprite, this is a nonissue. But imagine that we need to draw hundreds of characters or thousands of rotating particles from an explosion.
+У такій грі, як наша, де ми малюємо лише один трансформований спрайт, це не є проблемою. Але уявіть, що нам потрібно намалювати сотні персонажів або тисячі обертових частинок від вибуху.
 
-Think of a way to draw an inverted character without loading additional image files and without having to make transformed `drawImage` calls every frame.
+Подумайте, як намалювати перевернутий символ, не завантажуючи додаткові файли зображень і не виконуючи виклики трансформованого `drawImage` у кожному кадрі.
 
-{{hint
+{{підказка
 
-{{index mirror, scaling, "drawImage method"}}
+{{index mirror, scaling, «drawImage method»}}
 
-The key to the solution is the fact that we can use a ((canvas)) element as a source image when using `drawImage`. It is possible to create an extra `<canvas>` element, without adding it to the document, and draw our inverted sprites to it, once. When drawing an actual frame, we just copy the already inverted sprites to the main canvas.
+Ключ до вирішення проблеми полягає у тому, що ми можемо використовувати елемент ((canvas)) у якості вихідного зображення при використанні `drawImage`. Можна створити додатковий елемент `<canvas>`, не додаючи його до документа, і намалювати на ньому наші інвертовані спрайти, один раз. При малюванні реального кадру ми просто копіюємо вже інвертовані спрайти на основне полотно.
 
-{{index "load event"}}
+{{index «load event»}}
 
-Some care would be required because images do not load instantly. We do the inverted drawing only once, and if we do it before the image loads, it won't draw anything. A `"load"` handler on the image can be used to draw the inverted images to the extra canvas. This canvas can be used as a drawing source immediately (it'll simply be blank until we draw the character onto it).
+Тут потрібно бути обережним, оскільки зображення не завантажуються миттєво. Ми робимо інвертоване малювання лише один раз, і якщо ми зробимо це до завантаження зображення, воно нічого не намалює. Обробник ''load'' на зображенні можна використати для малювання перевернутих зображень на додатковому полотні. Це полотно можна одразу використовувати як джерело для малювання (воно буде просто порожнім, доки ми не намалюємо на ньому символ).
 
-hint}}
-
+підказка}}

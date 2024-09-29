@@ -1,78 +1,78 @@
-{{meta {load_files: ["code/intro.js"]}}}
+{{meta {load_files: [«code/intro.js»]}}}
 
-# Introduction
+# Вступ
 
-{{quote {author: "Ellen Ullman", title: "Close to the Machine: Technophilia and Its Discontents", chapter: true}
+{{quote {author: «Ellen Ullman», title: «Close to the Machine: 
 
-We think we are creating the system for our own purposes. We believe we are making it in our own image... But the computer is not really like us. It is a projection of a very slim part of ourselves: that portion devoted to logic, order, rule, and clarity.
-
-quote}}
-
-{{figure {url: "img/chapter_picture_00.jpg", alt: "Illustration of a screwdriver next to a circuit board of about the same size", chapter: "framed"}}}
-
-This is a book about instructing ((computer))s. Computers are about as common as screwdrivers today, but they are quite a bit more complex, and making them do what you want them to do isn't always easy.
-
-If the task you have for your computer is a common, well-understood one, such as showing you your email or acting like a calculator, you can open the appropriate ((application)) and get to work. But for unique or open-ended tasks, there often is no appropriate application.
-
-That is where ((programming)) may come in. _Programming_ is the act of constructing a _program_—a set of precise instructions telling a computer what to do. Because computers are dumb, pedantic beasts, programming is fundamentally tedious and frustrating.
-
-{{index [programming, "joy of"], speed}}
-
-Fortunately, if you can get over that fact—and maybe even enjoy the rigor of thinking in terms that dumb machines can deal with—programming can be rewarding. It allows you to do things in seconds that would take _forever_ by hand. It is a way to make your computer tool do things that it couldn't do before. On top of that, it makes for a wonderful game of puzzle solving and abstract thinking.
-
-Most programming is done with ((programming language))s. A _programming language_ is an artificially constructed language used to instruct computers. It is interesting that the most effective way we've found to communicate with a computer borrows so heavily from the way we communicate with each other. Like human languages, computer languages allow words and phrases to be combined in new ways, making it possible to express ever new concepts.
-
-{{index [JavaScript, "availability of"], "casual computing"}}
-
-At one point, language-based interfaces, such as the BASIC and DOS prompts of the 1980s and 1990s, were the main method of interacting with computers. For routine computer use, these have largely been replaced with visual interfaces, which are easier to learn but offer less freedom. But if you know where to look, the languages are still there. One of them, _JavaScript_, is built into every modern web ((browser))—and is thus available on almost every device.
-
-{{indexsee "web browser", browser}}
-
-This book will try to make you familiar enough with this language to do useful and amusing things with it.
-
-## On programming
-
-{{index [programming, "difficulty of"]}}
-
-Besides explaining JavaScript, I will introduce the basic principles of programming. Programming, it turns out, is hard. The fundamental rules are simple and clear, but programs built on top of these rules tend to become complex enough to introduce their own rules and complexity. You're building your own maze, in a way, and you can easily get lost in it.
-
-{{index learning}}
-
-There will be times when reading this book feels terribly frustrating. If you are new to programming, there will be a lot of new material to digest. Much of this material will then be _combined_ in ways that require you to make additional connections.
-
-It is up to you to make the necessary effort. When you are struggling to follow the book, do not jump to any conclusions about your own capabilities. You are fine—you just need to keep at it. Take a break, reread some material, and make sure you read and understand the example programs and ((exercises)). Learning is hard work, but everything you learn is yours and will make further learning easier.
-
-{{quote {author: "Ursula K. Le Guin", title: "The Left Hand of Darkness"}
-
-{{index "Le Guin, Ursula K."}}
-
-When action grows unprofitable, gather information; when information grows unprofitable, sleep.
+Ми думаємо, що створюємо систему для власних цілей. Ми віримо, що створюємо її за своїм образом і подобою... Але комп'ютер насправді не схожий на нас. Це проекція дуже тонкої частини нас самих: тієї частини, яка присвячена логіці, порядку, правилам і ясності.
 
 quote}}
 
-{{index [program, "nature of"], data}}
+{{figure {url: «img/chapter_picture_00.jpg», alt: «Ілюстрація викрутки поруч з друкованою платою приблизно такого ж розміру», »chapter: «Обрамлення"}}}.
 
-A program is many things. It is a piece of text typed by a programmer, it is the directing force that makes the computer do what it does, it is data in the computer's memory, and, at the same time, it controls the actions performed on this memory. Analogies that try to compare programs to familiar objects tend to fall short. A superficially fitting one is to compare a program to a machine—lots of separate parts tend to be involved, and to make the whole thing tick, we have to consider the ways in which these parts interconnect and contribute to the operation of the whole.
+Це книжка про те, як навчити ((комп'ютер))у. Комп'ютери сьогодні так само поширені, як і викрутки, але вони набагато складніші, і змусити їх робити те, що ви хочете, не завжди легко.
 
-A ((computer)) is a physical machine that acts as a host for these immaterial machines. Computers themselves can do only stupidly straightforward things. The reason they are so useful is that they do these things at an incredibly high ((speed)). A program can ingeniously combine an enormous number of these simple actions to do very complicated things.
+Якщо завдання, яке ви ставите перед комп'ютером, є звичайним, добре зрозумілим, наприклад, показати вам вашу електронну пошту або працювати як калькулятор, ви можете відкрити відповідний ((додаток)) і приступити до роботи. Але для унікальних або нестандартних завдань часто не існує відповідної програми.
 
-{{index [programming, "joy of"]}}
+Саме тут на допомогу може прийти ((програмування)). Програмування - це процес створення «програми» - набору точних інструкцій, які вказують комп'ютеру, що робити. Оскільки комп'ютери - тупі, педантичні тварини, програмування в принципі є нудним і неприємним заняттям.
 
-A program is a building of thought. It is costless to build, it is weightless, and it grows easily under our typing hands. But as a program grows, so does its ((complexity)). The skill of programming is the skill of building programs that don't confuse the programmer. The best programs are those that manage to do something interesting while still being easy to understand.
+{{index [програмування, «радість від»], швидкість}}
 
-{{index "programming style", "best practices"}}
+На щастя, якщо ви можете змиритися з цим фактом - і, можливо, навіть насолоджуватися строгістю мислення в термінах, з якими можуть мати справу німі машини - програмування може бути корисним. Воно дозволяє вам робити речі за секунди, на які вручну пішла б _вічність_. Це спосіб змусити комп'ютерний інструмент робити те, що він не міг робити раніше. Крім того, це чудова гра для розв'язування головоломок та абстрактного мислення.
 
-Some programmers believe that this complexity is best managed by using only a small set of well-understood techniques in their programs. They have composed strict rules ("best practices") prescribing the form programs should have and carefully stay within their safe little zone.
+Більшість програм виконується за допомогою ((мови програмування)). Мова програмування - це штучно створена мова, яка використовується для навчання комп'ютерів. Цікаво, що найефективніший спосіб спілкування з комп'ютером, який ми знайшли, значною мірою запозичений з того, як ми спілкуємося один з одним. Як і людські мови, комп'ютерні мови дозволяють комбінувати слова та фрази у нові способи, що дає змогу виражати все нові й нові поняття.
 
-{{index experiment}}
+{{index [JavaScript, «доступність»], «випадкові обчислення»}}
 
-This is not only boring—it is ineffective. New problems often require new solutions. The field of programming is young and still developing rapidly, and it is varied enough to have room for wildly different approaches. There are many terrible mistakes to make in program design, and you should go ahead and make them at least once so that you understand them. A sense of what a good program looks like is developed with practice, not learned from a list of rules.
+У якийсь момент мовні інтерфейси, такі як підказки BASIC і DOS 1980-х і 1990-х років, були основним методом взаємодії з комп'ютером. Для повсякденного використання комп'ютера вони були значною мірою замінені візуальними інтерфейсами, які легше вивчити, але вони пропонують менше свободи. Але якщо ви знаєте, де шукати, мови все ще існують. Одна з них, _JavaScript_, вбудована в кожен сучасний веб-браузер - і тому доступна майже на кожному пристрої.
 
-## Why language matters
+{{indexsee «веб-браузер», браузер}}
 
-{{index "programming language", "machine code", "binary data"}}
+У цій книжці ми спробуємо познайомити вас з цією мовою настільки, щоб ви могли робити з нею корисні та цікаві речі.
 
-In the beginning, at the birth of computing, there were no programming languages. Programs looked something like this:
+## Про програмування
+
+{{index [programming, «difficulty of»]}}
+
+Окрім пояснення JavaScript, я познайомлю вас з основними принципами програмування. Програмувати, виявляється, складно. Фундаментальні правила прості і зрозумілі, але програми, побудовані на основі цих правил, мають тенденцію ставати досить складними, щоб вводити свої власні правила і складності. Ви будуєте власний лабіринт, і в ньому легко загубитися.
+
+{{індекс навчання}}
+
+Будуть моменти, коли читання цієї книги буде викликати жахливе розчарування. Якщо ви новачок у програмуванні, вам доведеться засвоїти багато нового матеріалу. Значна частина цього матеріалу буде _поєднана_ таким чином, що вам доведеться встановлювати додаткові зв'язки.
+
+Ви повинні докласти необхідних зусиль. Коли вам буде важко слідувати за книгою, не робіть поспішних висновків щодо власних можливостей. З вами все гаразд - вам просто потрібно продовжувати. Зробіть перерву, перечитайте матеріал і переконайтеся, що ви прочитали і зрозуміли приклади програм і вправ. Навчання - це важка праця, але все, чого ви навчилися, належить вам і полегшить подальше навчання.
+
+{{цитата {автор: «Урсула К. Ле Ґуїн», назва: «Ліва рука темряви"}}
+
+{{індекс «Ле Ґуїн, Урсула К.»}}
+
+Коли дія стає невигідною, збирайте інформацію; коли інформація стає невигідною, спіть.
+
+quote}}
+
+{{індекс [програма, «природа»], дані}}
+
+Програма - це багато речей. Це шматок тексту, набраний програмістом, це керуюча сила, яка змушує комп'ютер робити те, що він робить, це дані в пам'яті комп'ютера, і, в той же час, вона керує діями, що виконуються над цією пам'яттю. Аналогії, які намагаються порівняти програми зі знайомими об'єктами, як правило, виявляються невдалими. Поверхнево підходящою аналогією є порівняння програми з машиною - в ній задіяно багато окремих частин, і для того, щоб змусити ціле працювати, ми повинні розглянути способи, якими ці частини взаємопов'язані між собою і сприяють роботі цілого.
+
+Комп'ютер - це фізична машина, яка діє як хост для цих нематеріальних машин. Самі по собі комп'ютери можуть робити лише тупо прості речі. Причина їхньої корисності полягає в тому, що вони роблять ці речі на неймовірно високій швидкості. Програма може геніально комбінувати величезну кількість цих простих дій, щоб робити дуже складні речі.
+
+{{index [програмування, «радість»]}}
+
+Програма - це будівля думки. Її створення не потребує витрат, вона невагома, і вона легко росте під нашими руками, що набирають текст. Але зі зростанням програми зростає і її ((складність)). Вміння програмувати - це вміння створювати програми, які не збивають програміста з пантелику. Найкращі програми - це ті, яким вдається робити щось цікаве, але при цьому бути простими для розуміння.
+
+{{індекс «стиль програмування», «найкращі практики»}}
+
+Деякі програмісти вважають, що з цією складністю найкраще впоратися, використовуючи у своїх програмах лише невеликий набір добре зрозумілих прийомів. Вони склали суворі правила («найкращі практики»), що визначають, якою має бути форма програм, і ретельно дотримуються їхньої безпечної маленької зони.
+
+{{індексний експеримент}}
+
+Це не тільки нудно - це неефективно. Нові проблеми часто вимагають нових рішень. Сфера програмування молода і все ще стрімко розвивається, і вона досить різноманітна, щоб мати місце для дико різних підходів. При розробці програм можна припуститися багатьох жахливих помилок, і вам варто спробувати зробити їх хоча б раз, щоб зрозуміти їх. Відчуття того, як виглядає хороша програма, розвивається з практикою, а не з переліком правил.
+
+## Чому мова має значення
+
+{{index «мова програмування», «машинний код», «двійкові дані»}}
+
+На початку, на зародженні обчислювальної техніки, не існувало жодних мов програмування. Програми виглядали приблизно так:
 
 ```{lang: null}
 00110001 00000000 00000000
@@ -86,51 +86,51 @@ In the beginning, at the birth of computing, there were no programming languages
 01100010 00000000 00000000
 ```
 
-{{index [programming, "history of"], "punch card", complexity}}
+{{index [програмування, «історія»], «перфокарта», складність}}
 
-This is a program to add the numbers from 1 to 10 together and print the result: `1 + 2 + ... + 10 = 55`. It could run on a simple hypothetical machine. To program early computers, it was necessary to set large arrays of switches in the right position or punch holes in strips of cardboard and feed them to the computer. You can imagine how tedious and error prone this procedure was. Even writing simple programs required much cleverness and discipline. Complex ones were nearly inconceivable.
+Це програма, яка додає числа від 1 до 10 і виводить результат: `1 + 2 + ... + 10 = 55`. Вона могла працювати на простій гіпотетичній машині. Для програмування ранніх комп'ютерів потрібно було встановлювати великі масиви перемикачів у потрібне положення або пробивати отвори в смужках картону і подавати їх до комп'ютера. Можна уявити, наскільки нудною і схильною до помилок була ця процедура. Навіть написання простих програм вимагало великої кмітливості та дисципліни. Складні були майже немислимі.
 
-{{index bit, "wizard (mighty)"}}
+{{index bit, «wizard (mighty)»}}
 
-Of course, manually entering these arcane patterns of bits (the ones and zeros) did give the programmer a profound sense of being a mighty wizard. And that has to be worth something in terms of job satisfaction.
+Звичайно, ручне введення цих таємничих бітів (одиниць і нулів) давало програмісту глибоке відчуття того, що він є могутнім чарівником. А це, мабуть, чогось варте з точки зору задоволення від роботи.
 
-{{index memory, instruction}}
+{{індексна пам'ять, інструкція}}
 
-Each line of the previous program contains a single instruction. It could be written in English like this:
+Кожен рядок попередньої програми містить одну інструкцію. Англійською мовою її можна записати так:
 
- 1. Store the number 0 in memory location 0.
- 2. Store the number 1 in memory location 1.
- 3. Store the value of memory location 1 in memory location 2.
- 4. Subtract the number 11 from the value in memory location 2.
- 5. If the value in memory location 2 is the number 0, continue with instruction 9.
- 6. Add the value of memory location 1 to memory location 0.
- 7. Add the number 1 to the value of memory location 1.
- 8. Continue with instruction 3.
- 9. Output the value of memory location 0.
+ 1. Зберегти число 0 у комірці пам'яті 0.
+ 2. Записати число 1 в комірку 1.
+ 3. Записати значення комірки 1 у комірку 2.
+ 4. Від значення в комірці 2 відняти число 11.
+ 5. Якщо значення в комірці 2 дорівнює числу 0, продовжити виконання інструкції 9.
+ 6. Додати значення комірки 1 до комірки 0.
+ 7. До значення комірки 1 додати число 1.
+ 8. Продовжити з інструкції 3.
+ 9. Вивести значення комірки 0.
 
-{{index readability, naming, binding}}
+{{читабельність індексів, іменування, зв'язування}}
 
-Although that is already more readable than the soup of bits, it is still rather obscure. Using names instead of numbers for the instructions and memory locations helps.
+Хоча це вже більш читабельно, ніж суп з бітів, але все ще досить незрозуміло. Використання імен замість чисел для інструкцій та комірок пам'яті допомагає.
 
-```{lang: "null"}
-  Set “total” to 0.
-  Set “count” to 1.
+```{lang: «null"}
+  Встановіть «total» у 0.
+  Встановіть «count» рівним 1.
 [loop]
-  Set “compare” to “count”.
-  Subtract 11 from “compare”.
-  If “compare” is 0, continue at [end].
-  Add “count” to “total”.
-  Add 1 to “count”.
-  Continue at [loop].
+  Встановити «compare» рівним «count».
+  Відняти 11 від «compare».
+  Якщо «compare» дорівнює 0, продовжити з [end].
+  Додати «count» до «total».
+  Додати 1 до «count».
+  Продовжуйте з [цикл].
 [end]
-  Output “total”.
+  Вивести «total».
 ```
 
-{{index loop, jump, "summing example"}}
+{{індексний цикл, стрибок, «приклад підбиття підсумків»}}
 
-Can you see how the program works at this point? The first two lines give two memory locations their starting values: `total` will be used to build up the result of the computation, and `count` will keep track of the number that we are currently looking at. The lines using `compare` are probably the most confusing ones. The program wants to see whether `count` is equal to 11 to decide whether it can stop running. Because our hypothetical machine is rather primitive, it can test only whether a number is zero and make a decision based on that. It therefore uses the memory location labeled `compare` to compute the value of `count - 11` and makes a decision based on that value. The next two lines add the value of `count` to the result and increment `count` by 1 every time the program decides that `count` is not 11 yet.
+Чи бачите ви, як працює програма на цьому етапі? Перші два рядки надають двом коміркам пам'яті початкові значення: `total` буде використано для накопичення результату обчислень, а `count` буде відстежувати число, на яке ми зараз дивимося. Рядки з використанням `compare`, мабуть, найбільш заплутані. Програма хоче побачити, чи дорівнює `count` 11, щоб вирішити, чи можна зупинити виконання. Оскільки наша гіпотетична машина досить примітивна, вона може перевірити лише те, чи дорівнює число нулю, і прийняти рішення на основі цього. Тому вона використовує комірку пам'яті з міткою `compare` для обчислення значення `count - 11` і приймає рішення на основі цього значення. Наступні два рядки додають значення `count` до результату і збільшують `count` на 1 кожного разу, коли програма вирішує, що `count` ще не дорівнює 11.
 
-Here is the same program in JavaScript:
+Ось та сама програма на JavaScript:
 
 ```
 let total = 0, count = 1;
@@ -142,17 +142,17 @@ console.log(total);
 // → 55
 ```
 
-{{index "while loop", loop, [braces, block]}}
+{{index «while loop», loop, [дужки, блок]}}
 
-This version gives us a few more improvements. Most importantly, there is no need to specify the way we want the program to jump back and forth anymore—the `while` construct takes care of that. It continues executing the block (wrapped in braces) below it as long as the condition it was given holds. That condition is `count <= 10`, which means “the count is less than or equal to 10”. We no longer have to create a temporary value and compare that to zero, which was just an uninteresting detail. Part of the power of programming languages is that they can take care of uninteresting details for us.
+Ця версія дає нам ще декілька покращень. Найголовніше, більше не потрібно вказувати спосіб, яким ми хочемо, щоб програма стрибала туди-сюди - про це подбає конструкція `while`. Вона продовжує виконувати блок (взятий у фігурні дужки) під нею доти, доки виконується умова, яку їй було задано. Цією умовою є `count <= 10`, що означає «кількість елементів менше або дорівнює 10». Нам більше не потрібно створювати тимчасове значення і порівнювати його з нулем, що було просто нецікавою деталлю. Частина сили мов програмування полягає в тому, що вони можуть подбати про нецікаві деталі за нас.
 
-{{index "console.log"}}
+{{index «console.log»}}
 
-At the end of the program, after the `while` construct has finished, the `console.log` operation is used to write out the result.
+В кінці програми, після завершення роботи конструкції `while`, операція `console.log` використовується для виведення результату.
 
-{{index "sum function", "range function", abstraction, function}}
+{{індекс «функція суми», «функція діапазону», абстракція, функція}}
 
-Finally, here is what the program could look like if we happened to have the convenient operations `range` and `sum` available, which respectively create a ((collection)) of numbers within a range and compute the sum of a collection of numbers:
+Нарешті, ось як могла б виглядати програма, якби у нас були доступні зручні операції `range` та `сума`, які відповідно створюють ((колекцію)) чисел у діапазоні та обчислюють суму колекції чисел:
 
 ```{startCode: true}
 console.log(sum(range(1, 10)));
@@ -161,117 +161,117 @@ console.log(sum(range(1, 10)));
 
 {{index readability}}
 
-The moral of this story is that the same program can be expressed in both long and short, unreadable and readable ways. The first version of the program was extremely obscure, whereas this last one is almost English: `log` the `sum` of the `range` of numbers from 1 to 10. (We will see in [later chapters](data) how to define operations like `sum` and `range`.)
+Мораль цієї історії полягає в тому, що одну і ту ж програму можна виразити і довгим, і коротким, і нечитабельним, і читабельним способом. Перша версія програми була вкрай незрозумілою, тоді як ця остання майже англійська: `log` суму `діапазону` чисел від 1 до 10. (Ми побачимо у [наступних розділах](дані), як визначати такі операції, як `сума` та `діапазон`).
 
-{{index ["programming language", "power of"], composability}}
+{{index [«мова програмування», «потужність»], компонованість}}
 
-A good programming language helps the programmer by allowing them to talk about the actions that the computer has to perform on a higher level. It helps omit details, provides convenient building blocks (such as `while` and `console.log`), allows you to define your own building blocks (such as `sum` and `range`), and makes those blocks easy to compose.
+Хороша мова програмування допомагає програмісту, дозволяючи йому говорити про дії, які має виконувати комп'ютер, на більш високому рівні. Вона допомагає опустити деталі, надає зручні будівельні блоки (такі як `while` і `console.log`), дозволяє визначати власні будівельні блоки (такі як `сума` і `діапазон`), і робить ці блоки легкими для компонування.
 
-## What is JavaScript?
+## Що таке JavaScript?
 
-{{index history, Netscape, browser, "web application", JavaScript, [JavaScript, "history of"], "World Wide Web"}}
+{{index history, Netscape, браузер, «веб-додаток», JavaScript, [JavaScript, «історія»], «World Wide Web»}}
 
-{{indexsee WWW, "World Wide Web"}}
+{{indexsee WWW, «World Wide Web»}}
 
-{{indexsee Web, "World Wide Web"}}
+{{indexsee Web, «World Wide Web»}}
 
-JavaScript was introduced in 1995 as a way to add programs to web pages in the Netscape Navigator browser. The language has since been adopted by all other major graphical web browsers. It has made modern web applications possible—that is, applications with which you can interact directly without doing a page reload for every action. JavaScript is also used in more traditional websites to provide various forms of interactivity and cleverness.
+JavaScript було введено в 1995 році як спосіб додавання програм до веб-сторінок у браузері Netscape Navigator. З тих пір мова була прийнята всіма іншими основними графічними веб-браузерами. Вона зробила можливими сучасні веб-додатки - тобто додатки, з якими можна взаємодіяти безпосередньо, не перезавантажуючи сторінку для кожної дії. JavaScript також використовується на більш традиційних веб-сайтах для забезпечення різних форм інтерактивності та інтелектуальності.
 
-{{index Java, naming}}
+{{індекс Java, іменування}}
 
-It is important to note that JavaScript has almost nothing to do with the programming language named Java. The similar name was inspired by marketing considerations rather than good judgment. When JavaScript was being introduced, the Java language was being heavily marketed and was gaining popularity. Someone thought it was a good idea to try to ride along on this success. Now we are stuck with the name.
+Важливо зазначити, що JavaScript не має майже нічого спільного з мовою програмування Java. Подібна назва була натхненна маркетинговими міркуваннями, а не здоровим глуздом. Коли з'явився JavaScript, мова Java інтенсивно рекламувалася і набувала популярності. Хтось подумав, що це гарна ідея - спробувати скористатися цим успіхом. Тепер ми застрягли з назвою.
 
-{{index ECMAScript, compatibility}}
+{{індекс ECMAScript, сумісність}}
 
-After its adoption outside of Netscape, a ((standard)) document was written to describe the way the JavaScript language should work so that the various pieces of software that claimed to support JavaScript could make sure they actually provided the same language. This is called the ECMAScript standard, after the Ecma International organization that conducted the standardization. In practice, the terms ECMAScript and JavaScript can be used interchangeably—they are two names for the same language.
+Після прийняття мови JavaScript за межами Netscape був написаний ((стандартний)) документ, який описує, як повинна працювати мова JavaScript, щоб різні частини програмного забезпечення, які стверджували, що підтримують JavaScript, могли переконатися, що вони насправді надають ту саму мову. Цей стандарт називається ECMAScript, на честь організації Ecma International, яка проводила стандартизацію. На практиці терміни ECMAScript і JavaScript можна використовувати як взаємозамінні - це дві назви однієї мови.
 
-{{index [JavaScript, "weaknesses of"], debugging}}
+{{index [JavaScript, «слабкі сторони»], налагодження}}
 
-There are those who will say _terrible_ things about JavaScript. Many of these things are true. When I was required to write something in JavaScript for the first time, I quickly came to despise it. It would accept almost anything I typed but interpret it in a way that was completely different from what I meant. This had a lot to do with the fact that I did not have a clue what I was doing, of course, but there is a real issue here: JavaScript is ridiculously liberal in what it allows. The idea behind this design was that it would make programming in JavaScript easier for beginners. In actuality, it mostly makes finding problems in your programs harder because the system will not point them out to you.
+Є люди, які говорять про JavaScript «жахливі» речі. Багато з цих речей є правдою. Коли мені вперше довелося написати щось на JavaScript, я швидко почав його зневажати. Вона приймала майже все, що я вводив, але інтерпретувала це зовсім не так, як я мав на увазі. Звісно, це багато в чому було пов'язано з тим, що я не мав жодного уявлення про те, що я робив, але тут є реальна проблема: JavaScript є до смішного ліберальним у тому, що він дозволяє. Ідея цього дизайну полягала в тому, що він полегшить програмування на JavaScript для початківців. Насправді, це здебільшого ускладнює пошук проблем у ваших програмах, оскільки система не вказує вам на них.
 
-{{index [JavaScript, "flexibility of"], flexibility}}
+{{index [JavaScript, «гнучкість»], flexibility}}
 
-This flexibility also has its advantages, though. It leaves room for techniques that are impossible in more rigid languages and makes for a pleasant, informal style of programming. After ((learning)) the language properly and working with it for a while, I have come to actually _like_ JavaScript.
+Однак ця гнучкість також має свої переваги. Вона залишає місце для прийомів, які неможливі у більш жорстких мовах, і створює приємний, неформальний стиль програмування. Після ((вивчення)) належного вивчення мови і роботи з нею деякий час, я прийшов до висновку, що мені насправді _подобається_ JavaScript.
 
-{{index future, [JavaScript, "versions of"], ECMAScript, "ECMAScript 6"}}
+{{index future, [JavaScript, «версії»], ECMAScript, «ECMAScript 6»}}
 
-There have been several versions of JavaScript. ECMAScript version 3 was the widely supported version during JavaScript's ascent to dominance, roughly between 2000 and 2010. During this time, work was underway on an ambitious version 4, which planned a number of radical improvements and extensions to the language. Changing a living, widely used language in such a radical way turned out to be politically difficult, and work on version 4 was abandoned in 2008. A much less ambitious version 5, which made only some uncontroversial improvements, came out in 2009. In 2015, version 6 came out, a major update that included some of the ideas planned for version 4. Since then we've had new, small updates every year.
+Існувало кілька версій JavaScript. ECMAScript версії 3 була широко підтримуваною версією під час сходження JavaScript до домінування, приблизно між 2000 і 2010 роками. У цей час велася робота над амбітною версією 4, яка планувала ряд радикальних поліпшень і розширень мови. Змінювати живу, широко використовувану мову таким радикальним чином виявилося політично складно, і роботу над версією 4 було припинено у 2008 році. Набагато менш амбітна версія 5, що містила лише деякі безперечні покращення, вийшла у 2009 році. У 2015 році вийшла версія 6, велике оновлення, яке включало деякі ідеї, заплановані для версії 4. З тих пір ми маємо нові, невеликі оновлення щороку.
 
-The fact that JavaScript is evolving means that browsers have to constantly keep up. If you're using an older browser, it may not support every feature. The language designers are careful to not make any changes that could break existing programs, so new browsers can still run old programs. In this book, I'm using the 2024 version of JavaScript.
+Той факт, що JavaScript розвивається, означає, що браузери повинні постійно йти в ногу з ним. Якщо ви використовуєте старіший браузер, він може не підтримувати всі функції. Розробники мови намагаються не вносити жодних змін, які могли б зламати існуючі програми, тому нові браузери все ще можуть запускати старі програми. У цій книзі я використовую версію JavaScript 2024 року.
 
-{{index [JavaScript, "uses of"]}}
+{{index [JavaScript, «uses of»]}}
 
-Web browsers are not the only platforms on which JavaScript is used. Some databases, such as MongoDB and CouchDB, use JavaScript as their scripting and query language. Several platforms for desktop and server programming, most notably the ((Node.js)) project (the subject of [Chapter ?](node)), provide an environment for programming JavaScript outside of the browser.
+Веб-браузери - не єдині платформи, на яких використовується JavaScript. Деякі бази даних, такі як MongoDB і CouchDB, використовують JavaScript як мову сценаріїв і запитів. Декілька платформ для десктопного та серверного програмування, зокрема проект ((Node.js)) (тема [Розділ ?](node)), надають середовище для програмування на JavaScript поза браузером.
 
-## Code, and what to do with it
+## Код і що з ним робити
 
-{{index "reading code", "writing code"}}
+{{індекс «читання коду», «запис коду»}}
 
-_Code_ is the text that makes up programs. Most chapters in this book contain quite a lot of code. I believe reading code and writing ((code)) are indispensable parts of ((learning)) to program. Try to not just glance over the examples—read them attentively and understand them. This may be slow and confusing at first, but I promise that you'll quickly get the hang of it. The same goes for the ((exercises)). Don't assume you understand them until you've actually written a working solution.
+Код - це текст, з якого складаються програми. Більшість розділів цієї книги містять досить багато коду. Я вважаю, що читання коду і написання ((коду)) є невід'ємними частинами ((навчання)) програмування. Намагайтеся не просто переглядати приклади - читайте їх уважно і розумійте. Спочатку це може бути повільно і заплутано, але я обіцяю, що ви швидко освоїтеся. Те саме стосується і вправ. Не вважайте, що ви їх зрозуміли, доки не напишете робочий розв'язок.
 
-{{index interpretation}}
+{{інтерпретація індексів}}
 
-I recommend you try your solutions to exercises in an actual JavaScript interpreter. That way, you'll get immediate feedback on whether what you are doing is working, and, I hope, you'll be tempted to ((experiment)) and go beyond the exercises.
+Я рекомендую вам спробувати свої розв'язки вправ у справжньому інтерпретаторі JavaScript. Таким чином, ви отримаєте негайний зворотній зв'язок про те, чи працює те, що ви робите, і, сподіваюся, у вас з'явиться спокуса ((поекспериментувати)) і вийти за рамки вправ.
 
-{{if interactive
+{{якщо інтерактивний
 
-When reading this book in your browser, you can edit (and run) all example programs by clicking them.
-
-if}}
-
-{{if book
-
-{{index download, sandbox, "running code"}}
-
-The easiest way to run the example code in the book—and to experiment with it—is to look it up in the online version of the book at [_https://eloquentjavascript.net_](https://eloquentjavascript.net/). There, you can click any code example to edit and run it and to see the output it produces. To work on the exercises, go to [_https://eloquentjavascript.net/code_](https://eloquentjavascript.net/code), which provides starting code for each coding exercise and allows you to look at the solutions.
+Якщо ви читаєте цю книгу у браузері, ви можете редагувати (і запускати) всі приклади програм, клацаючи на них.
 
 if}}
 
-{{index "developer tools", "JavaScript console"}}
+{{if книга
 
-Running the programs defined in this book outside of the book's website requires some care. Many examples stand on their own and should work in any JavaScript environment. But code in later chapters is often written for a specific environment (the browser or Node.js) and can run only there. In addition, many chapters define bigger programs, and the pieces of code that appear in them depend on each other or on external files. The [sandbox](https://eloquentjavascript.net/code) on the website provides links to ZIP files containing all the scripts and data files necessary to run the code for a given chapter.
+{{індекс завантаження, пісочниця, «виконуваний код»}}
 
-## Overview of this book
-
-This book contains roughly three parts. The first 12 chapters discuss the JavaScript language. The next seven chapters are about web ((browsers)) and the way JavaScript is used to program them. Finally, two chapters are devoted to ((Node.js)), another environment to program JavaScript in. There are five _project chapters_ in the book that describe larger example programs to give you a taste of actual programming.
-
-The language part of the book starts with four chapters that introduce the basic structure of the JavaScript language. They discuss [control structures](program_structure) (such as the `while` word you saw in this introduction), [functions](functions) (writing your own building blocks), and [data structures](data). After these, you will be able to write basic programs. Next, Chapters [?](higher_order) and [?](object) introduce techniques to use functions and objects to write more _abstract_ code and keep complexity under control.
-
-After a [first project chapter](robot) that builds a crude delivery robot, the language part of the book continues with chapters on [error handling and bug fixing](error), [regular expressions](regexp) (an important tool for working with text), [modularity](modules) (another defense against complexity), and [asynchronous programming](async) (dealing with events that take time). The [second project chapter](language), where we implement a programming language, concludes the first part of the book.
-
-The second part of the book, Chapters [?](browser) to [?](paint), describes the tools that browser JavaScript has access to. You'll learn to display things on the screen (Chapters [?](dom) and [?](canvas)), respond to user input ([Chapter ?](event)), and communicate over the network ([Chapter ?](http)). There are again two project chapters in this part: building a [platform game](game) and a [pixel paint program](paint).
-
-[Chapter ?](node) describes Node.js, and [Chapter ?](skillsharing) builds a small website using that tool.
-
-{{if commercial
-
-Finally, [Chapter ?](fast) describes some of the considerations that come up when optimizing JavaScript programs for speed.
+Найпростіший спосіб запустити приклад коду з книги - і поекспериментувати з ним - це знайти його в онлайн-версії книги за адресою [https://eloquentjavascript.net_](https://eloquentjavascript.net/). Там ви можете натиснути на будь-який приклад коду, щоб відредагувати його, запустити і побачити результати, які він видає. Для роботи над вправами перейдіть на [_https://eloquentjavascript.net/code_](https://eloquentjavascript.net/code), де ви знайдете початковий код для кожної вправи і зможете переглянути розв'язки.
 
 if}}
 
-## Typographic conventions
+{{index «tools for developer», «JavaScript console»}}
 
-{{index "factorial function"}}
+Запуск програм, описаних у цій книзі, за межами веб-сайту книги вимагає певної обережності. Багато прикладів є самостійними і повинні працювати у будь-якому середовищі JavaScript. Але код у наступних розділах часто написаний для конкретного середовища (браузера або Node.js) і може працювати тільки там. Крім того, багато глав визначають більші програми, і фрагменти коду, які в них з'являються, залежать один від одного або від зовнішніх файлів. У [пісочниці] (https://eloquentjavascript.net/code) на сайті є посилання на ZIP-файли, що містять усі скрипти та файли даних, необхідні для запуску коду певної глави.
 
-In this book, text written in a `monospaced` font will represent elements of programs. Sometimes these are self-sufficient fragments, and sometimes they just refer to part of a nearby program. Programs (of which you have already seen a few) are written as follows:
+## Огляд цієї книги
+
+Ця книга складається приблизно з трьох частин. У перших 12 розділах розглядається мова JavaScript. Наступні сім розділів присвячені веб-браузерам і тому, як JavaScript використовується для їхнього програмування. Нарешті, дві глави присвячені ((Node.js)), ще одному середовищу для програмування на JavaScript. У книзі є п'ять "проектних розділів », які описують великі приклади програм, щоб дати вам змогу відчути смак справжнього програмування.
+
+Мовна частина книги починається з чотирьох розділів, які знайомлять з базовою структурою мови JavaScript. У них обговорюються [керуючі структури] (program_structure) (наприклад, слово while, яке ви бачили у цьому вступі), [функції] (functions) (написання ваших власних будівельних блоків) і [структури даних] (data). Після цього ви зможете писати базові програми. Далі у розділах [?](вищий_порядок) та [?](об'єкт) ви дізнаєтесь про методи використання функцій та об'єктів для написання більш _абстрактного_ коду та контролю над складністю.
+
+Після [першого розділу проекту](робот), в якому створюється грубий робот-доставщик, мовна частина книги продовжується розділами про [обробку помилок і виправлення помилок](помилки), [регулярні вирази](regexp) (важливий інструмент для роботи з текстом), [модульність](модулі) (ще один захист від складності) та [асинхронне програмування](асинхрон) (робота з подіями, які потребують часу). Завершує першу частину книги [другий розділ проекту] (мова), де ми реалізуємо мову програмування.
+
+Друга частина книги, розділи від [?](браузер) до [?](paint), описує інструменти, до яких має доступ браузерний JavaScript. Ви навчитеся відображати об'єкти на екрані (розділи [?](dom) і [?](canvas)), реагувати на введення користувача ([Розділ ?](event)) і спілкуватися через мережу ([Розділ ?](http)). У цій частині знову дві глави проекту: створення [платформної гри] (game) та [програми для малювання пікселів] (paint).
+
+[Глава ?](node) описує Node.js, а [Глава ?](skillsharing) створює невеликий веб-сайт за допомогою цього інструменту.
+
+{{якщо реклама
+
+Нарешті, [Глава ?](fast) описує деякі міркування, які виникають при оптимізації JavaScript-програм для швидкості.
+
+if}}
+
+## Типографічні домовленості
+
+{{index «факторіальна функція»}}
+
+У цій книзі текст, написаний шрифтом `моноширинним`, представлятиме елементи програм. Іноді це самодостатні фрагменти, а іноді вони просто посилаються на частину сусідньої програми. Програми (деякі з яких ви вже бачили) записуються наступним чином:
 
 ```
 function factorial(n) {
   if (n == 0) {
-    return 1;
+    повернути 1;
   } else {
     return factorial(n - 1) * n;
   }
 }
 ```
 
-{{index "console.log"}}
+{{index «console.log»}}
 
-Sometimes, to show the output that a program produces, the expected output is written after it, with two slashes and an arrow in front.
+Іноді, щоб показати вивід, який видає програма, після неї записують очікуваний вивід, з двома скісними рисками та стрілкою попереду.
 
 ```
 console.log(factorial(8));
 // → 40320
 ```
 
-Good luck!
+Бажаємо успіхів!

@@ -1,81 +1,80 @@
-{{meta {load_files: ["code/chapter/16_game.js", "code/levels.js", "code/_stop_keys.js"], zip: "html include=[\"css/game.css\"]"}}}
+{{meta {load_files: [«code/chapter/16_game.js», «code/levels.js», «code/_stop_keys.js»], zip: «html include=[\«css/game.css\»]"}}}
 
-# Project: A Platform Game
+# Project: Платформерна гра
 
-{{quote {author: "Iain Banks", title: "The Player of Games", chapter: true}
-
-All reality is a game.
+{{quote {author: «Iain Banks», title: «The Player of Games», chapter: true}} {{quote {author: “Iain Banks”, title: “The Player of Games”, chapter: true}}
+Вся реальність - це гра.
 
 quote}}
 
-{{index "Banks, Iain", "project chapter", simulation}}
+{{індекс «Бенкс, Ієн», «розділ проекту», «симуляція» }}
 
-{{figure {url: "img/chapter_picture_16.jpg", alt: "Illustration showing a computer game character jumping over lava in a two dimensional world", chapter: "framed"}}}
+{{figure {url: «img/chapter_picture_16.jpg», alt: «Ілюстрація із зображенням персонажа комп'ютерної гри, що стрибає через лаву у двовимірному світі», »chapter: «Обрамлення"}}}.
 
-Much of my initial fascination with computers, like that of many nerdy kids, had to do with computer ((game))s. I was drawn into the tiny simulated ((world))s that I could manipulate and in which stories (sort of) unfolded—more, I suppose, because of the way I projected my ((imagination)) into them than because of the possibilities they actually offered.
+Моє початкове захоплення комп'ютерами, як і у багатьох дітей-ботаніків, було пов'язане з комп'ютерними іграми. Мене приваблювали крихітні симульовані ((світ)), якими я міг маніпулювати і в яких розгорталися історії - більше, гадаю, через те, як я проектував на них свою ((уяву)), ніж через ті можливості, які вони насправді пропонували.
 
-I don't wish a ((career)) in game programming on anyone. As with the ((music)) industry, the discrepancy between the number of eager young people wanting to work in it and the actual demand for such people creates a rather unhealthy environment. But writing games for fun is amusing.
+Я нікому не бажаю кар'єри програміста ігор. Як і у випадку з музичною індустрією, невідповідність між кількістю молодих людей, які хочуть працювати в ній, і реальним попитом на таких людей створює досить нездорове середовище. Але писати ігри для розваги - це весело.
 
-{{index "jump-and-run game", dimensions}}
+{{index «jump-and-run game», dimensions}}
 
-This chapter will walk through the implementation of a small ((platform game)). Platform games (or "jump and run" games) are games that expect the ((player)) to move a figure through a ((world)), which is usually two-dimensional and viewed from the side, while jumping over and onto things.
+У цій главі ми розглянемо реалізацію невеликої ((платформної гри)). Платформні ігри (або ігри «стрибай і біжи») - це ігри, у яких гравець повинен переміщати фігурку у ((світі)), який зазвичай є двовимірним і видимим збоку, перестрибуючи через предмети і на них.
 
-## The game
+## Гра
 
-{{index minimalism, "Palef, Thomas", "Dark Blue (game)"}}
+{{index minimalism, «Palef, Thomas», «Dark Blue (гра)»}}
 
-Our ((game)) will be roughly based on [Dark Blue](http://www.lessmilk.com/games/10)[ (_www.lessmilk.com/games/10_)]{if book} by Thomas Palef. I chose that game because it is both entertaining and minimalist and because it can be built without too much ((code)). It looks like this:
+Наша ((гра)) буде приблизно заснована на [Dark Blue](http://www.lessmilk.com/games/10)[ (www.lessmilk.com/games/10_)]{if book} Томаса Палефа. Я вибрав цю гру, тому що вона і цікава, і мінімалістична, і тому що її можна створити без зайвого ((коду)). Виглядає вона так:
 
-{{figure {url: "img/darkblue.png", alt: "Screenshot of the 'Dark Blue' game, showing a world made out of colored boxes. There's a black box representing the player, standing on lines of white against a blue background. Small yellow coins float in the air, and some parts of the background are red, representing lava."}}}
+{{figure {url: «img/darkblue.png», alt: «Скріншот гри «Dark Blue», що показує світ, зроблений з кольорових коробок. Чорна коробка, що представляє гравця, стоїть на білих лініях на синьому тлі. Маленькі жовті монети плавають у повітрі, а деякі частини фону червоні, що зображують лаву.» }}}.
 
-{{index coin, lava}}
+{{індексна монета, лава}}
 
-The dark ((box)) represents the ((player)), whose task is to collect the yellow boxes (coins) while avoiding the red stuff (lava). A ((level)) is completed when all coins have been collected.
+Темна ((коробка)) представляє ((гравця)), завданням якого є збирати жовті коробки (монети), уникаючи при цьому червоного кольору (лави). Рівень вважається завершеним, коли всі монети зібрано.
 
-{{index keyboard, jumping}}
+{{індексна клавіатура, стрибки}}
 
-The player can walk around with the left and right arrow keys and can jump with the up arrow. Jumping is this game character's specialty. It can reach several times its own height and can change direction in midair. This may not be entirely realistic, but it helps give the player the feeling of being in direct control of the on-screen ((avatar)).
+Гравець може ходити за допомогою клавіш зі стрілками вліво та вправо, а також стрибати за допомогою стрілки вгору. Стрибки - це особливість цього ігрового персонажа. Він може досягати висоти, що в кілька разів перевищує його власний зріст, і може змінювати напрямок у повітрі. Це може бути не зовсім реалістично, але допомагає гравцеві відчути, що він безпосередньо контролює ситуацію на екрані ((аватар)).
 
-{{index "fractional number", discretization, "artificial life", "electronic life"}}
+{{індекс «дробове число», дискретизація, «штучне життя», «електронне життя»}}
 
-The ((game)) consists of a static ((background)), laid out like a ((grid)), with the moving elements overlaid on that background. Each field on the grid is either empty, solid, or ((lava)). The moving elements are the player, coins, and certain pieces of lava. The positions of these elements are not constrained to the grid—their coordinates may be fractional, allowing smooth ((motion)).
+Гра складається зі статичного ((фон)), викладеного у вигляді ((сітка)), на який накладаються рухомі елементи. Кожне поле на сітці може бути або порожнім, або суцільним, або ((лава)). Рухомими елементами є гравець, монети та певні шматки лави. Позиції цих елементів не обмежені сіткою - їхні координати можуть бути дробовими, що забезпечує плавний ((рух)).
 
-## The technology
+## Технологія
 
-{{index "event handling", keyboard, [DOM, graphics]}}
+{{index «обробка подій», клавіатура, [DOM, графіка]}}
 
-We will use the ((browser)) DOM to display the game, and we'll read user input by handling key events.
+Ми будемо використовувати ((браузер)) DOM для відображення гри, а користувацьке введення будемо зчитувати за допомогою обробки ключових подій.
 
-{{index rectangle, "background (CSS)", "position (CSS)", graphics}}
+{{index rectangle, «background (CSS)», «position (CSS)», graphics}}
 
-The screen- and keyboard-related code is only a small part of the work we need to do to build this ((game)). Since everything looks like colored ((box))es, drawing is uncomplicated: we create DOM elements and use styling to give them a background color, size, and position.
+Код, пов'язаний з екраном та клавіатурою, - це лише невелика частина роботи, яку нам потрібно виконати, щоб створити цю ((гру)). Оскільки все виглядає як кольорові ((box))и, малювання нескладне: ми створюємо DOM-елементи і використовуємо стилі, щоб надати їм колір фону, розмір і позицію.
 
-{{index "table (HTML tag)"}}
+{{index «table (HTML-тег)»}}
 
-We can represent the background as a table, since it is an unchanging ((grid)) of squares. The free-moving elements can be overlaid using absolutely positioned elements.
+Ми можемо представити фон у вигляді таблиці, оскільки він являє собою незмінну ((сітку)) квадратів. Вільно рухомі елементи можна перекрити за допомогою абсолютно позиціонованих елементів.
 
-{{index performance, [DOM, graphics]}}
+{{індекс продуктивності, [DOM, графіка]}}
 
-In games and other programs that should animate ((graphics)) and respond to user ((input)) without noticeable delay, ((efficiency)) is important. Although the DOM was not originally designed for high-performance graphics, it is actually better at this than you would expect. You saw some ((animation))s in [Chapter ?](dom#animation). On a modern machine, a simple game like this performs well, even if we don't worry about ((optimization)) very much.
+У іграх та інших програмах, які повинні анімувати ((графіка)) і реагувати на дії користувача ((введення)) без помітної затримки, ((ефективність)) має важливе значення. Хоча DOM спочатку не призначався для високопродуктивної графіки, він справляється з цим краще, ніж можна було б очікувати. Ви бачили деякі ((анімації)) у [Глава ?](dom#animation). На сучасному комп'ютері така проста гра буде працювати добре, навіть якщо ми не будемо надто перейматися ((оптимізацією)).
 
-{{index canvas, [DOM, graphics]}}
+{{index canvas, [DOM, графіка]}}
 
-In the [next chapter](canvas), we will explore another ((browser)) technology, the `<canvas>` tag, which provides a more traditional way to draw graphics, working in terms of shapes and ((pixel))s rather than DOM elements.
+У [наступному розділі](canvas) ми розглянемо іншу технологію ((браузер)), тег `<canvas>`, який забезпечує більш традиційний спосіб малювання графіки, працюючи з фігурами та ((пікселями)), а не з елементами DOM.
 
-## Levels
+## Рівні
 
-{{index dimensions}}
+{{розміри індексів}}
 
-We'll want a human-readable, human-editable way to specify levels. Since it is okay for everything to start out on a grid, we could use big strings in which each character represents an element—either a part of the background grid or a moving element.
+Нам потрібен зручний для читання і редагування спосіб вказівки рівнів. Оскільки все може починатися з сітки, ми можемо використовувати великі рядки, у яких кожен символ представляє елемент - або частину фонової сітки, або рухомий елемент.
 
-The plan for a small level might look like this:
+План для невеликого рівня може виглядати наступним чином:
 
 ```{includeCode: true}
 let simpleLevelPlan = `
 ......................
 ..#................#..
 ..#..............=.#..
-..#.........o.o....#..
+..#.........o.o....#...
 ..#.@......#####...#..
 ..#####............#..
 ......#++++++++++++#..
@@ -83,108 +82,108 @@ let simpleLevelPlan = `
 ......................`;
 ```
 
-{{index level}}
+{{рівень індексу}}
 
-Periods are empty space, hash (`#`) characters are walls, and plus signs are lava. The ((player))'s starting position is the ((at sign)) (`@`). Every O character is a coin, and the equal sign (`=`) at the top is a block of lava that moves back and forth horizontally.
+Крапки - це порожній простір, символи хешу (`#`) - стіни, а знаки плюс - лава. Початкова позиція ((гравця)) - це позиція ((за знаком)) (`@`). Кожен символ O - це монета, а знак рівності (`=`) вгорі - блок лави, який рухається вперед-назад по горизонталі.
 
-{{index bouncing}}
+{{індекс стрибає}}
 
-We'll support two additional kinds of moving ((lava)): the pipe character (`|`) creates vertically moving blobs, and `v` indicates _dripping_ lava—vertically moving lava that doesn't bounce back and forth but only moves down, jumping back to its start position when it hits the floor.
+Ми підтримуємо два додаткових типи руху ((лави)): символ труби (`|`) створює вертикально рухомі блоки, а `v` позначає _капаючу_ лаву - вертикально рухому лаву, яка не відскакує вперед-назад, а лише рухається вниз, відскакуючи назад у початкове положення, коли потрапляє на підлогу.
 
-A whole ((game)) consists of multiple ((level))s that the ((player)) must complete. A level is completed when all ((coin))s have been collected. If the player touches ((lava)), the current level is restored to its starting position, and the player may try again.
+Ціла ((гра)) складається з декількох ((рівнів)), які ((гравець)) повинен пройти. Рівень вважається завершеним, коли зібрано всі ((монети)). Якщо гравець торкається ((лава)), поточний рівень відновлюється до початкової позиції, і гравець може спробувати ще раз.
 
 {{id level}}
 
-## Reading a level
+## Читання рівня
 
-{{index "Level class"}}
+{{index «Клас рівня»}}
 
-The following ((class)) stores a ((level)) object. Its argument should be the string that defines the level.
+Наступна функція ((клас)) зберігає об'єкт ((рівень)). Його аргументом має бути рядок, що визначає рівень.
 
 ```{includeCode: true}
 class Level {
   constructor(plan) {
-    let rows = plan.trim().split("\n").map(l => [...l]);
-    this.height = rows.length;
+    let rows = plan.trim().split(«\n»).map(l => [...l]);
+    this.height = rows.length
     this.width = rows[0].length;
     this.startActors = [];
 
     this.rows = rows.map((row, y) => {
       return row.map((ch, x) => {
         let type = levelChars[ch];
-        if (typeof type != "string") {
+        if (typeof type != «string») {
           let pos = new Vec(x, y);
           this.startActors.push(type.create(pos, ch));
-          type = "empty";
+          type = «empty»;
         }
-        return type;
+        повернути тип;
       });
     });
   }
 }
 ```
 
-{{index "trim method", "split method", [whitespace, trimming]}}
+{{index «trim method», «split method», [whitespace, trimming]}}
 
-The `trim` method is used to remove whitespace at the start and end of the plan string. This allows our example plan to start with a newline so that all lines are directly below each other. The remaining string is split on ((newline character))s, and each line is spread into an array, producing arrays of characters.
+Метод `trim` використовується для видалення пробілів на початку і в кінці рядка плану. Це дозволяє нашому прикладу плану починатися з нового рядка, так що всі рядки знаходяться безпосередньо один під одним. Решта рядка розбивається на ((символ нового рядка))s, і кожен рядок перетворюється на масив, створюючи масив символів.
 
-{{index [array, "as matrix"]}}
+{{index [array, «as matrix»]}}
 
-So `rows` holds an array of arrays of characters, the rows of the plan. We can derive the level's width and height from these. But we must still separate the moving elements from the background grid. We'll call moving elements _actors_. They'll be stored in an array of objects. The background will be an array of arrays of strings, holding field types such as `"empty"`, `"wall"`, or `"lava"`.
+Отже, `rows` містить масив масивів символів, рядків плану. З них ми можемо отримати ширину та висоту рівня. Але нам ще потрібно відокремити рухомі елементи від фонової сітки. Назвемо рухомі елементи _акторами_. Вони зберігатимуться у масиві об'єктів. Тло буде масивом масивів рядків, що містять такі типи полів, як ``порожнє``, ``стіна`` або ``лава``.
 
-{{index "map method"}}
+{{index «map method»}}
 
-To create these arrays, we map over the rows and then over their content. Remember that `map` passes the array index as a second argument to the mapping function, which tells us the x- and y-coordinates of a given character. Positions in the game will be stored as pairs of coordinates, with the upper left being 0,0 and each background square being 1 unit high and wide.
+Щоб створити ці масиви, ми зіставляємо рядки, а потім їхній вміст. Пам'ятайте, що `map` передає індекс масиву як другий аргумент функції відображення, який вказує нам на x- та y-координати заданого персонажа. Позиції у грі зберігатимуться як пари координат, де верхній лівий кут дорівнює 0,0, а кожна клітинка фону - 1 одиниця у висоту та ширину.
 
-{{index "static method"}}
+{{index «static method»}}
 
-To interpret the characters in the plan, the `Level` constructor uses the `levelChars` object, which, for each character used in the level descriptions, holds a string if it is a background type, and a class if it produces an actor. When `type` is an actor class, its static `create` method is used to create an object, which is added to `startActors`, and the mapping function returns `"empty"` for this background square.
+Для інтерпретації символів на плані конструктор `Level` використовує об'єкт `levelChars`, який для кожного символу, що використовується в описах рівнів, містить рядок, якщо це тип фону, і клас, якщо він створює актора. Якщо `type` є класом актора, його статичний метод `create` використовується для створення об'єкта, який додається до `startActors`, а функція відображення повертає `«порожньо»` для цього фонового квадрата.
 
-{{index "Vec class"}}
+{{index «Vec class»}}
 
-The position of the actor is stored as a `Vec` object. This is a two-dimensional vector, an object with `x` and `y` properties, as seen in the exercises of [Chapter ?](object#exercise_vector).
+Позиція актора зберігається як об'єкт `Vec`. Це двовимірний вектор, об'єкт з властивостями `x` та `y`, як показано у вправах [Розділу ?] (об'єкт#вектор_вправи).
 
-{{index [state, in objects]}}
+{{індекс [стан, в об'єктах]}}
 
-As the game runs, actors will end up in different places or even disappear entirely (as coins do when collected). We'll use a `State` class to track the state of a running game.
+Під час гри актори будуть опинятися у різних місцях або навіть зникати зовсім (як монети, коли їх збирають). Ми будемо використовувати клас `State` для відстеження стану гри, що виконується.
 
 ```{includeCode: true}
 class State {
   constructor(level, actors, status) {
-    this.level = level;
-    this.actors = actors;
+    this.level = level
+    this.actors = actors
     this.status = status;
   }
 
   static start(level) {
-    return new State(level, level.startActors, "playing");
+    return new State(level, level.startActors, «playing»);
   }
 
   get player() {
-    return this.actors.find(a => a.type == "player");
+    return this.actors.find(a => a.type == «player»);
   }
 }
 ```
 
-The `status` property will switch to `"lost"` or `"won"` when the game has ended.
+Властивість `status` зміниться на `«програно»` або `«виграно»`, коли гра закінчиться.
 
-This is again a persistent data structure—updating the game state creates a new state and leaves the old one intact.
+Це знову ж таки стійка структура даних - оновлення стану гри створює новий стан і залишає старий стан недоторканим.
 
-## Actors
+## Актори
 
-{{index actor, "Vec class", [interface, object]}}
+{{index actor, «Vec class», [інтерфейс, об'єкт]}}
 
-Actor objects represent the current position and state of a given moving element (player, coin, or mobile lava) in our game. All actor objects conform to the same interface. They have `size` and `pos` properties holding the size and the coordinates of the upper-left corner of the rectangle representing this actor, and an `update` method.
+Об'єкти-актори представляють поточну позицію та стан певного рухомого елементу (гравця, монети або рухомої лави) у нашій грі. Всі об'єкти акторів мають однаковий інтерфейс. Вони мають властивості `size` та `pos`, що містять розмір та координати верхнього лівого кута прямокутника, який представляє цей об'єкт, а також метод `update`.
 
-This `update` method is used to compute their new state and position after a given time step. It simulates the thing the actor does—moving in response to the arrow keys for the player and bouncing back and forth for the lava—and returns a new, updated actor object.
+Метод `update` використовується для обчислення нового стану та позиції актора після заданого кроку часу. Він імітує те, що робить актор - рухається у відповідь на натискання клавіш зі стрілками для гравця і підстрибує туди-сюди для лави - і повертає новий, оновлений об'єкт актора.
 
-A `type` property contains a string that identifies the type of the actor—`"player"`, `"coin"`, or `"lava"`. This is useful when drawing the game—the look of the rectangle drawn for an actor is based on its type.
+Властивість `type` містить рядок, який ідентифікує тип актора - `player`, `coin` або `lava`. Це корисно під час малювання гри - вигляд прямокутника, намальованого для актора, базується на його типі.
 
-Actor classes have a static `create` method that is used by the `Level` constructor to create an actor from a character in the level plan. It is given the coordinates of the character and the character itself, which is necessary because the `Lava` class handles several different characters.
+Класи акторів мають статичний метод `create`, який використовується конструктором `Level` для створення актора з персонажа на плані рівня. Йому передаються координати персонажа і сам персонаж, що є необхідним, оскільки клас `Lava` обробляє декілька різних персонажів.
 
 {{id vector}}
 
-This is the `Vec` class that we'll use for our two-dimensional values, such as the position and size of actors.
+Це клас `Vec`, який ми будемо використовувати для наших двовимірних значень, таких як положення та розмір акторів.
 
 ```{includeCode: true}
 class Vec {
@@ -200,24 +199,24 @@ class Vec {
 }
 ```
 
-{{index "times method", multiplication}}
+{{index «times method», множення}}
 
-The `times` method scales a vector by a given number. It will be useful when we need to multiply a speed vector by a time interval to get the distance traveled during that time.
+Метод `times` масштабує вектор на задане число. Він буде корисним, коли нам потрібно помножити вектор швидкості на часовий інтервал, щоб отримати відстань, пройдену за цей час.
 
-The different types of actors get their own classes, since their behavior is very different. Let's define these classes. We'll get to their `update` methods later.
+Різні типи акторів отримують власні класи, оскільки їхня поведінка дуже відрізняється. Давайте визначимо ці класи. Ми розглянемо їхні методи `update` пізніше.
 
-{{index simulation, "Player class"}}
+{{index simulation, «Клас гравця»}}
 
-The player class has a `speed` property that stores its current speed to simulate momentum and gravity.
+Клас гравця має властивість `speed`, яка зберігає його поточну швидкість для імітації імпульсу та гравітації.
 
-```{includeCode: true}
+```{includeCode: true}}
 class Player {
   constructor(pos, speed) {
     this.pos = pos;
     this.speed = speed;
   }
 
-  get type() { return "player"; }
+  get type() { return «player»; }
 
   static create(pos) {
     return new Player(pos.plus(new Vec(0, -0.5)),
@@ -228,15 +227,15 @@ class Player {
 Player.prototype.size = new Vec(0.8, 1.5);
 ```
 
-Because a player is one-and-a-half squares high, its initial position is set to be half a square above the position where the `@` character appeared. This way, its bottom aligns with the bottom of the square where it appeared.
+Оскільки гравець має висоту півтори клітинки, його початкова позиція встановлюється на півклітинки вище позиції, де з'явився символ `@`. Таким чином, його нижня частина збігається з нижньою частиною клітинки, де він з'явився.
 
-The `size` property is the same for all instances of `Player`, so we store it on the prototype rather than on the instances themselves. We could have used a ((getter)) like `type`, but that would create and return a new `Vec` object every time the property is read, which would be wasteful. (Strings, being ((immutable)), don't have to be re-created every time they are evaluated.)
+Властивість `size` однакова для всіх екземплярів `Player`, тому ми зберігаємо її на прототипі, а не на самих екземплярах. Ми могли б використати ((getter)) на кшталт `type`, але це призвело б до створення і повернення нового об'єкта `Vec` кожного разу, коли читається властивість, що було б марнотратством. (Рядки, будучи ((незмінними)), не потрібно створювати заново щоразу, коли вони обчислюються).
 
-{{index "Lava class", bouncing}}
+{{index «Lava class», bouncing}}
 
-When constructing a `Lava` actor, we need to initialize the object differently depending on the character it is based on. Dynamic lava moves along at its current speed until it hits an obstacle. At that point, if it has a `reset` property, it will jump back to its start position (dripping). If it does not, it will invert its speed and continue in the other direction (bouncing).
+При створенні актора `Lava` нам потрібно ініціалізувати об'єкт по-різному, залежно від того, на якому персонажі він базується. Динамічна лава рухається з поточною швидкістю, доки не натрапить на перешкоду. У цей момент, якщо у неї є властивість `reset`, вона повернеться у початкове положення (капає). Якщо ні, то він змінить швидкість і продовжить рух у зворотному напрямку (підстрибуючи).
 
-The `create` method looks at the character that the `Level` constructor passes and creates the appropriate lava actor.
+Метод `create` дивиться на символ, переданий конструктором `Level`, і створює відповідний актор лави.
 
 ```{includeCode: true}
 class Lava {
@@ -246,14 +245,14 @@ class Lava {
     this.reset = reset;
   }
 
-  get type() { return "lava"; }
+  get type() { return «lava»; }
 
   static create(pos, ch) {
-    if (ch == "=") {
+    if (ch == «=») {
       return new Lava(pos, new Vec(2, 0));
-    } else if (ch == "|") {
+    } else if (ch == «|») { return
       return new Lava(pos, new Vec(0, 2));
-    } else if (ch == "v") {
+    } else if (ch == «v») { return new Vec(0, 2)
       return new Lava(pos, new Vec(0, 3), pos);
     }
   }
@@ -262,9 +261,9 @@ class Lava {
 Lava.prototype.size = new Vec(1, 1);
 ```
 
-{{index "Coin class", animation}}
+{{index «Coin class», animation}}
 
-`Coin` actors are relatively simple. They mostly just sit in their place. But to liven up the game a little, they are given a "wobble", a slight vertical back-and-forth motion. To track this, a coin object stores a base position as well as a `wobble` property that tracks the ((phase)) of the bouncing motion. Together, these determine the coin's actual position (stored in the `pos` property).
+Актори `Coin` відносно прості. Здебільшого вони просто сидять на своїх місцях. Але щоб трохи оживити гру, їм додано «вобл» - легкі вертикальні рухи вперед-назад. Щоб відстежувати це, об'єкт монети зберігає базову позицію, а також властивість «коливання», яка відстежує ((фазу)) руху, що підстрибує. Разом вони визначають фактичне положення монети (зберігається у властивості `pos`).
 
 ```{includeCode: true}
 class Coin {
@@ -274,7 +273,7 @@ class Coin {
     this.wobble = wobble;
   }
 
-  get type() { return "coin"; }
+  get type() { return «coin»; }
 
   static create(pos) {
     let basePos = pos.plus(new Vec(0.2, 0.1));
@@ -286,53 +285,53 @@ class Coin {
 Coin.prototype.size = new Vec(0.6, 0.6);
 ```
 
-{{index "Math.random function", "random number", "Math.sin function", sine, wave}}
+{{індекс «Math.random function», «random number», «Math.sin function», sine, wave}}
 
-In [Chapter ?](dom#sin_cos), we saw that `Math.sin` gives us the y-coordinate of a point on a circle. That coordinate goes back and forth in a smooth waveform as we move along the circle, which makes the sine function useful for modeling a wavy motion.
+У [Главі ?](dom#sin_cos) ми бачили, що `Math.sin` дає нам координату y точки на колі. Ця координата плавно змінюється вперед і назад, коли ми рухаємося вздовж кола, що робить функцію синуса корисною для моделювання хвилеподібного руху.
 
-{{index pi}}
+{{індекс pi}}
 
-To avoid a situation where all coins move up and down synchronously, the starting phase of each coin is randomized. The period of `Math.sin`'s wave, the width of a wave it produces, is 2π. We multiply the value returned by `Math.random` by that number to give the coin a random starting position on the wave.
+Щоб уникнути ситуації, коли всі монети рухаються вгору і вниз синхронно, початкова фаза кожної монети рандомізована. Період хвилі `Math.sin`, тобто ширина хвилі, яку він створює, дорівнює 2π. Ми множимо значення, повернуте `Math.random`, на це число, щоб надати монеті випадкову початкову позицію на хвилі.
 
-{{index map, [object, "as map"]}}
+{{index map, [object, «as map»]}}
 
-We can now define the `levelChars` object that maps plan characters to either background grid types or actor classes.
+Тепер ми можемо визначити об'єкт `levelChars`, який зіставляє символи плану з типами фонової сітки або класами акторів.
 
 ```{includeCode: true}
 const levelChars = {
-  ".": "empty", "#": "wall", "+": "lava",
-  "@": Player, "o": Coin,
-  "=": Lava, "|": Lava, "v": Lava
+  «.": «пусто», “#”: «стіна», “+”: «lava»,
+  «@": гравець, «o»: Монета,
+  «=": Лава, «|»: Лава, «v»: Лава
 };
 ```
 
-That gives us all the parts needed to create a `Level` instance.
+Це дає нам усі частини, необхідні для створення екземпляра `Level`.
 
 ```{includeCode: strip_log}
 let simpleLevel = new Level(simpleLevelPlan);
 console.log(`${simpleLevel.width} by ${simpleLevel.height}`);
-// → 22 by 9
+// → 22 на 9
 ```
 
-The task ahead is to display such levels on the screen and to model time and motion inside them.
+Наше завдання полягає у відображенні таких рівнів на екрані та моделюванні часу і руху всередині них.
 
 {{id domdisplay}}
 
-## Drawing
+## Малюнок
 
-{{index graphics, encapsulation, "DOMDisplay class", [DOM, graphics]}}
+{{index graphics, encapsulation, «DOMDisplay class», [DOM, graphics]}}
 
-In the [next chapter](canvas#canvasdisplay), we'll ((display)) the same game in a different way. To make that possible, we put the drawing logic behind an interface and pass it to the game as an argument. That way, we can use the same game program with different new display ((module))s.
+У [наступному розділі](canvas#canvasdisplay) ми ((відобразимо)) ту саму гру у інший спосіб. Щоб зробити це можливим, ми винесемо логіку малювання за межі інтерфейсу і передамо її грі як аргумент. Таким чином, ми можемо використовувати ту саму ігрову програму з різними новими модулями відображення.
 
-A game display object draws a given ((level)) and state. We pass its constructor to the game to allow it to be replaced. The display class we define in this chapter is called `DOMDisplay` because it uses DOM elements to show the level.
+Ігровий об'єкт малює заданий ((рівень)) і стан. Ми передаємо його конструктор грі, щоб його можна було замінити. Клас дисплея, який ми визначаємо у цій главі, називається `DOMDisplay`, тому що він використовує елементи DOM для відображення рівня.
 
-{{index "style attribute", CSS}}
+{{index «style attribute», CSS}}
 
-We'll be using a style sheet to set the actual colors and other fixed properties of the elements that make up the game. It would also be possible to directly assign to the elements' `style` property when we create them, but that would produce more verbose programs.
+Ми будемо використовувати таблицю стилів для встановлення фактичних кольорів та інших фіксованих властивостей елементів, з яких складається гра. Також можна було б безпосередньо призначити властивість `style` елементам під час їх створення, але це призвело б до створення більш багатослівних програм.
 
-{{index "class attribute"}}
+{{index «class attribute»}}
 
-The following helper function provides a succinct way to create an element and give it some attributes and child nodes:
+Наступна допоміжна функція надає стислий спосіб створення елемента і надання йому деяких атрибутів та дочірніх вузлів:
 
 ```{includeCode: true}
 function elt(name, attrs, ...children) {
@@ -347,12 +346,12 @@ function elt(name, attrs, ...children) {
 }
 ```
 
-A display is created by giving it a parent element to which it should append itself and a ((level)) object.
+Дисплей створюється шляхом надання йому батьківського елемента, до якого він має приєднатися, та об'єкта ((level)).
 
 ```{includeCode: true}
 class DOMDisplay {
   constructor(parent, level) {
-    this.dom = elt("div", {class: "game"}, drawGrid(level));
+    this.dom = elt(«div», {class: «game"}, drawGrid(level));
     this.actorLayer = null;
     parent.appendChild(this.dom);
   }
@@ -363,81 +362,81 @@ class DOMDisplay {
 
 {{index level}}
 
-The level's ((background)) grid, which never changes, is drawn once. Actors are redrawn every time the display is updated with a given state. The `actorLayer` property will be used to track the element that holds the actors so that they can be easily removed and replaced.
+Сітка рівня ((background)), яка ніколи не змінюється, малюється один раз. Актори перемальовуються кожного разу, коли дисплей оновлюється з певним станом. Властивість `actorLayer` буде використано для відстеження елемента, який містить акторів, щоб їх можна було легко видалити та замінити.
 
-{{index scaling, "DOMDisplay class"}}
+{{index scaling, «DOMDisplay class»}}
 
-Our ((coordinates)) and sizes are tracked in ((grid)) units, where a size or distance of 1 means one grid block. When setting ((pixel)) sizes, we will have to scale these coordinates up—everything in the game would be ridiculously small at a single pixel per square. The `scale` constant gives the number of pixels that a single unit takes up on the screen.
+Наші ((координати)) та розміри відстежуються у ((сітка)) одиницях, де розмір або відстань 1 означає один блок сітки. При встановленні розмірів ((pixel)) нам доведеться масштабувати ці координати - все у грі було б смішно маленьким при одному пікселі на квадрат. Константа `scale` задає кількість пікселів, яку займає один юніт на екрані.
 
 ```{includeCode: true}
 const scale = 20;
 
 function drawGrid(level) {
-  return elt("table", {
-    class: "background",
+  return elt(«table», {
+    class: «background»,
     style: `width: ${level.width * scale}px`
-  }, ...level.rows.map(row =>
-    elt("tr", {style: `height: ${scale}px`},
-        ...row.map(type => elt("td", {class: type})))
+  }, ...level.rows.map(row =>)
+    elt(«tr», {style: `height: ${scale}px`},
+        ...row.map(type => elt(«td», {class: type})))
   ));
 }
 ```
 
-{{index "table (HTML tag)", "tr (HTML tag)", "td (HTML tag)", "spread operator"}}
+{{index «table (HTML-тег)», «tr (HTML-тег)», «td (HTML-тег)», «spread operator»}}
 
-The `<table>` element's form nicely corresponds to the structure of the `rows` property of the level—each row of the grid is turned into a table row (`<tr>` element). The strings in the grid are used as class names for the table cell (`<td>`) elements. The code uses the spread (triple dot) operator to pass arrays of child nodes to `elt` as separate arguments.
+Форма елемента `<table>` добре відповідає структурі властивості `rows` рівня - кожен рядок сітки перетворюється на рядок таблиці (елемент `<tr>`). Рядки в сітці використовуються як імена класів для елементів комірок таблиці (`<td>`). У коді використовується оператор spread (потрійна крапка) для передачі масивів дочірніх вузлів до `elt` як окремих аргументів.
 
 {{id game_css}}
 
-The following ((CSS)) makes the table look like the background we want:
+Наступний код ((CSS)) робить таблицю схожою на потрібний нам фон:
 
-```{lang: "css"}
-.background    { background: rgb(52, 166, 251);
+```{lang: «css"}}
+.background { background: rgb(52, 166, 251);
                  table-layout: fixed;
-                 border-spacing: 0;              }
-.background td { padding: 0;                     }
-.lava          { background: rgb(255, 100, 100); }
-.wall          { background: white;              }
+                 border-spacing: 0; }
+.background td { padding: 0; }
+.lava { background: rgb(255, 100, 100); }
+.wall { background: white; }
 ```
 
-{{index "padding (CSS)"}}
+{{index «padding (CSS)»}}
 
-Some of these (`table-layout`, `border-spacing`, and `padding`) are used to suppress unwanted default behavior. We don't want the layout of the ((table)) to depend upon the contents of its cells, and we don't want space between the ((table)) cells or padding inside them.
+Деякі з них (`table-layout`, `border-spacing` і `padding`) використовуються для придушення небажаної поведінки за замовчуванням. Ми не хочемо, щоб макет ((таблиці)) залежав від вмісту її клітинок, а також не хочемо, щоб між клітинками ((таблиці)) були пробіли або відступи всередині них.
 
-{{index "background (CSS)", "rgb (CSS)", CSS}}
+{{index «background (CSS)», «rgb (CSS)», CSS}}
 
-The `background` rule sets the background color. CSS allows colors to be specified both as words (`white`) or with a format such as `rgb(R, G, B)`, where the red, green, and blue components of the color are separated into three numbers from 0 to 255. In `rgb(52, 166, 251)`, the red component is 52, green is 166, and blue is 251. Since the blue component is the largest, the resulting color will be bluish. In the `.lava` rule, the first number (red) is the largest.
+Правило `background` задає колір фону. CSS дозволяє задавати кольори як словами (`white`), так і у форматі `rgb(R, G, B)`, де червона, зелена і синя складові кольору розділені трьома числами від 0 до 255. У форматі `rgb(52, 166, 251)` червона складова дорівнює 52, зелена - 166, а синя - 251. Оскільки синя складова є найбільшою, результуючий колір буде синюватим. У правилі `.lava` перше число (червоне) є найбільшим.
 
 {{index [DOM, graphics]}}
 
-We draw each ((actor)) by creating a DOM element for it and setting that element's position and size based on the actor's properties. The values must be multiplied by `scale` to go from game units to pixels.
+Ми малюємо кожен ((actor)), створюючи для нього DOM-елемент і встановлюючи позицію і розмір цього елемента на основі властивостей актора. Значення мають бути помножені на `scale`, щоб перейти від ігрових одиниць до пікселів.
 
 ```{includeCode: true}
 function drawActors(actors) {
-  return elt("div", {}, ...actors.map(actor => {
-    let rect = elt("div", {class: `actor ${actor.type}`});
+  return elt(«div», {}, ...actors.map(actor => {
+    let rect = elt(«div», {class: `actor ${actor.type}`});
     rect.style.width = `${actor.size.x * scale}px`;
     rect.style.height = `${actor.size.y * scale}px`;
     rect.style.left = `${actor.pos.x * scale}px`;
     rect.style.top = `${actor.pos.y * scale}px`;
-    return rect;
+    повернути rect;
   }));
 }
 ```
 
-{{index "position (CSS)", "class attribute"}}
+{{index «position (CSS)», «class attribute»}}
 
-To give an element more than one class, we separate the class names by spaces. In the following ((CSS)) code, the `actor` class gives the actors their absolute position. Their type name is used as an extra class to give them a color. We don't have to define the `lava` class again because we're reusing the class for the lava grid squares we defined earlier.
+Щоб надати елементу більше одного класу, ми розділяємо імена класів пробілами. У наступному коді ((CSS)) клас `actor` надає акторам їхню абсолютну позицію. Ім'я їхнього типу використовується як додатковий клас, щоб надати їм колір. Нам не потрібно визначати клас `lava` знову, тому що ми повторно використовуємо клас для квадратів сітки лави, які ми визначили раніше.
 
-```{lang: "css"}
-.actor  { position: absolute;            }
-.coin   { background: rgb(241, 229, 89); }
-.player { background: rgb(64, 64, 64);   }
+```{lang: «css"}
+.actor { position: absolute; }
+.coin { background: rgb(241, 229, 89); }
+.player { background: rgb(64, 64, 64); }
 ```
 
-{{index graphics, optimization, efficiency, [state, "of application"], [DOM, graphics]}}
+{{індекс графіки, оптимізація, ефективність, [стан, «додатку»], [DOM, графіка]}}
 
-The `syncState` method is used to make the display show a given state. It first removes the old actor graphics, if any, and then redraws the actors in their new positions. It may be tempting to try to reuse the DOM elements for actors, but to make that work, we would need a lot of additional bookkeeping to associate actors with DOM elements and to make sure we remove elements when their actors vanish. Since there will typically be only a handful of actors in the game, redrawing all of them is not expensive.
+Метод ``синхронізувати стан`` використовується для того, щоб змусити дисплей показувати заданий стан. Він спочатку видаляє стару графіку акторів, якщо така є, а потім перемальовує акторів у нові позиції. Може виникнути спокуса спробувати повторно використати DOM-елементи для акторів, але для цього нам знадобиться багато додаткового обліку, щоб пов'язати акторів з DOM-елементами і переконатися, що ми видаляємо елементи, коли їхні актори зникають. Оскільки у грі зазвичай буде лише декілька акторів, перемальовування їх усіх не буде дорогим.
 
 ```{includeCode: true}
 DOMDisplay.prototype.syncState = function(state) {
@@ -449,31 +448,31 @@ DOMDisplay.prototype.syncState = function(state) {
 };
 ```
 
-{{index level, "class attribute"}}
+{{index level, «атрибут класу»}}
 
-By adding the level's current status as a class name to the wrapper, we can style the player actor slightly differently when the game is won or lost by adding a ((CSS)) rule that takes effect only when the player has an ((ancestor element)) with a given class.
+Додавши поточний стан рівня як ім'я класу до обгортки, ми можемо дещо по-іншому стилізувати актор гравця, коли гра виграна або програна, додавши правило ((CSS)), яке вступає в силу лише тоді, коли у гравця є ((елемент-предк)) з заданим класом.
 
-```{lang: "css"}
+```{lang: «css"}}
 .lost .player {
   background: rgb(160, 64, 64);
 }
-.won .player {
+.win .player {
   box-shadow: -4px -7px 8px white, 4px -7px 8px white;
 }
 ```
 
-{{index player, "box shadow (CSS)"}}
+{{index player, «box shadow (CSS)»}}
 
-After touching ((lava)), the player turns dark red, suggesting scorching. When the last coin has been collected, we add two blurred white shadows—one to the upper left and one to the upper right—to create a white halo effect.
+Після дотику до ((лава)) гравець стає темно-червоним, що вказує на те, що його обпікає. Коли буде зібрано останню монету, ми додамо дві розмиті білі тіні - одну вгорі ліворуч і одну вгорі праворуч, щоб створити ефект білого ореолу.
 
 {{id viewport}}
 
-{{index "position (CSS)", "max-width (CSS)", "overflow (CSS)", "max-height (CSS)", viewport, scrolling, [DOM, graphics]}}
+{{index «position (CSS)», «max-width (CSS)», «overflow (CSS)», «max-height (CSS)», viewport, scrolling, [DOM, graphics]}}
 
-We can't assume that the level always fits in the _viewport_, the element into which we draw the game. That is why we need the `scrollPlayerIntoView` call: it ensures that if the level is protruding outside the viewport, we scroll that viewport to make sure the player is near its center. The following ((CSS)) gives the game's wrapping DOM element a maximum size and ensures that anything that sticks out of the element's box is not visible. We also give it a relative position so that the actors inside it are positioned relative to the level's upper-left corner.
+Ми не можемо припустити, що рівень завжди поміщається в _viewport_, елемент, в який ми малюємо гру. Ось чому нам потрібен виклик `scrollPlayerIntoView`: він гарантує, що якщо рівень виступає за межі області перегляду, ми прокрутимо цю область перегляду, щоб переконатися, що гравець знаходиться біля її центру. Наступний код ((CSS)) надає DOM-елементу гри максимальний розмір і гарантує, що все, що стирчить з поля елемента, не буде видимим. Ми також задаємо йому відносну позицію, щоб актори всередині нього розташовувалися відносно верхнього лівого кута рівня.
 
 ```{lang: css}
-.game {
+.game {{lang: css}
   overflow: hidden;
   max-width: 600px;
   max-height: 450px;
@@ -481,17 +480,17 @@ We can't assume that the level always fits in the _viewport_, the element into w
 }
 ```
 
-{{index scrolling}}
+{{індекс прокрутки}}
 
-In the `scrollPlayerIntoView` method, we find the player's position and update the wrapping element's scroll position. We change the scroll position by manipulating that element's `scrollLeft` and `scrollTop` properties when the player is too close to the edge.
+У методі `scrollPlayerIntoView` ми знаходимо позицію гравця та оновлюємо позицію прокрутки елемента обгортки. Ми змінюємо позицію прокрутки, маніпулюючи властивостями `scrollLeft` та `scrollTop` цього елемента, коли гравець знаходиться надто близько до краю.
 
 ```{includeCode: true}
 DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
-  let width = this.dom.clientWidth;
-  let height = this.dom.clientHeight;
+  let width = this.dom.clientWidth
+  let height = this.dom.clientHeight
   let margin = width / 3;
 
-  // The viewport
+  // Екран перегляду
   let left = this.dom.scrollLeft, right = left + width;
   let top = this.dom.scrollTop, bottom = top + height;
 
@@ -501,89 +500,89 @@ DOMDisplay.prototype.scrollPlayerIntoView = function(state) {
 
   if (center.x < left + margin) {
     this.dom.scrollLeft = center.x - margin;
-  } else if (center.x > right - margin) {
+  } else if (center.x > right - margin) { this.dom.scrollLeft = center.x - margin; }
     this.dom.scrollLeft = center.x + margin - width;
   }
   if (center.y < top + margin) {
-    this.dom.scrollTop = center.y - margin;
-  } else if (center.y > bottom - margin) {
-    this.dom.scrollTop = center.y + margin - height;
+    this.dom.scrollTop = center.y - margin
+  } else if (center.y > bottom - margin) { this.dom.scrollTop = center.y - margin; } if (center.y > bottom - margin)
+    this.dom.scrollTop = center.y + margin - height
   }
 };
 ```
 
-{{index center, coordinates, readability}}
+{{індекс центру, координати, читабельність}}
 
-The way the player's center is found shows how the methods on our `Vec` type allow computations with objects to be written in a relatively readable way. To find the actor's center, we add its position (its upper-left corner) and half its size. That is the center in level coordinates, but we need it in pixel coordinates, so we then multiply the resulting vector by our display scale.
+Спосіб знаходження центру гравця показує, як методи нашого типу `Vec` дозволяють записувати обчислення з об'єктами у відносно читабельному вигляді. Щоб знайти центр актора, ми додаємо його позицію (верхній лівий кут) і половину його розміру. Це центр у координатах рівня, але нам потрібен центр у координатах пікселів, тому ми помножимо отриманий вектор на наш масштаб відображення.
 
-{{index validation}}
+{Перевірка індексів
 
-Next, a series of checks verifies that the player position isn't outside of the allowed range. Note that sometimes this will set nonsense scroll coordinates that are below zero or beyond the element's scrollable area. This is okay—the DOM will constrain them to acceptable values. Setting `scrollLeft` to `-10` will cause it to become `0`.
+Далі виконується низка перевірок, щоб переконатися, що позиція гравця не виходить за межі дозволеного діапазону. Зауважте, що іноді це може призвести до встановлення безглуздих координат прокрутки, які є меншими за нуль або виходять за межі області прокрутки елемента. Це нормально - DOM обмежить їх до прийнятних значень. Встановлення значення `scrollLeft` у `-10` призведе до того, що воно стане рівним `0`.
 
-While it would have been slightly simpler to always try to scroll the player to the center of the ((viewport)), this creates a rather jarring effect. As you are jumping, the view will constantly shift up and down. It's more pleasant to have a "neutral" area in the middle of the screen where you can move around without causing any scrolling.
+Хоча було б трохи простіше завжди намагатися прокручувати плеєр до центру ((області перегляду)), це створює досить незручний ефект. Коли ви стрибаєте, вид постійно зміщується вгору і вниз. Приємніше мати «нейтральну» область посередині екрана, де ви можете переміщатися, не спричиняючи скролінгу.
 
-{{index [game, screenshot]}}
+{{індекс [гри, скріншот]}}
 
-We are now able to display our tiny level.
+Тепер ми можемо відобразити наш крихітний рівень.
 
 ```{lang: html}
-<link rel="stylesheet" href="css/game.css">
+<link rel=«stylesheet» href=«css/game.css»>
 
 <script>
   let simpleLevel = new Level(simpleLevelPlan);
   let display = new DOMDisplay(document.body, simpleLevel);
   display.syncState(State.start(simpleLevel));
-</script>
+</script> </span> </span> </span> </span> </span
 ```
 
 {{if book
 
-{{figure {url: "img/game_simpleLevel.png", alt: "Screenshot of the rendered level", width: "7cm"}}}
+{{figure {url: «img/game_simpleLevel.png», alt: «Скріншот зображеного рівня», width: “7cm”}}}}
 
 if}}
 
-{{index "link (HTML tag)", CSS}}
+{{index «link (HTML-тег)», CSS}}
 
-The `<link>` tag, when used with `rel="stylesheet"`, is a way to load a CSS file into a page. The file `game.css` contains the styles necessary for our game.
+Тег `<link>`, коли він використовується з `rel=«stylesheet»`, є способом завантаження файлу CSS на сторінку. Файл `game.css` містить стилі, необхідні для нашої гри.
 
-## Motion and collision
+## Рух та зіткнення
 
-{{index physics, [animation, "platform game"]}}
+{{index physics, [animation, «platform game»]}}
 
-Now we're at the point where we can start adding motion. The basic approach taken by most games like this is to split ((time)) into small steps and, for each step, move the actors by a distance corresponding to their speed multiplied by the size of the time step. We'll measure time in seconds, so speeds are expressed in units per second.
+Тепер ми підійшли до того моменту, коли можна починати додавати рух. Основний підхід, який використовується у більшості подібних ігор, полягає у тому, щоб розбити ((час)) на невеликі кроки і на кожному кроці переміщати акторів на відстань, що відповідає їх швидкості, помноженій на розмір кроку часу. Ми будемо вимірювати час у секундах, тому швидкості виражаються в одиницях за секунду.
 
-{{index obstacle, "collision detection"}}
+{{індекс перешкоди, «виявлення зіткнень»}}
 
-Moving things is easy. The difficult part is dealing with the interactions between the elements. When the player hits a wall or floor, they should not simply move through it. The game must notice when a given motion causes an object to hit another object and respond accordingly. For walls, the motion must be stopped. When hitting a coin, that coin must be collected. When touching lava, the game should be lost.
+Переміщати речі легко. Складніше мати справу з взаємодією між елементами. Коли гравець вдаряється об стіну або підлогу, він не повинен просто проходити крізь неї. Гра повинна помічати, коли певний рух призводить до того, що об'єкт вдаряється об інший об'єкт, і реагувати відповідно. Для стін рух повинен бути зупинений. При ударі об монету, цю монету потрібно зібрати. При дотику до лави гра повинна бути програна.
 
-Solving this for the general case is a major task. You can find libraries, usually called _((physics engine))s_, that simulate interaction between physical objects in two or three ((dimensions)). We'll take a more modest approach in this chapter, handling only collisions between rectangular objects and handling them in a rather simplistic way.
+Розв'язання цієї задачі для загального випадку є серйозною проблемою. Ви можете знайти бібліотеки, які зазвичай називаються _((фізичний рушій))s_, що імітують взаємодію між фізичними об'єктами у двох або трьох ((вимірах)). У цій главі ми застосуємо скромніший підхід, розглядаючи лише зіткнення між прямокутними об'єктами і обробляючи їх у досить спрощений спосіб.
 
-{{index bouncing, "collision detection", [animation, "platform game"]}}
+{{index bouncing, «виявлення зіткнень», [анімація, «гра на платформі»]}}
 
-Before moving the ((player)) or a block of ((lava)), we test whether the motion would take it inside of a wall. If it does, we simply cancel the motion altogether. The response to such a collision depends on the type of actor—the player will stop, whereas a lava block will bounce back.
+Перед переміщенням ((гравця)) або блоку ((лави)) ми перевіряємо, чи не заведе цей рух всередину стіни. Якщо це станеться, ми просто скасовуємо рух. Реакція на таке зіткнення залежить від типу актора - гравець зупиниться, тоді як блок лави відскочить назад.
 
-{{index discretization}}
+{Дискретизація індексів
 
-This approach requires our ((time)) steps to be rather small, since it will cause motion to stop before the objects actually touch. If the time steps (and thus the motion steps) are too big, the player would end up hovering a noticeable distance above the ground. Another approach, arguably better but more complicated, would be to find the exact collision spot and move there. We will take the simple approach and hide its problems by ensuring the animation proceeds in small steps.
+Такий підхід вимагає, щоб наші ((time)) кроки були досить малими, оскільки це призведе до зупинки руху до того, як об'єкти фактично доторкнуться один до одного. Якщо кроки часу (і, відповідно, кроки руху) будуть занадто великими, гравець буде зависати на значній відстані над землею. Інший підхід, можливо, кращий, але складніший, полягає в тому, щоб знайти точне місце зіткнення і переміститися туди. Ми скористаємося простим підходом і приховаємо його недоліки, забезпечивши анімацію невеликими кроками.
 
-{{index obstacle, "touches method", "collision detection"}}
+{{index obstacle, «touches method», «collision detection»}}
 
 {{id touches}}
 
-This method tells us whether a ((rectangle)) (specified by a position and a size) touches a grid element of the given type.
+Цей метод визначає, чи торкається ((прямокутник)) (заданий позицією та розміром) елемента сітки заданого типу.
 
 ```{includeCode: true}
 Level.prototype.touches = function(pos, size, type) {
   let xStart = Math.floor(pos.x);
-  let xEnd = Math.ceil(pos.x + size.x);
-  let yStart = Math.floor(pos.y);
+  let xEnd = Math.ceil(pos.x + size.x)
+  let yStart = Math.floor(pos.y)
   let yEnd = Math.ceil(pos.y + size.y);
 
   for (let y = yStart; y < yEnd; y++) {
     for (let x = xStart; x < xEnd; x++) {
-      let isOutside = x < 0 || x >= this.width ||
+      let isOutside = x < 0 || x >= this.width || x >= this.height
                       y < 0 || y >= this.height;
-      let here = isOutside ? "wall" : this.rows[y][x];
+      let here = isOutside ? «wall» : this.rows[y][x];
       if (here == type) return true;
     }
   }
@@ -591,15 +590,15 @@ Level.prototype.touches = function(pos, size, type) {
 };
 ```
 
-{{index "Math.floor function", "Math.ceil function"}}
+{{index «Math.floor function», «Math.ceil function»}}
 
-The method computes the set of grid squares that the body ((overlap))s with by using `Math.floor` and `Math.ceil` on its ((coordinates)). Remember that ((grid)) squares are 1 by 1 units in size. By ((rounding)) the sides of a box up and down, we get the range of ((background)) squares that the box touches.
+Метод обчислює набір квадратів сітки, якими тіло ((перекривається)) перекривається, використовуючи функції `Math.floor` та `Math.ceil` на його ((координатах)). Пам'ятайте, що квадрати ((сітки)) мають розмір 1 на 1 одиницю. Округляючи сторони квадрата вгору і вниз, ми отримуємо діапазон ((фон)) квадратів, яких торкається квадрат.
 
-{{figure {url: "img/game-grid.svg", alt: "Diagram showing a grid with a black box overlaid on it. All of the grid squares that are partially covered by the block are marked.", width: "3cm"}}}
+{{figure {url: «img/game-grid.svg», alt: «Діаграма, що показує сітку з накладеною на неї чорною коробкою. Всі клітинки сітки, які частково покриваються блоком, позначено.», width: “3cm”}}}.
 
-We loop over the block of ((grid)) squares found by ((rounding)) the ((coordinates)) and return `true` when a matching square is found. Squares outside of the level are always treated as `"wall"` to ensure that the player can't leave the world and that we won't accidentally try to read outside of the bounds of our `rows` array.
+Ми обходимо блок ((сітка)) квадратів, знайдених за ((округлення)) ((координати)), і повертаємо `true`, коли знайдено відповідний квадрат. Клітинки за межами рівня завжди розглядаються як «стіна», щоб гарантувати, що гравець не зможе покинути світ, і що ми випадково не спробуємо прочитати за межами нашого масиву `rows`.
 
-The state `update` method uses `touches` to figure out whether the player is touching lava.
+Метод state `update` використовує `touches`, щоб з'ясувати, чи торкається гравець лави.
 
 ```{includeCode: true}
 State.prototype.update = function(time, keys) {
@@ -607,11 +606,11 @@ State.prototype.update = function(time, keys) {
     .map(actor => actor.update(time, this, keys));
   let newState = new State(this.level, actors, this.status);
 
-  if (newState.status != "playing") return newState;
+  if (newState.status != «playing») return newState;
 
   let player = newState.player;
-  if (this.level.touches(player.pos, player.size, "lava")) {
-    return new State(this.level, actors, "lost");
+  if (this.level.touches(player.pos, player.size, «lava»)) { {
+    return new State(this.level, actors, «lost»);
   }
 
   for (let actor of actors) {
@@ -623,64 +622,64 @@ State.prototype.update = function(time, keys) {
 };
 ```
 
-The method is passed a time step and a data structure that tells it which keys are being held down. The first thing it does is call the `update` method on all actors, producing an array of updated actors. The actors also get the time step, the keys, and the state so that they can base their update on those. Only the player will actually read keys, since that's the only actor that's controlled by the keyboard.
+Методу передається часовий крок і структура даних, яка вказує йому, які клавіші утримуються натиснутими. Перше, що він робить, це викликає метод `update` для всіх акторів, створюючи масив оновлених акторів. Актори також отримують часовий крок, ключі та стан, щоб вони могли базувати своє оновлення на цих даних. Тільки гравець буде читати ключі, оскільки це єдиний актор, який керується за допомогою клавіатури.
 
-If the game is already over, no further processing has to be done (the game can't be won after being lost, or vice versa). Otherwise, the method tests whether the player is touching background lava. If so, the game is lost and we're done. Finally, if the game really is still going on, it sees whether any other actors overlap the player.
+Якщо гру вже завершено, то ніякої подальшої обробки не потрібно робити (гру не можна виграти після програшу, або навпаки). В іншому випадку метод перевіряє, чи торкається гравець фонової лави. Якщо так, то гру програно, і на цьому все. Нарешті, якщо гра все ще триває, метод перевіряє, чи не перекривають гравця інші актори.
 
-Overlap between actors is detected with the `overlap` function. It takes two actor objects and returns `true` when they touch—which is the case when they overlap both along the x-axis and along the y-axis.
+Перекриття між акторами виявляється за допомогою функції `overlap`. Вона приймає два об'єкти-актори і повертає «true», коли вони дотикаються - це відбувається у випадку, коли вони перекриваються як по осі x, так і по осі y.
 
 ```{includeCode: true}
 function overlap(actor1, actor2) {
   return actor1.pos.x + actor1.size.x > actor2.pos.x &&
          actor1.pos.x < actor2.pos.x + actor2.size.x &&
          actor1.pos.y + actor1.size.y > actor2.pos.y &&
-         actor1.pos.y < actor2.pos.y + actor2.size.y;
+         actor1.pos.y < actor2.pos.y + actor2.size.y
 }
 ```
 
-If any actor does overlap, its `collide` method gets a chance to update the state. Touching a lava actor sets the game status to `"lost"`. Coins vanish when you touch them and set the status to `"won"` when they are the last coin of the level.
+Якщо якийсь актор перекривається, його метод `collide` отримує можливість оновити стан. Дотик до лавового актора встановлює стан гри у ``загублено``. Монети зникають при дотику до них і встановлюють статус ``виграно``, коли це остання монета на рівні.
 
 ```{includeCode: true}
 Lava.prototype.collide = function(state) {
-  return new State(state.level, state.actors, "lost");
+  return new State(state.level, state.actors, «lost»);
 };
 
 Coin.prototype.collide = function(state) {
   let filtered = state.actors.filter(a => a != this);
   let status = state.status;
-  if (!filtered.some(a => a.type == "coin")) status = "won";
+  if (!filtered.some(a => a.type == «coin»)) status = «won»;
   return new State(state.level, filtered, status);
 };
 ```
 
 {{id actors}}
 
-## Actor updates
+## Оновлення акторів
 
-{{index actor, "Lava class", lava}}
+{{index actor, «Клас лави», lava}}
 
-Actor objects' `update` methods take as arguments the time step, the state object, and a `keys` object. The one for the `Lava` actor type ignores the `keys` object.
+Методи `update` об'єктів акторів приймають як аргументи часовий крок, об'єкт стану та об'єкт `keys`. Метод для типу актора `Lava` ігнорує об'єкт `keys`.
 
 ```{includeCode: true}
 Lava.prototype.update = function(time, state) {
-  let newPos = this.pos.plus(this.speed.times(time));
-  if (!state.level.touches(newPos, this.size, "wall")) {
+  нехай newPos = this.pos.plus(this.speed.times(time));
+  if (!state.level.touches(newPos, this.size, «стіна»)) {
     return new Lava(newPos, this.speed, this.reset);
   } else if (this.reset) {
-    return new Lava(this.reset, this.speed, this.reset);
+    повернути new Lava(this.reset, this.speed, this.reset);
   } else {
     return new Lava(this.pos, this.speed.times(-1));
   }
 };
 ```
 
-{{index bouncing, multiplication, "Vec class", "collision detection"}}
+{{index bouncing, multiplication, «Vec class», «collision detection»}}
 
-This `update` method computes a new position by adding the product of the ((time)) step and the current speed to its old position. If no obstacle blocks that new position, it moves there. If there is an obstacle, the behavior depends on the type of the ((lava)) block—dripping lava has a `reset` position, to which it jumps back when it hits something. Bouncing lava inverts its speed by multiplying it by `-1` so that it starts moving in the opposite direction.
+Цей метод `update` обчислює нову позицію, додаючи до старої позиції добуток кроку ((time)) на поточну швидкість. Якщо нова позиція не блокується перешкодою, вона переміщується туди. Якщо перешкода є, поведінка залежить від типу блоку ((лава)): лава, що капає, має позицію «скидання», на яку вона відскакує, коли вдаряється об щось. Лава, що стрибає, інвертує свою швидкість, помноживши її на `-1`, так що вона починає рухатися у зворотному напрямку.
 
-{{index "Coin class", coin, wave}}
+{{index «Coin class», coin, wave}}
 
-Coins use their `update` method to wobble. They ignore collisions with the grid, since they are simply wobbling around inside of their own square.
+Монети використовують свій метод `update` для коливання. Вони ігнорують зіткнення з сіткою, оскільки просто коливаються всередині власного квадрату.
 
 ```{includeCode: true}
 const wobbleSpeed = 8, wobbleDist = 0.07;
@@ -693,17 +692,17 @@ Coin.prototype.update = function(time) {
 };
 ```
 
-{{index "Math.sin function", sine, phase}}
+{{index «Math.sin function», sine, phase}}
 
-The `wobble` property is incremented to track time and then used as an argument to `Math.sin` to find the new position on the ((wave)). The coin's current position is then computed from its base position and an offset based on this wave.
+Властивість `wobble` інкрементується для відстеження часу, а потім використовується як аргумент функції `Math.sin` для знаходження нової позиції на ((хвилі)). Поточна позиція монети обчислюється з її базової позиції та зміщення на основі цієї хвилі.
 
-{{index "collision detection", "Player class"}}
+{{index «collision detection», «Player class»}}
 
-That leaves the ((player)) itself. Player motion is handled separately per ((axis)) because hitting the floor should not prevent horizontal motion, and hitting a wall should not stop falling or jumping motion.
+Залишається сам ((гравець)). Рух гравця обробляється окремо за ((віссю)), оскільки удар об підлогу не повинен перешкоджати горизонтальному руху, а удар об стіну не повинен зупиняти падіння або стрибки.
 
 ```{includeCode: true}
 const playerXSpeed = 7;
-const gravity = 30;
+const gravity = 30
 const jumpSpeed = 17;
 
 Player.prototype.update = function(time, state, keys) {
@@ -712,15 +711,15 @@ Player.prototype.update = function(time, state, keys) {
   if (keys.ArrowRight) xSpeed += playerXSpeed;
   let pos = this.pos;
   let movedX = pos.plus(new Vec(xSpeed * time, 0));
-  if (!state.level.touches(movedX, this.size, "wall")) {
+  if (!state.level.touches(movedX, this.size, «wall»)) {
     pos = movedX;
   }
 
   let ySpeed = this.speed.y + time * gravity;
   let movedY = pos.plus(new Vec(0, ySpeed * time));
-  if (!state.level.touches(movedY, this.size, "wall")) {
+  if (!state.level.touches(movedY, this.size, «wall»)) {
     pos = movedY;
-  } else if (keys.ArrowUp && ySpeed > 0) {
+  } else if (keys.ArrowUp && ySpeed > 0) { { pos = movedY; } else if (keys.ArrowUp && ySpeed > 0) {
     ySpeed = -jumpSpeed;
   } else {
     ySpeed = 0;
@@ -729,71 +728,71 @@ Player.prototype.update = function(time, state, keys) {
 };
 ```
 
-{{index [animation, "platform game"], keyboard}}
+{{index [animation, «platform game»], keyboard}}
 
-The horizontal motion is computed based on the state of the left and right arrow keys. When there's no wall blocking the new position created by this motion, it is used. Otherwise, the old position is kept.
+Горизонтальний рух обчислюється на основі стану клавіш зі стрілками вліво та вправо. Якщо немає стіни, що блокує нову позицію, створену цим рухом, вона використовується. В іншому випадку зберігається стара позиція.
 
-{{index acceleration, physics}}
+{{прискорення індексу, фізика}}
 
-Vertical motion works in a similar way but has to simulate ((jumping)) and ((gravity)). The player's vertical speed (`ySpeed`) is first accelerated to account for ((gravity)).
+Вертикальний рух працює аналогічно, але має імітувати ((стрибки)) і ((гравітацію)). Вертикальна швидкість гравця (`ySpeed`) спочатку прискорюється, щоб врахувати ((гравітацію)).
 
-{{index "collision detection", keyboard, jumping}}
+{{індекс «виявлення зіткнень», клавіатура, стрибки}}
 
-We check for walls again. If we don't hit any, the new position is used. If there _is_ a wall, there are two possible outcomes. When the up arrow is pressed _and_ we are moving down (meaning the thing we hit is below us), the speed is set to a relatively large, negative value. This causes the player to jump. If that is not the case, the player simply bumped into something, and the speed is set to zero.
+Знову перевіряємо наявність стін. Якщо ми не натрапили на жодну, використовується нова позиція. Якщо стіна _є_, то можливі два варіанти розвитку подій. Коли натиснуто стрілку вгору,  і ми рухаємося вниз (тобто предмет, в який ми влучили, знаходиться під нами), швидкість встановлюється на відносно велике від'ємне значення. Це змушує гравця підстрибнути. Якщо цього не сталося, то гравець просто врізався в щось, і швидкість встановлюється на нуль.
 
-The gravity strength, ((jumping)) speed, and other ((constant))s in the game were determined by simply trying out some numbers and seeing which ones felt right. You can try experimenting with them.
+Сила гравітації, швидкість ((стрибка)) та інші ((константи)) у грі були визначені шляхом простого експериментування з деякими числами і визначенням того, які з них підходять. Ви можете спробувати поекспериментувати з ними.
 
-## Tracking keys
+## Клавіші відстеження
 
-{{index keyboard}}
+{{індекс клавіатури}}
 
-For a ((game)) like this, we do not want keys to take effect once per keypress. Rather, we want their effect (moving the player figure) to stay active as long as they are held.
+Для такої ((гри)), як ця, ми не хочемо, щоб клавіші спрацьовували один раз при натисканні. Навпаки, ми хочемо, щоб їхній ефект (переміщення фігурки гравця) залишався активним доти, доки їх утримують.
 
-{{index "preventDefault method"}}
+{{index «preventDefault method»}}
 
-We need to set up a key handler that stores the current state of the left, right, and up arrow keys. We will also want to call `preventDefault` for those keys so that they don't end up ((scrolling)) the page.
+Нам потрібно створити обробник клавіш, який зберігатиме поточний стан клавіш зі стрілками ліворуч, праворуч та вгору. Ми також захочемо викликати `preventDefault` для цих клавіш, щоб вони не закінчували ((прокручування)) сторінку.
 
-{{index "trackKeys function", "key code", "event handling", "addEventListener method"}}
+{{index «trackKeys function», «key code», «event handling», «addEventListener method»}}
 
-The following function, when given an array of key names, will return an object that tracks the current position of those keys. It registers event handlers for `"keydown"` and `"keyup"` events and, when the key code in the event is present in the set of codes that it is tracking, updates the object.
+Наступна функція за масивом назв клавіш поверне об'єкт, який відстежує поточну позицію цих клавіш. Вона реєструє обробники подій ``keydown`` та ``keyup`` і, коли код клавіші у події присутній у наборі кодів, які вона відстежує, оновлює об'єкт.
 
 ```{includeCode: true}
 function trackKeys(keys) {
   let down = Object.create(null);
   function track(event) {
     if (keys.includes(event.key)) {
-      down[event.key] = event.type == "keydown";
+      down[event.key] = event.type == «keydown»;
       event.preventDefault();
     }
   }
-  window.addEventListener("keydown", track);
-  window.addEventListener("keyup", track);
-  return down;
+  window.addEventListener(«keydown», track);
+  window.addEventListener(«keyup», track);
+  повернути вниз;
 }
 
 const arrowKeys =
-  trackKeys(["ArrowLeft", "ArrowRight", "ArrowUp"]);
+  trackKeys([«ArrowLeft», «ArrowRight», «ArrowUp»]);
 ```
 
-{{index "keydown event", "keyup event"}}
+{{index «keydown event», «keyup event»}}
 
-The same handler function is used for both event types. It looks at the event object's `type` property to determine whether the key state should be updated to true (`"keydown"`) or false (`"keyup"`).
+Для обох типів подій використовується однакова функція-обробник. Вона перевіряє властивість `type` об'єкта події, щоб визначити, чи слід оновити стан клавіші на true (`«keydown»`) або false (`«keyup»`).
 
 {{id runAnimation}}
 
-## Running the game
+## Запуск гри
 
-{{index "requestAnimationFrame function", [animation, "platform game"]}}
+{{index «requestAnimationFrame function», [animation, «platform game»]}}
 
-The `requestAnimationFrame` function, which we saw in [Chapter ?](dom#animationFrame), provides a good way to animate a game. But its interface is quite primitive—using it requires us to track the time at which our function was called the last time around and call `requestAnimationFrame` again after every frame.
+Функція `requestAnimationFrame`, яку ми розглядали у [Главі ?](dom#animationFrame), надає хороший спосіб анімувати гру. Але її інтерфейс досить примітивний - використання цієї функції вимагає від нас відстежувати час останнього виклику нашої функції і викликати `requestAnimationFrame` знову після кожного кадру.
 
-{{index "runAnimation function", "callback function", [function, "as value"], [function, "higher-order"], [animation, "platform game"]}}
+{{index «runAnimation function», «callback function», [function, «as value»], [function, «higher-order»], [animation, «platform game»]}}
 
-Let's define a helper function that wraps all that in a convenient interface and allows us to simply call `runAnimation`, giving it a function that expects a time difference as an argument and draws a single frame. When the frame function returns the value `false`, the animation stops.
+Визначимо допоміжну функцію, яка обгорне все це у зручний інтерфейс і дозволить нам просто викликати `runAnimation`, передавши їй функцію, яка очікує різницю в часі як аргумент і малює один кадр. Коли функція frame повертає значення `false`, анімація зупиняється.
 
 ```{includeCode: true}
 function runAnimation(frameFunc) {
-  let lastTime = null;
+  нехай lastTime = null;
   function frame(time) {
     if (lastTime != null) {
       let timeStep = Math.min(time - lastTime, 100) / 1000;
@@ -806,15 +805,15 @@ function runAnimation(frameFunc) {
 }
 ```
 
-{{index time, discretization}}
+{{індексний час, дискретизація}}
 
-I have set a maximum frame step of 100 milliseconds (one-tenth of a second). When the browser tab or window with our page is hidden, `requestAnimationFrame` calls will be suspended until the tab or window is shown again. In this case, the difference between `lastTime` and `time` will be the entire time in which the page was hidden. Advancing the game by that much in a single step would look silly and might cause weird side effects, such as the player falling through the floor.
+Я встановив максимальний крок кадру в 100 мілісекунд (одна десята секунди). Коли вкладку або вікно браузера з нашою сторінкою буде приховано, виклики `requestAnimationFrame` буде призупинено, доки вкладку або вікно не буде показано знову. У цьому випадку різниця між `lastTime` і `time` буде складати весь час, протягом якого сторінка була прихована. Просування гри на стільки за один крок виглядало б нерозумно і могло б викликати дивні побічні ефекти, такі як падіння гравця крізь підлогу.
 
-The function also converts the time steps to seconds, which are an easier quantity to think about than milliseconds.
+Функція також конвертує кроки у секунди, які є більш зручними для сприйняття, ніж мілісекунди.
 
-{{index "callback function", "runLevel function", [animation, "platform game"]}}
+{{index «функція зворотного виклику», «функція runLevel», [animation, «platform game»]}}
 
-The `runLevel` function takes a `Level` object and a ((display)) constructor and returns a promise. It displays the level (in `document.body`) and lets the user play through it. When the level is finished (lost or won), `runLevel` waits one more second (to let the user see what happens) and then clears the display, stops the animation, and resolves the promise to the game's end status.
+Функція `runLevel` приймає об'єкт `Level` та конструктор ((display)) і повертає обіцянку. Вона відображає рівень (у `document.body`) і дозволяє користувачеві пройти його. Коли рівень завершено (програно або виграно), `runLevel` чекає ще одну секунду (щоб користувач побачив, що сталося), а потім очищає дисплей, зупиняє анімацію і перетворює обіцянку на стан завершення гри.
 
 ```{includeCode: true}
 function runLevel(level, Display) {
@@ -825,7 +824,7 @@ function runLevel(level, Display) {
     runAnimation(time => {
       state = state.update(time, arrowKeys);
       display.syncState(state);
-      if (state.status == "playing") {
+      if (state.status == «playing») {
         return true;
       } else if (ending > 0) {
         ending -= time;
@@ -840,102 +839,102 @@ function runLevel(level, Display) {
 }
 ```
 
-{{index "runGame function"}}
+{{index «runGame function»}}
 
-A game is a sequence of ((level))s. Whenever the ((player)) dies, the current level is restarted. When a level is completed, we move on to the next level. This can be expressed by the following function, which takes an array of level plans (strings) and a ((display)) constructor:
+Гра - це послідовність ((рівнів)). Щоразу, коли ((гравець)) помирає, поточний рівень перезапускається. Коли рівень завершено, ми переходимо до наступного рівня. Це можна виразити наступною функцією, яка отримує масив планів рівнів (рядків) і конструктор ((display)):
 
 ```{includeCode: true}
 async function runGame(plans, Display) {
   for (let level = 0; level < plans.length;) {
     let status = await runLevel(new Level(plans[level]),
                                 Display);
-    if (status == "won") level++;
+    if (status == «won») level++;
   }
-  console.log("You've won!");
+  console.log(«Ви виграли!»);
 }
 ```
 
-{{index "asynchronous programming", "event handling"}}
+{{index «asynchronous programming», «event handling»}}
 
-Because we made `runLevel` return a promise, `runGame` can be written using an `async` function, as shown in [Chapter ?](async). It returns another promise, which resolves when the player finishes the game.
+Оскільки ми змусили `runLevel` повертати обіцянку, `runGame` можна написати з використанням функції `async`, як показано у [Глава ?](async). Вона повертає іншу обіцянку, яка виконується, коли гравець завершує гру.
 
-{{index game, "GAME_LEVELS dataset"}}
+{{index game, «GAME_LEVELS dataset»}}
 
-There is a set of ((level)) plans available in the `GAME_LEVELS` binding in [this chapter's sandbox](https://eloquentjavascript.net/code#16)[ ([_https://eloquentjavascript.net/code#16_](https://eloquentjavascript.net/code#16))]{if book}. This page feeds them to `runGame`, starting an actual game.
+У зв'язці `GAME_LEVELS` у [пісочниці цієї глави](https://eloquentjavascript.net/code#16)[ ([_https://eloquentjavascript.net/code#16_](https://eloquentjavascript.net/code#16))]{if book} є набір планів ((рівень)), доступних у зв'язці `GAME_LEVELS`. Ця сторінка передає їх до `runGame`, запускаючи власне гру.
 
 ```{sandbox: null, focus: yes, lang: html, startCode: true}
-<link rel="stylesheet" href="css/game.css">
+<link rel=«stylesheet» href=«css/game.css»>
 
 <body>
   <script>
     runGame(GAME_LEVELS, DOMDisplay);
-  </script>
-</body>
+  </script> </script> </span> </span> </span
+</body></body>
 ```
 
-{{if interactive
+{{if інтерактивний
 
-See if you can beat those. I had fun building them.
+Подивись, чи зможеш ти побити їх. Мені було весело будувати їх.
 
 if}}
 
-## Exercises
+## Вправи
 
-### Game over
+## Гра завершена
 
-{{index "lives (exercise)", game}}
+{{index «lives (вправа)», game}}
 
-It's traditional for ((platform game))s to have the player start with a limited number of _lives_ and subtract one life each time they die. When the player is out of lives, the game restarts from the beginning.
+Традиційно для ((платформних ігор)) гравець починає гру з обмеженою кількістю _життєй_ і віднімає по одному життю щоразу, коли помирає. Коли у гравця закінчуються життя, гра починається з початку.
 
-{{index "runGame function"}}
+{{index «runGame function»}}
 
-Adjust `runGame` to implement lives. Have the player start with three. Output the current number of lives (using `console.log`) every time a level starts.
+Налаштуйте `runGame` для реалізації життів. Нехай гравець починає з трьох. Виводити поточну кількість життів (за допомогою `console.log`) кожного разу, коли починається рівень.
 
 {{if interactive
 
 ```{lang: html, test: no, focus: yes}
-<link rel="stylesheet" href="css/game.css">
+<link rel=«stylesheet» href=«css/game.css»>
 
 <body>
 <script>
-  // The old runGame function. Modify it...
+  // Стара функція runGame. Модифікуємо її...
   async function runGame(plans, Display) {
     for (let level = 0; level < plans.length;) {
       let status = await runLevel(new Level(plans[level]),
                                   Display);
-      if (status == "won") level++;
+      if (status == «won») level++;
     }
-    console.log("You've won!");
+    console.log(«Ви виграли!»);
   }
   runGame(GAME_LEVELS, DOMDisplay);
-</script>
-</body>
+</script> </span> </span> </span> </span
+</body></body>
 ```
 
 if}}
 
-### Pausing the game
+### Ставимо гру на паузу
 
-{{index "pausing (exercise)", "escape key", keyboard, "runLevel function", "event handling"}}
+{{index «pausing (exercise)», «escape key», keyboard, «runLevel function», «event handling»}}
 
-Make it possible to pause (suspend) and unpause the game by pressing [esc]{keyname}. You can do this by changing the `runLevel` function to set up a keyboard event handler that interrupts or resumes the animation whenever [esc]{keyname} is hit.
+Зробіть так, щоб гру можна було ставити на паузу (призупиняти) та виводити з паузи натисканням [esc]{назва клавіші}. Це можна зробити, змінивши функцію `runLevel` на обробник подій клавіатури, який перериває або відновлює анімацію при натисканні [esc]{ключова назва}.
 
-{{index "runAnimation function"}}
+{{index «runAnimation function»}}
 
-The `runAnimation` interface may not look like it is suitable for this at first glance, but it is if you rearrange the way `runLevel` calls it.
+На перший погляд може здатися, що інтерфейс `runAnimation` не підходить для цього, але це не так, якщо змінити спосіб виклику `runLevel`.
 
-{{index [binding, global], "trackKeys function"}}
+{{index [binding, global], «trackKeys function»}}
 
-When you have that working, there's something else you can try. The way we've been registering keyboard event handlers is somewhat problematic. The `arrowKeys` object is currently a global binding, and its event handlers are kept around even when no game is running. You could say they _((leak))_ out of our system. Extend `trackKeys` to provide a way to unregister its handlers, then change `runLevel` to register its handlers when it starts and unregister them again when it is finished.
+Коли у вас це запрацює, ви можете спробувати дещо інше. Спосіб, у який ми реєстрували обробники подій клавіатури, є дещо проблематичним. Об'єкт `arrowKeys` наразі є глобальною прив'язкою, і його обробники подій залишаються доступними навіть тоді, коли гру не запущено. Можна сказати, що вони _((витікають))_ з нашої системи. Розширте `trackKeys`, щоб надати можливість скасовувати його обробники, а потім змініть `runLevel`, щоб він реєстрував свої обробники під час запуску гри і скасовував їх після завершення.
 
-{{if interactive
+{{if інтерактивний
 
 ```{lang: html, focus: yes, test: no}
-<link rel="stylesheet" href="css/game.css">
+<link rel=«stylesheet» href=«css/game.css»>
 
 <body>
 <script>
-  // The old runLevel function. Modify this...
+  // Стара функція runLevel. Змініть її...
   function runLevel(level, Display) {
     let display = new Display(document.body, level);
     let state = State.start(level);
@@ -944,7 +943,7 @@ When you have that working, there's something else you can try. The way we've be
       runAnimation(time => {
         state = state.update(time, arrowKeys);
         display.syncState(state);
-        if (state.status == "playing") {
+        if (state.status == «playing») {
           return true;
         } else if (ending > 0) {
           ending -= time;
@@ -959,52 +958,52 @@ When you have that working, there's something else you can try. The way we've be
   }
   runGame(GAME_LEVELS, DOMDisplay);
 </script>
-</body>
+</body></body
 ```
 
 if}}
 
 {{hint
 
-{{index "pausing (exercise)", [animation, "platform game"]}}
+{{індекс «пауза (вправа)», [анімація, «гра для платформи»]}}
 
-An animation can be interrupted by returning `false` from the function given to `runAnimation`. It can be continued by calling `runAnimation` again.
+Анімацію можна перервати, повернувши `false` з функції, переданої `runAnimation`. Її можна продовжити повторним викликом `runAnimation`.
 
-{{index closure}}
+{{закриття індексу}}
 
-So we need to communicate the fact that we are pausing the game to the function given to `runAnimation`. For that, you can use a binding that both the event handler and that function have access to.
+Отже, нам потрібно повідомити функцію, яка викликається `runAnimation`, про те, що ми ставимо гру на паузу. Для цього можна використати прив'язку, до якої матимуть доступ і обробник подій, і ця функція.
 
-{{index "event handling", "removeEventListener method", [function, "as value"]}}
+{{index «обробник подій», «removeEventListener метод», [function, «as value»]}}
 
-When finding a way to unregister the handlers registered by `trackKeys`, remember that the _exact_ same function value that was passed to `addEventListener` must be passed to `removeEventListener` to successfully remove a handler. Thus, the `handler` function value created in `trackKeys` must be available to the code that unregisters the handlers.
+Шукаючи спосіб скасувати реєстрацію обробників, зареєстрованих за допомогою `trackKeys`, пам'ятайте, що для успішного видалення обробника до `removeEventListener` має бути передано _точне_ значення функції, яке було передано до `addEventListener`. Таким чином, значення функції `handler`, створене у `trackKeys`, має бути доступним для коду, який скасовує реєстрацію обробників.
 
-You can add a property to the object returned by `trackKeys`, containing either that function value or a method that handles the unregistering directly.
+Ви можете додати властивість до об'єкта, що повертається `trackKeys`, яка міститиме або значення цієї функції, або метод, який безпосередньо обробляє скасування реєстрації.
 
-hint}}
+підказка}}
 
-### A monster
+### Монстр
 
-{{index "monster (exercise)"}}
+{{index «monster (exercise)»}}
 
-It is traditional for platform games to have enemies that you can defeat by jumping on top of them. This exercise asks you to add such an actor type to the game.
+Традиційним для платформних ігор є наявність ворогів, яких можна перемогти, стрибнувши на них зверху. У цій вправі вам пропонується додати у гру такий тип актора.
 
-We'll call this actor a monster. Monsters move only horizontally. You can make them move in the direction of the player, bounce back and forth like horizontal lava, or have any other movement pattern you want. The class doesn't have to handle falling, but it should make sure the monster doesn't walk through walls.
+Назвемо його монстром. Монстри рухаються лише по горизонталі. Ви можете змусити їх рухатися у напрямку гравця, підстрибувати вперед-назад, як горизонтальна лава, або мати будь-який інший шаблон руху, який ви хочете. Клас не зобов'язаний відповідати за падіння, але він повинен стежити за тим, щоб монстр не проходив крізь стіни.
 
-When a monster touches the player, the effect depends on whether the player is jumping on top of them or not. You can approximate this by checking whether the player's bottom is near the monster's top. If this is the case, the monster disappears. If not, the game is lost.
+Коли монстр торкається гравця, ефект залежить від того, стрибає гравець на нього чи ні. Ви можете наближено визначити це, перевіривши, чи знаходиться низ гравця поруч з верхом монстра. Якщо це так, то монстр зникає. Якщо ні, то гра програна.
 
-{{if interactive
+{{якщо інтерактивно
 
 ```{test: no, lang: html, focus: yes}
-<link rel="stylesheet" href="css/game.css">
+<link rel=«stylesheet» href=«css/game.css»>
 <style>.monster { background: purple }</style>
 
 <body>
   <script>
-    // Complete the constructor, update, and collide methods
+    // Закінчити конструктор, оновлення та методи зіткнення
     class Monster {
       constructor(pos, /* ... */) {}
 
-      get type() { return "monster"; }
+      get type() { return «monster»; }
 
       static create(pos) {
         return new Monster(pos.plus(new Vec(0, -1)));
@@ -1017,7 +1016,7 @@ When a monster touches the player, the effect depends on whether the player is j
 
     Monster.prototype.size = new Vec(1.2, 2);
 
-    levelChars["M"] = Monster;
+    levelChars[«M»] = Monster;
 
     runLevel(new Level(`
 ..................................
@@ -1028,27 +1027,27 @@ When a monster touches the player, the effect depends on whether the player is j
 .#...........................o..#.
 .#..@...........................#.
 .##########..............########.
-..........#..o..o..o..o..#........
+..........#..o..o..o..o..o..#........
 ..........#...........M..#........
 ..........################........
 ..................................
 `), DOMDisplay);
-  </script>
-</body>
+  </script> </script
+</body></body
 ```
 
 if}}
 
 {{hint
 
-{{index "monster (exercise)", "persistent data structure"}}
+{{index «monster (exercise)», «persistent data structure»}}
 
-If you want to implement a type of motion that is stateful, such as bouncing, make sure you store the necessary state in the actor object—include it as a constructor argument and add it as a property.
+Якщо ви хочете реалізувати тип руху, який залежить від стану, наприклад, підстрибування, переконайтеся, що ви зберігаєте необхідний стан в об'єкті актора - включіть його як аргумент конструктора і додайте його як властивість.
 
-Remember that `update` returns a _new_ object rather than changing the old one.
+Пам'ятайте, що `update` повертає _новий_ об'єкт, а не змінює старий.
 
-{{index "collision detection"}}
+{{index «collision detection»}}
 
-When handling collision, find the player in `state.actors` and compare its position to the monster's position. To get the _bottom_ of the player, you have to add its vertical size to its vertical position. The creation of an updated state will resemble either `Coin`'s `collide` method (removing the actor) or `Lava`'s (changing the status to `"lost"`), depending on the player position.
+При обробці зіткнення знайдіть гравця у `state.actors` і порівняйте його позицію з позицією монстра. Щоб отримати _нижню_ позицію гравця, потрібно додати його вертикальний розмір до його вертикальної позиції. Створення оновленого стану буде нагадувати або метод `collide` `Coin` (видалення актора), або `Lava` (зміна статусу на `lost`), залежно від позиції гравця.
 
-hint}}
+підказка}}
